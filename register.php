@@ -1,6 +1,75 @@
 <?php
-require_once '../functions/DbHelper.php';
+require_once 'functions/DbHelper.php';
 
+$error = '';
+$success = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // Validate form data
+  $firstName = trim($_POST['firstName'] ?? '');
+  $lastName = trim($_POST['lastName'] ?? '');
+  $email = trim($_POST['email'] ?? '');
+  $mobile = trim($_POST['mobile'] ?? '');
+  $gender = $_POST['gender'] ?? '';
+  $password = $_POST['password'] ?? '';
+  $confirmPassword = $_POST['confirmPassword'] ?? '';
+  $terms = isset($_POST['terms']);
+
+  // Basic validation
+  if (
+    empty($firstName) || empty($lastName) || empty($email) || empty($mobile) ||
+    empty($gender) || empty($password) || empty($confirmPassword)
+  ) {
+    $error = "All fields are required.";
+  } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $error = "Invalid email format.";
+  } elseif ($password !== $confirmPassword) {
+    $error = "Passwords do not match.";
+  } elseif (strlen($password) < 8) {
+    $error = "Password must be at least 8 characters long.";
+  } elseif (!$terms) {
+    $error = "You must agree to the Terms and Conditions.";
+  } else {
+    // Check if email already exists
+    if (DbHelper::emailExists($email)) {
+      $error = "Email already registered. Please use a different email.";
+    } else {
+      // Prepare username from email (part before @)
+      $username = strtolower(explode('@', $email)[0]);
+      $baseUsername = $username;
+      $counter = 1;
+
+      // Make sure username is unique
+      while (DbHelper::usernameExists($username)) {
+        $username = $baseUsername . $counter;
+        $counter++;
+      }
+
+      // Prepare user data
+      $userData = [
+        'username' => $username,
+        'email' => $email,
+        'password' => $password,
+        'full_name' => $firstName . ' ' . $lastName,
+        'role' => 'user', // Default role
+        'status' => 'active',
+        'mobile' => $mobile,
+        'gender' => $gender
+      ];
+
+      // Create user
+      $userId = DbHelper::createUser($userData);
+
+      if ($userId) {
+        $success = "Registration successful! Your username is: " . $username;
+        // Redirect to login page after 3 seconds
+        header("refresh:3;url=index.html");
+      } else {
+        $error = "Registration failed. Please try again.";
+      }
+    }
+  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -151,8 +220,34 @@ require_once '../functions/DbHelper.php';
                 </p>
               </div>
 
+              <?php if ($error): ?>
+                <div class="mb-4 bg-red-50 border-l-4 border-red-500 p-4">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                      <i class="fas fa-exclamation-circle text-red-500"></i>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm text-red-700"><?php echo htmlspecialchars($error); ?></p>
+                    </div>
+                  </div>
+                </div>
+              <?php endif; ?>
+
+              <?php if ($success): ?>
+                <div class="mb-4 bg-green-50 border-l-4 border-green-500 p-4">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                      <i class="fas fa-check-circle text-green-500"></i>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm text-green-700"><?php echo htmlspecialchars($success); ?></p>
+                    </div>
+                  </div>
+                </div>
+              <?php endif; ?>
+
               <!-- Registration Form -->
-              <form class="space-y-6">
+              <form method="POST" action="" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label
