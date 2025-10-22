@@ -9,10 +9,42 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <link
+      rel="shortcut icon"
+      href="./assets/images/favicon.png"
+      type="image/x-icon"
+    />
   </head>
   <body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
     <div class="min-h-screen flex">
-      <!-- Left Side - Login Form -->
+      <!-- Left Side - Logo -->
+      <div
+        class="hidden lg:flex flex-1 items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700"
+      >
+        <div class="text-center">
+          <div class="w-full mb-8">
+            <!-- Full width logo image -->
+            <div
+              class="w-full bg-white/90 backdrop-blur-sm shadow-xl overflow-hidden py-6 px-12"
+            >
+              <img
+                src="assets/images/logo.png"
+                alt="NWSDB Logo"
+                class="w-full h-auto max-h-48 object-contain mx-auto"
+              />
+            </div>
+          </div>
+          <h1 class="text-4xl font-bold text-white mb-4">DEVICE RECORD</h1>
+          <p class="text-xl text-blue-100 mb-2">SYSTEM</p>
+          <p class="text-xl text-blue-100">Monaragala</p>
+          <div class="mt-8 text-blue-200">
+            <p class="text-sm">Managing Device Records</p>
+            <p class="text-sm">Monaragala District</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side - Login Form -->
       <div class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full space-y-8">
           <div>
@@ -20,7 +52,7 @@
               DEVICE RECORD SYSTEM
             </h2>
             <p class="mt-2 text-center text-lg font-medium text-gray-600">
-              Kegalle
+              Monaragala
             </p>
           </div>
           <form class="mt-8 space-y-6">
@@ -98,33 +130,6 @@
               </button>
             </div>
           </form>
-        </div>
-      </div>
-
-      <!-- Right Side - Logo -->
-      <div
-        class="hidden lg:flex flex-1 items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700"
-      >
-        <div class="text-center">
-          <div class="mx-auto w-32 h-32 mb-8">
-            <!-- Logo placeholder - you can replace this with an actual logo image -->
-            <div
-              class="w-full h-full bg-white rounded-full flex items-center justify-center shadow-lg overflow-hidden"
-            >
-              <img
-                src="assets/images/logo.png"
-                alt="NWSDB Logo"
-                class="w-20 h-20 object-contain"
-              />
-            </div>
-          </div>
-          <h1 class="text-4xl font-bold text-white mb-4">DEVICE RECORD</h1>
-          <p class="text-xl text-blue-100 mb-2">SYSTEM</p>
-          <p class="text-xl text-blue-100">Kegalle</p>
-          <div class="mt-8 text-blue-200">
-            <p class="text-sm">Managing Device Records</p>
-            <p class="text-sm">Kegalle District</p>
-          </div>
         </div>
       </div>
     </div>
