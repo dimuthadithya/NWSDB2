@@ -298,7 +298,7 @@
                   <p class="text-sm text-gray-600">
                     Already have an account?
                     <a
-                      href="index.html"
+                      href="index.php"
                       class="font-medium text-blue-600 hover:text-blue-500">
                       Sign in here
                     </a>
