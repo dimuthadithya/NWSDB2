@@ -151,7 +151,7 @@
                         <li>
                             <a href="../admin/devices.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
                                 <i class="fas fa-building text-sm"></i>
-                                <span class="text-sm">Manage Devices</span>
+                                <span class="text-sm">Device Categories</span>
                             </a>
                         </li>
                         <li>
