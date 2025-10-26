@@ -1,3 +1,7 @@
+<?php
+include '../components/sessions.php';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
