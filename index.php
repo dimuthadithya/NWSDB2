@@ -33,10 +33,10 @@
         </div>
         <h1 class="text-4xl font-bold text-white mb-4">DEVICE RECORD</h1>
         <p class="text-xl text-blue-100 mb-2">SYSTEM</p>
-        <p class="text-xl text-blue-100">Monaragala</p>
+        <p class="text-xl text-blue-100">Bandarawela</p>
         <div class="mt-8 text-blue-200">
           <p class="text-sm">Managing Device Records</p>
-          <p class="text-sm">Monaragala District</p>
+          <p class="text-sm">Bandarawela District</p>
         </div>
       </div>
     </div>
@@ -49,7 +49,7 @@
             DEVICE RECORD SYSTEM
           </h2>
           <p class="mt-2 text-center text-lg font-medium text-gray-600">
-            Monaragala
+            Bandarawela
           </p>
         </div>
         <form class="mt-8 space-y-6" action="./handlers/auth.php" method="post">

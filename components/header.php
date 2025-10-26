@@ -19,7 +19,7 @@
                 <div class="text-center sm:text-left">
                     <p class="text-sm">
                         <i class="far fa-building mr-2"></i>
-                        <span>Monaragala Branch</span>
+                        <span>Bandarawela Branch</span>
                     </p>
                 </div>
             </div>

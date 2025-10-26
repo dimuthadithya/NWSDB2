@@ -40,7 +40,7 @@
             <p class="text-blue-100 text-sm sm:text-base">
               National Water Supply and Drainage Board
             </p>
-            <span class="text-blue-200">Monaragala</span>
+            <span class="text-blue-200">Bandarawela</span>
           </div>
 
           <!-- Sign In Link -->
