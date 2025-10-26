@@ -33,7 +33,6 @@ class DbHelper
     public static function createUser(
         $first_name,
         $last_name,
-        $username,
         $email,
         $gender,
         $password,
@@ -46,7 +45,6 @@ class DbHelper
         $userData = [
             'first_name' => $first_name,
             'last_name' => $last_name,
-            'username' => $username,
             'email' => $email,
             'gender' => $gender,
             'password' => $hashedPassword,

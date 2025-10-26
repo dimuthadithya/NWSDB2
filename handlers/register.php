@@ -14,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
     $userId = DbHelper::createUser(
         $first_name,
         $last_name,
-        $username,
         $email,
         $gender,
         $password,
