@@ -1,5 +1,8 @@
 <?php
-include '../components/sessions.php';
+require_once __DIR__ . '/../functions/DbHelper.php';
+require '../components/sessions.php';
+
+
 ?>
 
 <!DOCTYPE html>
@@ -25,7 +28,7 @@ include '../components/sessions.php';
       <!-- Welcome Section -->
       <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
         <h1 class="text-2xl font-bold text-gray-900 mb-2">
-          Welcome Back, John!
+          Welcome Back, <?php echo $first_name ?>!
         </h1>
         <p class="text-gray-600">
           Here's an overview of your device management system.

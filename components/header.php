@@ -11,8 +11,8 @@
                         <i class="fas fa-user"></i>
                     </div>
                     <div>
-                        <p class="text-sm font-medium">John Doe</p>
-                        <p class="text-xs text-gray-500">Administrator</p>
+                        <p class="text-sm font-medium"><?php echo $full_name ?></p>
+                        <p class="text-xs text-gray-500"><?php echo $role ?></p>
                     </div>
                 </div>
                 <div class="hidden sm:block h-6 w-px bg-gray-300"></div>

@@ -76,4 +76,17 @@ class DbHelper
 
         return false;
     }
+
+    public static function getUserById($userId)
+    {
+        self::init();
+
+        if (!is_numeric($userId)) {
+            return false;
+        }
+
+        $userInfo = self::$db->getById('users', $userId);
+
+        return $userInfo ? $userInfo : false;
+    }
 }
