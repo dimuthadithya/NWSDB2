@@ -21,12 +21,9 @@ class DbHelper
      * Creates a new user in the database
      * @param string $first_name User's first name
      * @param string $last_name User's last name
-     * @param string $username User's username
      * @param string $email User's email
-     * @param string $mobile_number User's mobile number
      * @param string $gender User's gender (Male/Female)
      * @param string $password User's password
-     * @param string $site_office User's site office
      * @param string $role User's role (admin/user)
      * @return bool|int Returns user ID on success, false on failure
      */
@@ -53,5 +50,30 @@ class DbHelper
         ];
 
         return self::$db->insert('users', $userData);
+    }
+
+
+    /**
+     * Authenticates a user login attempt
+     * @param string $email User's email
+     * @param string $password User's password
+     * @return array|bool Returns user data on success, false on failure
+     */
+    public static function loginUser($email, $password)
+    {
+        self::init();
+
+        $where = ['email' => $email];
+        $result = self::$db->select('users', ['*'], $where);
+
+        if ($result && count($result) > 0) {
+            $user = $result[0];
+            if (password_verify($password, $user['password'])) {
+                unset($user['password']); // Remove password from return data
+                return $user;
+            }
+        }
+
+        return false;
     }
 }
