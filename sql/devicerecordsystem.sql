@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
   mobile_number VARCHAR(15) NOT NULL UNIQUE,
   gender ENUM('Male', 'Female') NOT NULL,
   password VARCHAR(255) NOT NULL,
-  site_office VARCHAR(100) NOT NULL,
+  site_office VARCHAR(100) ,
   role ENUM('admin', 'user') NOT NULL DEFAULT 'user',
   status ENUM('active', 'inactive', 'suspended') NOT NULL DEFAULT 'active',
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

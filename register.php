@@ -1,76 +1,3 @@
-<?php
-require_once 'functions/DbHelper.php';
-
-$error = '';
-$success = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  // Validate form data
-  $firstName = trim($_POST['firstName'] ?? '');
-  $lastName = trim($_POST['lastName'] ?? '');
-  $email = trim($_POST['email'] ?? '');
-  $mobile = trim($_POST['mobile'] ?? '');
-  $gender = $_POST['gender'] ?? '';
-  $password = $_POST['password'] ?? '';
-  $confirmPassword = $_POST['confirmPassword'] ?? '';
-  $terms = isset($_POST['terms']);
-
-  // Basic validation
-  if (
-    empty($firstName) || empty($lastName) || empty($email) || empty($mobile) ||
-    empty($gender) || empty($password) || empty($confirmPassword)
-  ) {
-    $error = "All fields are required.";
-  } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $error = "Invalid email format.";
-  } elseif ($password !== $confirmPassword) {
-    $error = "Passwords do not match.";
-  } elseif (strlen($password) < 8) {
-    $error = "Password must be at least 8 characters long.";
-  } elseif (!$terms) {
-    $error = "You must agree to the Terms and Conditions.";
-  } else {
-    // Check if email already exists
-    if (DbHelper::emailExists($email)) {
-      $error = "Email already registered. Please use a different email.";
-    } else {
-      // Prepare username from email (part before @)
-      $username = strtolower(explode('@', $email)[0]);
-      $baseUsername = $username;
-      $counter = 1;
-
-      // Make sure username is unique
-      while (DbHelper::usernameExists($username)) {
-        $username = $baseUsername . $counter;
-        $counter++;
-      }
-
-      // Prepare user data
-      $userData = [
-        'username' => $username,
-        'email' => $email,
-        'password' => $password,
-        'full_name' => $firstName . ' ' . $lastName,
-        'role' => 'user', // Default role
-        'status' => 'active',
-        'mobile' => $mobile,
-        'gender' => $gender
-      ];
-
-      // Create user
-      $userId = DbHelper::createUser($userData);
-
-      if ($userId) {
-        $success = "Registration successful! Your username is: " . $username;
-        // Redirect to login page after 3 seconds
-        header("refresh:3;url=index.html");
-      } else {
-        $error = "Registration failed. Please try again.";
-      }
-    }
-  }
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -220,34 +147,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </p>
               </div>
 
-              <?php if ($error): ?>
-                <div class="mb-4 bg-red-50 border-l-4 border-red-500 p-4">
-                  <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                      <i class="fas fa-exclamation-circle text-red-500"></i>
-                    </div>
-                    <div class="ml-3">
-                      <p class="text-sm text-red-700"><?php echo htmlspecialchars($error); ?></p>
-                    </div>
-                  </div>
-                </div>
-              <?php endif; ?>
-
-              <?php if ($success): ?>
-                <div class="mb-4 bg-green-50 border-l-4 border-green-500 p-4">
-                  <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                      <i class="fas fa-check-circle text-green-500"></i>
-                    </div>
-                    <div class="ml-3">
-                      <p class="text-sm text-green-700"><?php echo htmlspecialchars($success); ?></p>
-                    </div>
-                  </div>
-                </div>
-              <?php endif; ?>
-
               <!-- Registration Form -->
-              <form method="POST" action="" class="space-y-6">
+              <form class="space-y-6" action="./handlers/register.php" method="post">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label
@@ -257,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </label>
                     <input
                       id="firstName"
-                      name="firstName"
+                      name="first_name"
                       type="text"
                       required
                       class="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
@@ -271,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </label>
                     <input
                       id="lastName"
-                      name="lastName"
+                      name="last_name"
                       type="text"
                       required
                       class="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
@@ -387,6 +288,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="pt-2">
                   <button
                     type="submit"
+                    name="submit"
                     class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out cursor-pointer">
                     <i class="fas fa-user-plus mr-2"></i> Create Account
                   </button>
