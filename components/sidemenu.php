@@ -69,6 +69,105 @@
                         <span>Summary</span>
                     </a>
                 </li>
+                <!-- Super Admin Section -->
+                <li class="mt-6">
+                    <div class="px-3 mb-2">
+                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Super Admin</h3>
+                    </div>
+                </li>
+
+                <!-- User Management Dropdown -->
+                <li>
+                    <button class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50 focus:outline-none">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-users-cog"></i>
+                            <span>User Management</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-sm transition-transform"></i>
+                    </button>
+                    <ul class="mt-1 ml-8 space-y-1">
+                        <li>
+                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
+                                <i class="fas fa-user-plus text-sm"></i>
+                                <span class="text-sm">Add User</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
+                                <i class="fas fa-user-shield text-sm"></i>
+                                <span class="text-sm">Manage Roles</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
+                                <i class="fas fa-user-edit text-sm"></i>
+                                <span class="text-sm">Edit Users</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- System Settings Dropdown -->
+                <li>
+                    <button class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50 focus:outline-none">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-cog"></i>
+                            <span>System Settings</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-sm transition-transform"></i>
+                    </button>
+                    <ul class="mt-1 ml-8 space-y-1">
+                        <li>
+                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
+                                <i class="fas fa-building text-sm"></i>
+                                <span class="text-sm">Department Settings</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
+                                <i class="fas fa-map-marker-alt text-sm"></i>
+                                <span class="text-sm">Location Management</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
+                                <i class="fas fa-wrench text-sm"></i>
+                                <span class="text-sm">System Config</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Logs & Reports Dropdown -->
+                <li>
+                    <button class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50 focus:outline-none">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>Logs & Reports</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-sm transition-transform"></i>
+                    </button>
+                    <ul class="mt-1 ml-8 space-y-1">
+                        <li>
+                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
+                                <i class="fas fa-history text-sm"></i>
+                                <span class="text-sm">Activity Logs</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
+                                <i class="fas fa-chart-line text-sm"></i>
+                                <span class="text-sm">System Reports</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
+                                <i class="fas fa-bug text-sm"></i>
+                                <span class="text-sm">Error Logs</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
         </nav>
 
@@ -80,4 +179,41 @@
             </a>
         </div>
     </div>
+
+    <!-- Dropdown Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownButtons = document.querySelectorAll('nav button');
+
+            dropdownButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Toggle dropdown visibility
+                    const dropdownContent = this.nextElementSibling;
+                    const isVisible = dropdownContent.style.display === 'block';
+
+                    // Hide all dropdowns first
+                    document.querySelectorAll('nav button + ul').forEach(dropdown => {
+                        dropdown.style.display = 'none';
+                        dropdown.previousElementSibling.querySelector('.fa-chevron-down').style.transform = 'rotate(0deg)';
+                    });
+
+                    // Show/hide clicked dropdown
+                    if (!isVisible) {
+                        dropdownContent.style.display = 'block';
+                        this.querySelector('.fa-chevron-down').style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+
+            // Hide dropdowns when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('nav button')) {
+                    document.querySelectorAll('nav button + ul').forEach(dropdown => {
+                        dropdown.style.display = 'none';
+                        dropdown.previousElementSibling.querySelector('.fa-chevron-down').style.transform = 'rotate(0deg)';
+                    });
+                }
+            });
+        });
+    </script>
 </aside>
