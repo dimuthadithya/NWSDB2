@@ -1,5 +1,5 @@
 <?php
-// Sidebar Navigation
+$basePath = $basePath ?? false;
 ?>
 <!-- Mobile Menu Toggle Button -->
 <div class="fixed bottom-4 right-4 lg:hidden z-50">
@@ -22,49 +22,49 @@
         <nav class="flex-1 overflow-y-auto p-4">
             <ul class="space-y-2">
                 <li>
-                    <a href="index.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
+                    <a href="<?php echo $basePath ? $basePath . 'index.php' : 'index.php' ?>" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
                         <i class="fas fa-home"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
                 <li>
-                    <a href="computers.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'computers.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
+                    <a href="<?php echo $basePath ? $basePath . 'computers.php' : 'computers.php' ?>" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'computers.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
                         <i class="fas fa-desktop"></i>
                         <span>Computers</span>
                     </a>
                 </li>
                 <li>
-                    <a href="laptops.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'laptops.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
+                    <a href="<?php echo $basePath ? $basePath . 'laptops.php' : 'laptops.php' ?>" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'laptops.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
                         <i class="fas fa-laptop"></i>
                         <span>Laptops</span>
                     </a>
                 </li>
                 <li>
-                    <a href="repairs.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'repairs.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
+                    <a href="<?php echo $basePath ? $basePath . 'repairs.php' : 'repairs.php' ?>" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'repairs.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
                         <i class="fas fa-tools"></i>
                         <span>Repair Details</span>
                     </a>
                 </li>
                 <li>
-                    <a href="site-offices.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'site-offices.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
+                    <a href="<?php echo $basePath ? $basePath . 'site-offices.php' : 'site-offices.php' ?>" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'site-offices.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
                         <i class="fas fa-building"></i>
                         <span>Site Offices</span>
                     </a>
                 </li>
                 <li>
-                    <a href="printers.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'printers.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
+                    <a href="<?php echo $basePath ? $basePath . 'printers.php' : 'printers.php' ?>" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'printers.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
                         <i class="fas fa-print"></i>
                         <span>Printer Details</span>
                     </a>
                 </li>
                 <li>
-                    <a href="other-devices.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'other-devices.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
+                    <a href="<?php echo $basePath ? $basePath . 'other-devices.php' : 'other-devices.php' ?>" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'other-devices.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
                         <i class="fas fa-microchip"></i>
                         <span>Other Details</span>
                     </a>
                 </li>
                 <li>
-                    <a href="summary.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'summary.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
+                    <a href="<?php echo $basePath ? $basePath . 'summary.php' : 'summary.php' ?>" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'summary.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
                         <i class="fas fa-chart-pie"></i>
                         <span>Summary</span>
                     </a>
