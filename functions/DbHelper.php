@@ -89,4 +89,13 @@ class DbHelper
 
         return $userInfo ? $userInfo : false;
     }
+
+    public static function getAllDeviceCategories()
+    {
+        self::init();
+
+        $deviceCategories = self::$db->select('device_categories');
+
+        return $deviceCategories ? $deviceCategories : false;
+    }
 }
