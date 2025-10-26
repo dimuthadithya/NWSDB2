@@ -148,7 +148,7 @@
               </div>
 
               <!-- Registration Form -->
-              <form class="space-y-6" action="./handlers/register.php" method="post">
+              <form class="space-y-6" action="./handlers/auth.php" method="post">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label
