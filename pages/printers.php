@@ -40,55 +40,132 @@ include '../components/sessions.php';
         </div>
       </div>
 
-      <!-- Filters -->
-      <div class="mb-6 bg-white rounded-lg shadow p-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <select class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-              <option value="">All Status</option>
-              <option value="active">Active</option>
-              <option value="under_repair">Under Repair</option>
-              <option value="retired">Retired</option>
-              <option value="maintenance">Under Maintenance</option>
-            </select>
+      <!-- Enhanced Filters -->
+      <div class="mb-6 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <i class="fas fa-filter text-white"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900">Filter Printers</h3>
+                <p class="text-sm text-gray-600">Refine your search results</p>
+              </div>
+            </div>
+            <button onclick="clearFilters()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+              <i class="fas fa-times mr-2"></i>Clear All
+            </button>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
-            <select class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-              <option value="">All Types</option>
-              <option value="laser">Laser Printer</option>
-              <option value="inkjet">Inkjet Printer</option>
-              <option value="dotmatrix">Dot Matrix Printer</option>
-              <option value="multifunction">Multifunction Printer</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
-            <select class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-              <option value="">All Departments</option>
-              <option value="it">IT Department</option>
-              <option value="hr">HR Department</option>
-              <option value="finance">Finance Department</option>
-              <option value="operations">Operations</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-            <select class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-              <option value="">All Locations</option>
-              <option value="head_office">Head Office</option>
-              <option value="branch_office">Branch Office</option>
-              <option value="site_office">Site Office</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+        </div>
+
+        <!-- Filter Content -->
+        <div class="p-6">
+          <!-- Search Bar - Prominent Position -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Quick Search</label>
             <div class="relative">
-              <input type="text" placeholder="Search printers..." class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 pl-10">
-              <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+              <input
+                type="text"
+                placeholder="Search by printer name, model, or serial number..."
+                class="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200">
+              <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
             </div>
           </div>
+
+          <!-- Filter Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <!-- Status Filter -->
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700">
+                <i class="fas fa-circle-dot text-blue-600 mr-2"></i>Status
+              </label>
+              <select class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white">
+                <option value="">All Status</option>
+                <option value="active">✓ Active</option>
+                <option value="under_repair">⚠ Under Repair</option>
+                <option value="retired">✕ Retired</option>
+                <option value="maintenance">🔧 Under Maintenance</option>
+              </select>
+            </div>
+
+            <!-- Type Filter -->
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700">
+                <i class="fas fa-print text-blue-600 mr-2"></i>Type
+              </label>
+              <select class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white">
+                <option value="">All Types</option>
+                <option value="laser">Laser Printer</option>
+                <option value="inkjet">Inkjet Printer</option>
+                <option value="dotmatrix">Dot Matrix Printer</option>
+                <option value="multifunction">Multifunction Printer</option>
+              </select>
+            </div>
+
+            <!-- Department Filter -->
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700">
+                <i class="fas fa-building text-blue-600 mr-2"></i>Department
+              </label>
+              <select class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white">
+                <option value="">All Departments</option>
+                <option value="it">IT Department</option>
+                <option value="hr">HR Department</option>
+                <option value="finance">Finance Department</option>
+                <option value="operations">Operations</option>
+              </select>
+            </div>
+
+            <!-- Location Filter -->
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700">
+                <i class="fas fa-map-marker-alt text-blue-600 mr-2"></i>Location
+              </label>
+              <select class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white">
+                <option value="">All Locations</option>
+                <option value="head_office">Head Office</option>
+                <option value="branch_office">Branch Office</option>
+                <option value="site_office">Site Office</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Location Type Checkboxes -->
+          <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <label class="block text-sm font-medium text-gray-700 mb-3">
+              <i class="fas fa-location-dot text-blue-600 mr-2"></i>Location Type
+            </label>
+            <div class="flex flex-wrap gap-4">
+              <label class="inline-flex items-center cursor-pointer group">
+                <input
+                  type="checkbox"
+                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                  name="location_type[]"
+                  value="bandarawela">
+                <span class="ml-2 text-sm text-gray-700 group-hover:text-gray-900">Bandarawela</span>
+              </label>
+              <label class="inline-flex items-center cursor-pointer group">
+                <input
+                  type="checkbox"
+                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                  name="location_type[]"
+                  value="non_bandarawela">
+                <span class="ml-2 text-sm text-gray-700 group-hover:text-gray-900">Non Bandarawela</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer with Apply Button -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+          <button onclick="resetFilters()" class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+            <i class="fas fa-rotate-right mr-2"></i>Reset
+          </button>
+          <button onclick="applyFilters()" class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm">
+            <i class="fas fa-check mr-2"></i>Apply Filters
+          </button>
         </div>
       </div>
 
