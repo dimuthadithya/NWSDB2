@@ -16,7 +16,10 @@ require_once '../functions/Database.php';
 </head>
 
 <body class="min-h-screen bg-gray-50">
-    <?php include '../components/sidemenu.php'; ?>
+    <?php
+    $basePath = "../pages/";
+    include '../components/sidemenu.php';
+    ?>
 
     <div class="lg:pl-64 min-h-screen flex flex-col">
         <?php include '../components/header.php'; ?>
