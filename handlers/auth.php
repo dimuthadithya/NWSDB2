@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $userId = DbHelper::createUser($first_name, $last_name, $email, $gender, $password, $role);
 
         if ($userId) {
-            header('Location: ../login.php?registration=success');
+            header('Location: ../index.php?registration=success');
             exit();
         } else {
             header('Location: ../register.php?registration=failed');
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = DbHelper::loginUser($email, $password);
         if ($user) {
             session_start();
-            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['user_role'] = $user['role'];
             header('Location: ../pages/index.php?login=true');
             exit();

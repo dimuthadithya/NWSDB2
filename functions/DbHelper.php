@@ -85,7 +85,7 @@ class DbHelper
             return false;
         }
 
-        $userInfo = self::$db->getById('users', $userId);
+        $userInfo = self::$db->getById('users', $userId, $idColumn = 'user_id');
 
         return $userInfo ? $userInfo : false;
     }
