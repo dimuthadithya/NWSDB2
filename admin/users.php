@@ -1,0 +1,242 @@
+<?php
+include '../components/sessions.php';
+require_once '../functions/Database.php';
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NWSDB - User Management | Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="shortcut icon" href="../assets/images/favicon.png" type="image/x-icon" />
+</head>
+
+<body class="min-h-screen bg-gray-50">
+    <?php
+    $basePath = "../pages/";
+    include '../components/sidemenu.php';
+    ?>
+
+    <div class="lg:pl-64 min-h-screen flex flex-col">
+        <?php include '../components/header.php'; ?>
+
+        <!-- Main Content -->
+        <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Page Header -->
+            <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">User Management</h1>
+                    <p class="mt-1 text-sm text-gray-600">Manage and track all users in the system</p>
+                </div>
+                <div class="mt-4 md:mt-0 flex flex-col sm:flex-row gap-3">
+                    <button class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-plus mr-2"></i>
+                        Add New Office
+                    </button>
+                    <button class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <i class="fas fa-file-excel mr-2"></i>
+                        Export to Excel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="mb-6 bg-white rounded-lg shadow p-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                        <select class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                            <option value="">All Roles</option>
+                            <option value="admin">Admin</option>
+                            <option value="user">User</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <select class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="suspended">Suspended</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Site Office</label>
+                        <select class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                            <option value="">All Offices</option>
+                            <option value="head_office">Head Office</option>
+                            <option value="branch_office">Branch Office</option>
+                            <option value="site_office">Site Office</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                        <div class="relative">
+                            <input type="text" placeholder="Search users..." class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 pl-10">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Site Offices Table -->
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">User Info</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Contact</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Site Office & Role</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Last Login</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <!-- Sample Row 1 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            <span class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                                                <i class="fas fa-user"></i>
+                                            </span>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">John Smith</div>
+                                            <div class="text-sm text-gray-500">@johnsmith</div>
+                                            <div class="text-xs text-gray-500">Male</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900">john.smith@gmail.com</div>
+                                    <div class="text-sm text-gray-500">+94 71 234 5678</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900">Head Office</div>
+                                    <div class="text-xs text-blue-600 font-medium">Admin</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Active
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    2023-10-25 14:30
+                                </td>
+                                <td class="px-6 py-4 text-right text-sm font-medium">
+                                    <div class="flex justify-end space-x-2">
+                                        <button class="text-indigo-600 hover:text-indigo-900" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="text-yellow-600 hover:text-yellow-900" title="Reset Password">
+                                            <i class="fas fa-key"></i>
+                                        </button>
+                                        <button class="text-red-600 hover:text-red-900" title="Deactivate">
+                                            <i class="fas fa-ban"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Sample Row 2 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            <span class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                                                <i class="fas fa-user"></i>
+                                            </span>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">Jane Doe</div>
+                                            <div class="text-sm text-gray-500">@janedoe</div>
+                                            <div class="text-xs text-gray-500">Female</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900">jane.doe@gmail.com</div>
+                                    <div class="text-sm text-gray-500">+94 77 987 6543</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900">Branch Office</div>
+                                    <div class="text-xs text-gray-600">User</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        Inactive
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    2023-10-24 09:15
+                                </td>
+                                <td class="px-6 py-4 text-right text-sm font-medium">
+                                    <div class="flex justify-end space-x-2">
+                                        <button class="text-indigo-600 hover:text-indigo-900" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="text-yellow-600 hover:text-yellow-900" title="Reset Password">
+                                            <i class="fas fa-key"></i>
+                                        </button>
+                                        <button class="text-green-600 hover:text-green-900" title="Activate">
+                                            <i class="fas fa-check-circle"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-4 flex items-center justify-between">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Previous
+                    </button>
+                    <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Next
+                    </button>
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Showing <span class="font-medium">1</span> to <span class="font-medium">3</span> of <span class="font-medium">12</span> results
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            <button class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <span class="sr-only">Previous</span>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                1
+                            </button>
+                            <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                2
+                            </button>
+                            <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                3
+                            </button>
+                            <button class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <span class="sr-only">Next</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
