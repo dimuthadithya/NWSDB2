@@ -31,3 +31,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     header('Location: ../register.php');
     exit();
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
+    // Handle login logic here
+} else {
+    header('Location: ../index.php');
+    exit();
+}

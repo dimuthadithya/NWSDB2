@@ -56,17 +56,17 @@
           <div class="rounded-md space-y-4">
             <div>
               <label
-                for="username"
+                for="email"
                 class="block text-sm font-medium text-gray-700 mb-2">
-                Username
+                Email
               </label>
               <input
-                id="username"
-                name="username"
+                id="email"
+                name="email"
                 type="text"
                 required
                 class="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Enter your username" />
+                placeholder="Enter your email" />
             </div>
             <div>
               <label
