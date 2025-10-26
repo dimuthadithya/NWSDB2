@@ -50,19 +50,42 @@ include '../components/sessions.php';
               <option value="active">Active</option>
               <option value="under_repair">Under Repair</option>
               <option value="retired">Retired</option>
-              <option value="lost">Lost</option>
+              <option value="maintenance">Under Maintenance</option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
             <select class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-              <option value="">All Sections</option>
+              <option value="">All Types</option>
+              <option value="laser">Laser Printer</option>
+              <option value="inkjet">Inkjet Printer</option>
+              <option value="dotmatrix">Dot Matrix Printer</option>
+              <option value="multifunction">Multifunction Printer</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+            <select class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+              <option value="">All Departments</option>
+              <option value="it">IT Department</option>
+              <option value="hr">HR Department</option>
+              <option value="finance">Finance Department</option>
+              <option value="operations">Operations</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+            <select class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+              <option value="">All Locations</option>
+              <option value="head_office">Head Office</option>
+              <option value="branch_office">Branch Office</option>
+              <option value="site_office">Site Office</option>
             </select>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
             <div class="relative">
-              <input type="text" placeholder="Search computers..." class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 pl-10">
+              <input type="text" placeholder="Search printers..." class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 pl-10">
               <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
             </div>
           </div>
