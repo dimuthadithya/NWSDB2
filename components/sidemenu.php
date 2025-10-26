@@ -74,7 +74,7 @@
 
         <!-- Bottom Section -->
         <div class="p-4 border-t border-gray-200">
-            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50">
+            <a href="../handlers/logout.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a>

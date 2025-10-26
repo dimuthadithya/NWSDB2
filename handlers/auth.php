@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             session_start();
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_role'] = $user['role'];
-            header('Location: ../pages/index.php');
+            header('Location: ../pages/index.php?login=true');
             exit();
         } else {
             header('Location: ../index.php?login=failed');
