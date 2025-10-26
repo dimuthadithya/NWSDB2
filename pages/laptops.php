@@ -50,7 +50,7 @@ include '../components/sessions.php';
                 <i class="fas fa-filter text-white"></i>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-gray-900">Filter Printers</h3>
+                <h3 class="text-lg font-semibold text-gray-900">Filter Laptops</h3>
                 <p class="text-sm text-gray-600">Refine your search results</p>
               </div>
             </div>
