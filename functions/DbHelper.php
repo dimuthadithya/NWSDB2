@@ -35,10 +35,8 @@ class DbHelper
         $last_name,
         $username,
         $email,
-        $mobile_number,
         $gender,
         $password,
-        $site_office,
         $role = 'user'
     ) {
         self::init();
@@ -50,10 +48,8 @@ class DbHelper
             'last_name' => $last_name,
             'username' => $username,
             'email' => $email,
-            'mobile_number' => $mobile_number,
             'gender' => $gender,
             'password' => $hashedPassword,
-            'site_office' => $site_office,
             'role' => $role,
             'status' => 'active'
         ];
