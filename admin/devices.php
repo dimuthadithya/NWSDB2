@@ -3,6 +3,9 @@ include '../components/sessions.php';
 require_once '../functions/DbHelper.php';
 
 $allCategories = DbHelper::getAllDeviceCategories();
+$deviceIcons = ['fas fa-desktop', 'fas fa-print', 'fa-solid fa-expand', 'fa-solid fa-wifi', 'fas fa-laptop']
+
+
 ?>
 
 <!DOCTYPE html>
@@ -105,7 +108,7 @@ $allCategories = DbHelper::getAllDeviceCategories();
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 h-10 w-10">
                                                 <span class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                                                    <i class="fas fa-desktop"></i>
+                                                    <i class="<?php echo $deviceIcons[$key] ?>"></i>
                                                 </span>
                                             </div>
                                             <div class="ml-4">
