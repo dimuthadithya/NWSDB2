@@ -88,6 +88,19 @@ include '../components/sessions.php';
               <input type="text" placeholder="Search printers..." class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 pl-10">
               <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
             </div>
+            <div class="flex flex-col gap-2">
+              <label class="block text-sm font-medium text-gray-700">Location Type</label>
+              <div class="flex items-center gap-4">
+                <label class="inline-flex items-center">
+                  <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" name="location_type[]" value="bandarawela">
+                  <span class="ml-2">Bandarawela</span>
+                </label>
+                <label class="inline-flex items-center">
+                  <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" name="location_type[]" value="non_bandarawela">
+                  <span class="ml-2">Non Bandarawela</span>
+                </label>
+              </div>
+            </div>
           </div>
         </div>
       </div>
