@@ -1,5 +1,9 @@
 <?php
 include '../components/sessions.php';
+require_once '../functions/DbHelper.php';
+
+$computers = DbHelper::getAllComputers();
+
 ?>
 
 <!DOCTYPE html>
@@ -185,64 +189,100 @@ include '../components/sessions.php';
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <!-- Sample Row -->
-              <tr class="hover:bg-gray-50">
-                <td class="px-6 py-4">
-                  <div class="flex items-center">
-                    <i class="fas fa-desktop text-gray-400 mr-3"></i>
-                    <div>
-                      <div class="text-sm font-medium text-gray-900">Dell OptiPlex 7090</div>
-                      <div class="text-sm text-gray-500">ID: PC001</div>
-                      <div class="text-sm text-gray-500">Model: OptiPlex 7090</div>
-                      <div class="text-sm text-gray-500">Purchase: 2023-03-15</div>
+              <?php foreach ($computers as $key => $computer) { ?>
+                <tr class="hover:bg-gray-50">
+                  <!-- Device Basic Info -->
+                  <td class="px-6 py-4">
+                    <div class="flex items-center">
+                      <i class="fas fa-desktop text-gray-400 mr-3"></i>
+                      <div>
+                        <div class="text-sm font-medium text-gray-900">
+                          <?= htmlspecialchars($computer['device_name'] ?? 'if need') ?>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          ID: <?= htmlspecialchars($computer['device_id'] ?? 'if need') ?>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          Model: <?= htmlspecialchars($computer['model'] ?? 'if need') ?>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          Purchase: <?= htmlspecialchars($computer['purchase_date'] ?? 'if need') ?>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm">
-                    <div>Processor: Intel i7-11700</div>
-                    <div>RAM: 16GB DDR4</div>
-                    <div>Storage: 512GB SSD</div>
-                    <div>Graphics: Intel UHD 750</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm">
-                    <div>OS: Windows 10 Pro</div>
-                    <div>Monitor: 24" FHD</div>
-                    <div>USB Ports: 8</div>
-                    <div>Form Factor: Tower</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm">
-                    <div>IP Address: 192.168.1.101</div>
-                    <div>MAC: 00:1B:44:11:3A:B8</div>
-                    <div>Connection: Ethernet</div>
-                    <div>Location: Main Office</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm mb-2">
-                    <div>Section: Administration</div>
-                    <div>Assigned to: John Doe</div>
-                  </div>
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    Active
-                  </span>
-                  <div class="text-xs text-gray-500 mt-2">
-                    <i class="fas fa-info-circle"></i> Click for notes
-                  </div>
-                </td>
-                <td class="px-6 py-4 text-right text-sm font-medium">
-                  <button class="text-blue-600 hover:text-blue-900 mr-3">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="text-red-600 hover:text-red-900">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
+                  </td>
+
+                  <!-- Hardware Info -->
+                  <td class="px-6 py-4">
+                    <div class="text-sm">
+                      <div>Processor: <?= htmlspecialchars($computer['processor'] ?? 'if need') ?></div>
+                      <div>RAM: <?= htmlspecialchars($computer['ram'] ?? 'if need') ?></div>
+                      <div>Storage: <?= htmlspecialchars($computer['hard_drive_capacity'] ?? 'if need') ?></div>
+                      <div>Keyboard: <?= htmlspecialchars($computer['keyboard'] ?? 'if need') ?></div>
+                      <div>Mouse: <?= htmlspecialchars($computer['mouse'] ?? 'if need') ?></div>
+                    </div>
+                  </td>
+
+                  <!-- OS & Monitor Info -->
+                  <td class="px-6 py-4">
+                    <div class="text-sm">
+                      <div>OS: <?= htmlspecialchars($computer['operating_system'] ?? 'if need') ?></div>
+                      <div>Monitor: <?= htmlspecialchars($computer['monitor_info'] ?? 'if need') ?></div>
+                      <div>CPU Serial: <?= htmlspecialchars($computer['cpu_serial'] ?? 'if need') ?></div>
+                      <div>Made In: <?= htmlspecialchars($computer['made_in'] ?? 'if need') ?></div>
+                    </div>
+                  </td>
+
+                  <!-- Network Info -->
+                  <td class="px-6 py-4">
+                    <div class="text-sm">
+                      <div>IP Address: <?= htmlspecialchars($computer['ip_address'] ?? 'if need') ?></div>
+                      <div>Network: <?= htmlspecialchars($computer['network_connectivity'] ?? 'if need') ?></div>
+                      <div>Printer Conn: <?= htmlspecialchars($computer['printer_connectivity'] ?? 'if need') ?></div>
+                      <div>Virus Guard: <?= htmlspecialchars($computer['virus_guard'] ?? 'if need') ?></div>
+                    </div>
+                  </td>
+
+                  <!-- Assignment Info -->
+                  <td class="px-6 py-4">
+                    <div class="text-sm mb-2">
+                      <div>Section: <?= htmlspecialchars($computer['section_name'] ?? 'if need') ?></div>
+                      <div>Assigned to: <?= htmlspecialchars($computer['assigned_to_name'] ?? 'if need') ?></div>
+                    </div>
+
+                    <?php
+                    $status = $computer['status'] ?? 'if need';
+                    $statusColors = [
+                      'active' => 'bg-green-100 text-green-800',
+                      'under_repair' => 'bg-yellow-100 text-yellow-800',
+                      'retired' => 'bg-gray-100 text-gray-800',
+                      'lost' => 'bg-red-100 text-red-800'
+                    ];
+                    $statusClass = $statusColors[$status] ?? 'bg-gray-100 text-gray-600';
+                    ?>
+
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?= $statusClass ?>">
+                      <?= htmlspecialchars(ucwords($status)) ?>
+                    </span>
+
+                    <div class="text-xs text-gray-500 mt-2">
+                      <i class="fas fa-info-circle"></i>
+                      <?= !empty($computer['notes']) ? htmlspecialchars($computer['notes']) : 'Click for notes' ?>
+                    </div>
+                  </td>
+
+                  <!-- Action Buttons -->
+                  <td class="px-6 py-4 text-right text-sm font-medium">
+                    <button class="text-blue-600 hover:text-blue-900 mr-3">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="text-red-600 hover:text-red-900">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              <?php } ?>
+
             </tbody>
           </table>
         </div>

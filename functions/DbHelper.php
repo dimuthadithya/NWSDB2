@@ -124,6 +124,17 @@ class DbHelper
         return $sections ? $sections : false;
     }
 
+    public static function getAllComputers()
+    {
+        self::init();
+
+        $computerId = self::$db->getId('device_categories', 'category_name', 'Computer', 'category_id');
+
+        $computers = self::$db->select('devices', ['*'], ['category_id' => $computerId]);
+
+        return $computers ? $computers : false;
+    }
+
     public static function createBranch($branch_name, $branch_location)
     {
         self::init();

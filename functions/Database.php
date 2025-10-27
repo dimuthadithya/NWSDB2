@@ -280,4 +280,31 @@ class Database
             return false;
         }
     }
+
+    /**
+     * Get the ID of a record by matching a specific column and value.
+     * Example: getId('users', 'email', 'user@example.com', 'user_id')
+     *
+     * @param string $table Table name
+     * @param string $searchColumn Column name to search
+     * @param mixed $searchValue Value to match
+     * @param string $idColumn Column name of the ID (default: 'id')
+     * @return int|false Returns the ID if found, or false if not
+     */
+    public function getId($table, $searchColumn, $searchValue, $idColumn = 'id')
+    {
+        try {
+            $query = "SELECT {$idColumn} FROM {$table} WHERE {$searchColumn} = ? LIMIT 1";
+            $stmt = $this->executeQuery($query, [$searchValue]);
+
+            if ($stmt) {
+                $result = $stmt->fetch();
+                return $result ? (int)$result[$idColumn] : false;
+            }
+            return false;
+        } catch (PDOException $e) {
+            error_log("getId failed: " . $e->getMessage());
+            return false;
+        }
+    }
 }
