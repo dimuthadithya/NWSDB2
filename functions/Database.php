@@ -254,4 +254,30 @@ class Database
         $error = $this->conn->errorInfo();
         return $error[2];
     }
+
+    public function getSectionsByDeviceCount()
+    {
+        try {
+            $query = "
+            SELECT 
+                s.section_id,
+                s.section_name,
+                COUNT(d.device_id) AS total_devices
+            FROM 
+                sections s
+            LEFT JOIN 
+                devices d ON s.section_id = d.section_id
+            GROUP BY 
+                s.section_id, s.section_name
+            ORDER BY 
+                total_devices DESC
+        ";
+
+            $stmt = $this->executeQuery($query);
+            return $stmt ? $stmt->fetchAll() : false;
+        } catch (PDOException $e) {
+            error_log('getSectionsByDeviceCount failed: ' . $e->getMessage());
+            return false;
+        }
+    }
 }

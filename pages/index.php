@@ -5,6 +5,7 @@ require '../components/sessions.php';
 $computerCount = DbHelper::getComputerCount();
 $printerCount = DbHelper::getPrinterCount();
 $laptopCount = DbHelper::getLaptopCount();
+$sectionsByDeviceCount = DBHelper::getSectionsByDeviceCount();
 ?>
 
 <!DOCTYPE html>
@@ -174,46 +175,22 @@ $laptopCount = DbHelper::getLaptopCount();
             Site Office Distribution
           </h2>
           <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div
-                  class="h-8 w-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
-                  <i class="fas fa-building"></i>
+            <?php
+            if ($sectionsByDeviceCount) {
+              foreach ($sectionsByDeviceCount as $section) { ?>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-3">
+                    <div
+                      class="h-8 w-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
+                      <i class="fas fa-building"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-900"><?php echo $section['section_name'] ?></span>
+                  </div>
+                  <span class="text-sm font-bold text-gray-900"><?php echo $section['total_devices'] ?></span>
                 </div>
-                <span class="text-sm font-medium text-gray-900">Main Office</span>
-              </div>
-              <span class="text-sm font-bold text-gray-900">28 devices</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div
-                  class="h-8 w-8 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600">
-                  <i class="fas fa-building"></i>
-                </div>
-                <span class="text-sm font-medium text-gray-900">Engineering Unit</span>
-              </div>
-              <span class="text-sm font-bold text-gray-900">15 devices</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div
-                  class="h-8 w-8 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600">
-                  <i class="fas fa-building"></i>
-                </div>
-                <span class="text-sm font-medium text-gray-900">Site Office A</span>
-              </div>
-              <span class="text-sm font-bold text-gray-900">8 devices</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div
-                  class="h-8 w-8 bg-green-50 rounded-lg flex items-center justify-center text-green-600">
-                  <i class="fas fa-building"></i>
-                </div>
-                <span class="text-sm font-medium text-gray-900">Site Office B</span>
-              </div>
-              <span class="text-sm font-bold text-gray-900">5 devices</span>
-            </div>
+            <?php }
+            }
+            ?>
           </div>
         </div>
       </div>

@@ -250,4 +250,13 @@ class DbHelper
 
         return $result ? $result : 0;
     }
+
+    public static function getSectionsByDeviceCount()
+    {
+        self::init();
+
+        $sections = self::$db->getSectionsByDeviceCount();
+
+        return $sections ? $sections : false;
+    }
 }
