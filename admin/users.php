@@ -1,6 +1,10 @@
 <?php
 include '../components/sessions.php';
-require_once '../functions/Database.php';
+require_once '../functions/DbHelper.php';
+
+$users = DbHelper::getAllUsers();
+
+
 ?>
 
 <!DOCTYPE html>
@@ -99,98 +103,55 @@ require_once '../functions/Database.php';
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <!-- Sample Row 1 -->
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10">
-                                            <span class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
-                                                <i class="fas fa-user"></i>
-                                            </span>
+                            <?php
+                            foreach ($users as $key => $user) { ?>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <span class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                                                    <i class="fas fa-user"></i>
+                                                </span>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900"><?php echo $user['first_name'] . " " . $user['last_name'] ?></div>
+                                                <div class="text-sm text-gray-500">@username</div>
+                                                <div class="text-xs text-gray-500"><?php echo $user['gender'] ?></div>
+                                            </div>
                                         </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">John Smith</div>
-                                            <div class="text-sm text-gray-500">@johnsmith</div>
-                                            <div class="text-xs text-gray-500">Male</div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-gray-900"><?php echo $user['email'] ?></div>
+                                        <div class="text-sm text-gray-500"><?php echo $user['mobile_number'] ?></div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-gray-900"><?php echo $user['site_office'] ?></div>
+                                        <div class="text-xs text-blue-600 font-medium"><?php echo $user['role'] ?></div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <?php echo $user['status'] ?>
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <?php echo "last login" ?>
+                                    </td>
+                                    <td class="px-6 py-4 text-right text-sm font-medium">
+                                        <div class="flex justify-end space-x-2">
+                                            <button class="text-indigo-600 hover:text-indigo-900" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-yellow-600 hover:text-yellow-900" title="Reset Password">
+                                                <i class="fas fa-key"></i>
+                                            </button>
+                                            <button class="text-red-600 hover:text-red-900" title="Deactivate">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900">john.smith@gmail.com</div>
-                                    <div class="text-sm text-gray-500">+94 71 234 5678</div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900">Head Office</div>
-                                    <div class="text-xs text-blue-600 font-medium">Admin</div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        Active
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    2023-10-25 14:30
-                                </td>
-                                <td class="px-6 py-4 text-right text-sm font-medium">
-                                    <div class="flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-900" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-yellow-600 hover:text-yellow-900" title="Reset Password">
-                                            <i class="fas fa-key"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-900" title="Deactivate">
-                                            <i class="fas fa-ban"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Sample Row 2 -->
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10">
-                                            <span class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
-                                                <i class="fas fa-user"></i>
-                                            </span>
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">Jane Doe</div>
-                                            <div class="text-sm text-gray-500">@janedoe</div>
-                                            <div class="text-xs text-gray-500">Female</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900">jane.doe@gmail.com</div>
-                                    <div class="text-sm text-gray-500">+94 77 987 6543</div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900">Branch Office</div>
-                                    <div class="text-xs text-gray-600">User</div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                        Inactive
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    2023-10-24 09:15
-                                </td>
-                                <td class="px-6 py-4 text-right text-sm font-medium">
-                                    <div class="flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-900" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-yellow-600 hover:text-yellow-900" title="Reset Password">
-                                            <i class="fas fa-key"></i>
-                                        </button>
-                                        <button class="text-green-600 hover:text-green-900" title="Activate">
-                                            <i class="fas fa-check-circle"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            <?php
+                            } ?>
                         </tbody>
                     </table>
                 </div>

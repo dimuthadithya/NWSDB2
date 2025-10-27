@@ -98,4 +98,20 @@ class DbHelper
 
         return $deviceCategories ? $deviceCategories : false;
     }
+    public static function getAllUsers()
+    {
+        self::init();
+
+        $users = self::$db->select('users');
+
+        return $users ? $users : false;
+    }
+    public static function getAllBranches()
+    {
+        self::init();
+
+        $branches = self::$db->select('branches');
+
+        return $branches ? $branches : false;
+    }
 }
