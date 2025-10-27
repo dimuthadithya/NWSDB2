@@ -1,5 +1,9 @@
 <?php
 include '../components/sessions.php';
+require_once '../functions/DbHelper.php';
+
+$laptops = DbHelper::getAllLaptops();
+
 ?>
 
 <!DOCTYPE html>
@@ -185,64 +189,82 @@ include '../components/sessions.php';
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <!-- Sample Row -->
-              <tr class="hover:bg-gray-50">
-                <td class="px-6 py-4">
-                  <div class="flex items-center">
-                    <i class="fas fa-laptop text-gray-400 mr-3"></i>
-                    <div>
-                      <div class="text-sm font-medium text-gray-900">Device: Dell Latitude 5520</div>
-                      <div class="text-sm text-gray-500">Model: Latitude 5520</div>
-                      <div class="text-sm text-gray-500">Made in: Malaysia</div>
-                      <div class="text-sm text-gray-500">Purchase: 2023-01-15</div>
+              <?php foreach ($laptops as $laptop): ?>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4">
+                    <div class="flex items-center">
+                      <i class="fas fa-laptop text-gray-400 mr-3"></i>
+                      <div>
+                        <div class="text-sm font-medium text-gray-900">
+                          Device: <?php echo $laptop['device_name'] ?? 'if need'; ?>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          Model: <?php echo $laptop['model'] ?? 'if need'; ?>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          Made in: <?php echo $laptop['made_in'] ?? 'if need'; ?>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                          Purchase: <?php echo $laptop['purchase_date'] ?? 'if need'; ?>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm">
-                    <div>Processor: Intel i7-1165G7</div>
-                    <div>RAM: 16GB DDR4</div>
-                    <div>Storage: 512GB NVMe SSD</div>
-                    <div>Display: 15.6" FHD</div>
-                    <div>Serial: XYZ123456</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm">
-                    <div>Battery: 4-Cell 63Whr</div>
-                    <div>Keyboard: Backlit</div>
-                    <div>Webcam: HD 720p</div>
-                    <div>Charger: 65W USB-C</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm">
-                    <div>IP Address: 192.168.1.100</div>
-                    <div>WiFi: Intel AX201</div>
-                    <div>Network: WiFi/Ethernet</div>
-                    <div>Security: BitLocker</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm mb-2">
-                    <div>Section: Field Operations</div>
-                    <div>Assigned to: Jane Smith</div>
-                  </div>
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    Active
-                  </span>
-                  <div class="text-xs text-gray-500 mt-2">
-                    <i class="fas fa-info-circle"></i> Click for notes
-                  </div>
-                </td>
-                <td class="px-6 py-4 text-right text-sm font-medium">
-                  <button class="text-blue-600 hover:text-blue-900 mr-3">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="text-red-600 hover:text-red-900">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
+                  </td>
+
+                  <td class="px-6 py-4">
+                    <div class="text-sm">
+                      <div>Processor: <?php echo $laptop['processor'] ?? 'if need'; ?></div>
+                      <div>RAM: <?php echo $laptop['ram'] ?? 'if need'; ?></div>
+                      <div>Storage: <?php echo $laptop['hard_drive_capacity'] ?? 'if need'; ?></div>
+                      <div>Monitor: <?php echo $laptop['monitor_info'] ?? 'if need'; ?></div>
+                      <div>Serial: <?php echo $laptop['cpu_serial'] ?? 'if need'; ?></div>
+                    </div>
+                  </td>
+
+                  <td class="px-6 py-4">
+                    <div class="text-sm">
+                      <div>Keyboard: <?php echo $laptop['keyboard'] ?? 'if need'; ?></div>
+                      <div>Mouse: <?php echo $laptop['mouse'] ?? 'if need'; ?></div>
+                      <div>Printer Connectivity: <?php echo $laptop['printer_connectivity'] ?? 'if need'; ?></div>
+                      <div>Virus Guard: <?php echo $laptop['virus_guard'] ?? 'if need'; ?></div>
+                    </div>
+                  </td>
+
+                  <td class="px-6 py-4">
+                    <div class="text-sm">
+                      <div>IP Address: <?php echo $laptop['ip_address'] ?? 'if need'; ?></div>
+                      <div>Network: <?php echo $laptop['network_connectivity'] ?? 'if need'; ?></div>
+                      <div>OS: <?php echo $laptop['operating_system'] ?? 'if need'; ?></div>
+                    </div>
+                  </td>
+
+                  <td class="px-6 py-4">
+                    <div class="text-sm mb-2">
+                      <div>Section: <?php echo $laptop['section_name'] ?? 'if need'; ?></div>
+                      <div>Assigned to: <?php echo $laptop['user_name'] ?? 'if need'; ?></div>
+                    </div>
+
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+        <?php echo ($laptop['status'] == 'active') ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'; ?>">
+                      <?php echo ucfirst($laptop['status'] ?? 'if need'); ?>
+                    </span>
+
+                    <div class="text-xs text-gray-500 mt-2">
+                      <i class="fas fa-info-circle"></i>
+                      <?php echo !empty($laptop['notes']) ? htmlspecialchars($laptop['notes']) : 'if need'; ?>
+                    </div>
+                  </td>
+
+                  <td class="px-6 py-4 text-right text-sm font-medium">
+                    <button class="text-blue-600 hover:text-blue-900 mr-3">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="text-red-600 hover:text-red-900">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
             </tbody>
           </table>
         </div>

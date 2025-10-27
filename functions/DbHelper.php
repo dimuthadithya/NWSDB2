@@ -135,6 +135,17 @@ class DbHelper
         return $computers ? $computers : false;
     }
 
+    public static function getAllLaptops()
+    {
+        self::init();
+
+        $laptopId = self::$db->getId('device_categories', 'category_name', 'Laptop', 'category_id');
+
+        $laptops = self::$db->select('devices', ['*'], ['category_id' => $laptopId]);
+
+        return $laptops ? $laptops : false;
+    }
+
     public static function createBranch($branch_name, $branch_location)
     {
         self::init();
