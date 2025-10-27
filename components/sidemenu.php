@@ -78,157 +78,42 @@ $basePath = $basePath ?? false;
 
                 <!-- Site Offices Management  -->
                 <li>
-                    <button class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50 focus:outline-none">
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-users-cog"></i>
-                            <span>Site Offices</span>
-                        </div>
-                        <i class="fas fa-chevron-down text-sm transition-transform"></i>
-                    </button>
-                    <ul class="mt-1 ml-8 space-y-1">
-                        <li>
-                            <a href="../admin/side_offices.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
-                                <i class="fas fa-user-plus text-sm"></i>
-                                <span class="text-sm">Manage Site Ofices</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
-                                <i class="fas fa-user-shield text-sm"></i>
-                                <span class="text-sm">Manage Roles</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
-                                <i class="fas fa-user-edit text-sm"></i>
-                                <span class="text-sm">Edit Users</span>
-                            </a>
-                        </li>
-                    </ul>
+                    <a href="../admin/side_offices.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
+                        <i class="fas fa-user-plus text-sm"></i>
+                        <span class="text-sm">Manage Site Ofices</span>
+                    </a>
                 </li>
 
                 <!-- User Management Dropdown -->
                 <li>
-                    <button class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50 focus:outline-none">
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-users-cog"></i>
-                            <span>User Management</span>
-                        </div>
-                        <i class="fas fa-chevron-down text-sm transition-transform"></i>
-                    </button>
-                    <ul class="mt-1 ml-8 space-y-1">
-                        <li>
-                            <a href="../admin/users.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
-                                <i class="fas fa-user-plus text-sm"></i>
-                                <span class="text-sm">Add User</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
-                                <i class="fas fa-user-shield text-sm"></i>
-                                <span class="text-sm">Manage Roles</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
-                                <i class="fas fa-user-edit text-sm"></i>
-                                <span class="text-sm">Edit Users</span>
-                            </a>
-                        </li>
-                    </ul>
+                    <a href="../admin/users.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
+                        <i class="fas fa-user-plus text-sm"></i>
+                        <span class="text-sm">Add User</span>
+                    </a>
                 </li>
 
                 <!-- Devices Dropdown -->
                 <li>
-                    <button class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50 focus:outline-none">
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-cog"></i>
-                            <span>Devices Management</span>
-                        </div>
-                        <i class="fas fa-chevron-down text-sm transition-transform"></i>
-                    </button>
-                    <ul class="mt-1 ml-8 space-y-1">
-                        <li>
-                            <a href="../admin/devices.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
-                                <i class="fas fa-building text-sm"></i>
-                                <span class="text-sm">Device Categories</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
-                                <i class="fas fa-map-marker-alt text-sm"></i>
-                                <span class="text-sm">Location Management</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
-                                <i class="fas fa-wrench text-sm"></i>
-                                <span class="text-sm">System Config</span>
-                            </a>
-                        </li>
-                    </ul>
+                    <a href="../admin/devices.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
+                        <i class="fas fa-building text-sm"></i>
+                        <span class="text-sm">Device Categories</span>
+                    </a>
                 </li>
 
                 <!-- System Settings Dropdown -->
                 <li>
-                    <button class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50 focus:outline-none">
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-cog"></i>
-                            <span>System Settings</span>
-                        </div>
-                        <i class="fas fa-chevron-down text-sm transition-transform"></i>
-                    </button>
-                    <ul class="mt-1 ml-8 space-y-1">
-                        <li>
-                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
-                                <i class="fas fa-building text-sm"></i>
-                                <span class="text-sm">Department Settings</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
-                                <i class="fas fa-map-marker-alt text-sm"></i>
-                                <span class="text-sm">Location Management</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
-                                <i class="fas fa-wrench text-sm"></i>
-                                <span class="text-sm">System Config</span>
-                            </a>
-                        </li>
-                    </ul>
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
+                        <i class="fas fa-building text-sm"></i>
+                        <span class="text-sm">Department Settings</span>
+                    </a>
                 </li>
 
                 <!-- Logs & Reports Dropdown -->
                 <li>
-                    <button class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50 focus:outline-none">
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-clipboard-list"></i>
-                            <span>Logs & Reports</span>
-                        </div>
-                        <i class="fas fa-chevron-down text-sm transition-transform"></i>
-                    </button>
-                    <ul class="mt-1 ml-8 space-y-1">
-                        <li>
-                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
-                                <i class="fas fa-history text-sm"></i>
-                                <span class="text-sm">Activity Logs</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
-                                <i class="fas fa-chart-line text-sm"></i>
-                                <span class="text-sm">System Reports</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
-                                <i class="fas fa-bug text-sm"></i>
-                                <span class="text-sm">Error Logs</span>
-                            </a>
-                        </li>
-                    </ul>
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
+                        <i class="fas fa-history text-sm"></i>
+                        <span class="text-sm">Activity Logs</span>
+                    </a>
                 </li>
             </ul>
         </nav>
