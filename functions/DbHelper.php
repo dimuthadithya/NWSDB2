@@ -138,4 +138,28 @@ class DbHelper
 
         return self::$db->insert('device_categories', $categoryData);
     }
+
+    public static function deleteBranch($branch_id)
+    {
+        self::init();
+
+        if (!is_numeric($branch_id)) {
+            return false;
+        }
+
+        $where = ['branch_id' => $branch_id];
+        return self::$db->delete('branches', $where);
+    }
+
+    public static function deleteDeviceCategory($category_id)
+    {
+        self::init();
+
+        if (!is_numeric($category_id)) {
+            return false;
+        }
+
+        $where = ['category_id' => $category_id];
+        return self::$db->delete('device_categories', $where);
+    }
 }

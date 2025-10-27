@@ -167,8 +167,10 @@ $deviceIcons = ['fas fa-desktop', 'fas fa-print', 'fa-solid fa-expand', 'fa-soli
                                             <button class="text-indigo-600 hover:text-indigo-900" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button class="text-red-600 hover:text-red-900" title="Delete">
-                                                <i class="fas fa-trash"></i>
+                                            <button class="text-red-600 hover:text-red-900 cousor-pointer" title="Delete">
+                                                <a href="./handlers/deleteHandler.php?action=delete_device_category&category_id=<?php echo $category['category_id']; ?>">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
                                             </button>
                                             <button class="text-gray-600 hover:text-gray-900" title="View Details">
                                                 <i class="fas fa-info-circle"></i>

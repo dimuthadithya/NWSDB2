@@ -159,8 +159,10 @@ $branches = DbHelper::getAllBranches();
                                             <button class="text-indigo-600 hover:text-indigo-900">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button class="text-red-600 hover:text-red-900">
-                                                <i class="fas fa-trash"></i>
+                                            <button class="text-red-600 hover:text-red-900 cousor-pointer">
+                                                <a href="./handlers/deleteHandler.php?branch_id=<?php echo $branch['branch_id']; ?>&&action=delete_branch">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
                                             </button>
                                             <button class="text-gray-600 hover:text-gray-900">
                                                 <i class="fas fa-info-circle"></i>
