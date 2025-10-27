@@ -114,4 +114,28 @@ class DbHelper
 
         return $branches ? $branches : false;
     }
+
+    public static function createBranch($branch_name, $branch_location)
+    {
+        self::init();
+
+        $branchData = [
+            'branch_name' => $branch_name,
+            'location' => $branch_location
+        ];
+
+        return self::$db->insert('branches', $branchData);
+    }
+
+    public static function createDeviceCategory($category_name, $category_description)
+    {
+        self::init();
+
+        $categoryData = [
+            'category_name' => $category_name,
+            'description' => $category_description
+        ];
+
+        return self::$db->insert('device_categories', $categoryData);
+    }
 }

@@ -78,7 +78,7 @@ $basePath = $basePath ?? false;
 
                 <!-- Site Offices Management  -->
                 <li>
-                    <a href="../admin/side_offices.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
+                    <a href="../admin/site_offices.php" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50">
                         <i class="fas fa-user-plus text-sm"></i>
                         <span class="text-sm">Manage Site Ofices</span>
                     </a>
