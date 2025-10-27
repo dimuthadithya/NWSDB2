@@ -195,4 +195,59 @@ class DbHelper
         $where = ['section_id' => $section_id];
         return self::$db->delete('sections', $where);
     }
+
+    public static function getComputerCount()
+    {
+        self::init();
+
+        $computerRecord = self::$db->select('device_categories', ['category_id'], ['category_name' => 'Computer']);
+
+        if (!$computerRecord || empty($computerRecord[0]['category_id'])) {
+            return 0; // No Computer category found
+        }
+
+        $computerId = $computerRecord[0]['category_id'];
+
+        $result = self::$db->count('devices', ['category_id' => $computerId]);
+
+        return $result ? $result : 0;
+    }
+
+    public static function getLaptopCount()
+    {
+        self::init();
+
+        $laptopRecord = self::$db->select('device_categories', ['category_id'], ['category_name' => 'Laptop']);
+
+        if (!$laptopRecord || empty($laptopRecord[0]['category_id'])) {
+            return 0; // No Laptop category found
+        }
+
+        $laptopId = $laptopRecord[0]['category_id'];
+
+        $result = self::$db->count('devices', ['category_id' => $laptopId]);
+
+        return $result ? $result : 0;
+    }
+
+
+    public static function getPrinterCount()
+    {
+        self::init();
+
+        // Get the printer category record
+        $printerRecord = self::$db->select('device_categories', ['category_id'], ['category_name' => 'Printer']);
+
+        if (!$printerRecord || empty($printerRecord[0]['category_id'])) {
+            return 0; // no printer category found
+        }
+
+        // Extract the category_id (it's inside the first element)
+        $printerId = $printerRecord[0]['category_id'];
+
+        // Count devices with that category_id
+        $result = self::$db->count('devices', ['category_id' => $printerId]);
+
+        return $result ? $result : 0;
+    }
 }

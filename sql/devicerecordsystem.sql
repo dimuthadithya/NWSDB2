@@ -147,9 +147,3 @@ CREATE TABLE device_issues (
   CONSTRAINT fk_issues_user FOREIGN KEY (reported_by) REFERENCES users(user_id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ===============================================================
--- 9. Default Admin User
--- ===============================================================
-INSERT INTO users (first_name, last_name, username, email, mobile_number, gender, password, site_office, role)
-VALUES ('Admin', 'User', 'admin', 'admin@gmail.com', '0000000000', 'Male', SHA2('admin123', 256), 'Head Office', 'admin')
-ON DUPLICATE KEY UPDATE user_id=user_id;  -- Prevent duplicate insertion

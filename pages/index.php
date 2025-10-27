@@ -2,7 +2,9 @@
 require_once __DIR__ . '/../functions/DbHelper.php';
 require '../components/sessions.php';
 
-
+$computerCount = DbHelper::getComputerCount();
+$printerCount = DbHelper::getPrinterCount();
+$laptopCount = DbHelper::getLaptopCount();
 ?>
 
 <!DOCTYPE html>
@@ -44,7 +46,7 @@ require '../components/sessions.php';
               <p class="text-sm font-medium text-gray-600">
                 Desktop Computers
               </p>
-              <h3 class="text-2xl font-bold text-gray-900 mt-1">24</h3>
+              <h3 class="text-2xl font-bold text-gray-900 mt-1"><?php echo $computerCount ?></h3>
             </div>
             <div
               class="h-12 w-12 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
@@ -62,7 +64,7 @@ require '../components/sessions.php';
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600">Laptops</p>
-              <h3 class="text-2xl font-bold text-gray-900 mt-1">18</h3>
+              <h3 class="text-2xl font-bold text-gray-900 mt-1"><?php echo $laptopCount  ?></h3>
             </div>
             <div
               class="h-12 w-12 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600">
@@ -80,7 +82,7 @@ require '../components/sessions.php';
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-gray-600">Printers</p>
-              <h3 class="text-2xl font-bold text-gray-900 mt-1">12</h3>
+              <h3 class="text-2xl font-bold text-gray-900 mt-1"><?php echo $printerCount ?></h3>
             </div>
             <div
               class="h-12 w-12 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600">
