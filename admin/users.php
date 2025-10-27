@@ -37,10 +37,6 @@ $users = DbHelper::getAllUsers();
                     <p class="mt-1 text-sm text-gray-600">Manage and track all users in the system</p>
                 </div>
                 <div class="mt-4 md:mt-0 flex flex-col sm:flex-row gap-3">
-                    <button class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <i class="fas fa-plus mr-2"></i>
-                        Add New Office
-                    </button>
                     <button class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
                         <i class="fas fa-file-excel mr-2"></i>
                         Export to Excel
@@ -102,7 +98,6 @@ $users = DbHelper::getAllUsers();
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <!-- Sample Row 1 -->
                             <?php
                             foreach ($users as $key => $user) { ?>
                                 <tr class="hover:bg-gray-50">

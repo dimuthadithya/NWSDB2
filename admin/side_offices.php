@@ -47,6 +47,7 @@ $branches = DbHelper::getAllBranches();
                 </div>
             </div>
 
+            <!-- Modal -->
             <el-dialog>
                 <dialog id="dialog" aria-labelledby="dialog-title" class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent">
                     <el-dialog-backdrop class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in" onclick="document.getElementById('dialog').close()"></el-dialog-backdrop>
