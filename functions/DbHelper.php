@@ -115,6 +115,15 @@ class DbHelper
         return $branches ? $branches : false;
     }
 
+    public static function getAllSections()
+    {
+        self::init();
+
+        $sections = self::$db->select('sections');
+
+        return $sections ? $sections : false;
+    }
+
     public static function createBranch($branch_name, $branch_location)
     {
         self::init();
@@ -139,6 +148,18 @@ class DbHelper
         return self::$db->insert('device_categories', $categoryData);
     }
 
+    public static function createSection($section_name, $branch_id)
+    {
+        self::init();
+
+        $sectionData = [
+            'section_name' => $section_name,
+            'branch_id' => $branch_id
+        ];
+
+        return self::$db->insert('sections', $sectionData);
+    }
+
     public static function deleteBranch($branch_id)
     {
         self::init();
@@ -161,5 +182,17 @@ class DbHelper
 
         $where = ['category_id' => $category_id];
         return self::$db->delete('device_categories', $where);
+    }
+
+    public static function deleteSection($section_id)
+    {
+        self::init();
+
+        if (!is_numeric($section_id)) {
+            return false;
+        }
+
+        $where = ['section_id' => $section_id];
+        return self::$db->delete('sections', $where);
     }
 }

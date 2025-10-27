@@ -30,3 +30,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_device_category'
         exit();
     }
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_section'])) {
+    $section_name = trim($_POST['section_name']);
+    $branch_id = intval($_POST['branch_id']);
+
+    $sectionId = DbHelper::createSection($section_name, $branch_id);
+
+    if ($sectionId) {
+        header('Location: ../sections.php?section_add=success');
+        exit();
+    } else {
+        header('Location: ../sections.php?section_add=failed');
+        exit();
+    }
+}

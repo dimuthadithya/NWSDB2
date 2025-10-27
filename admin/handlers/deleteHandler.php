@@ -37,4 +37,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             exit();
         }
     }
+
+    if ($action === 'delete_section' && isset($_GET['section_id'])) {
+        $section_id = intval($_GET['section_id']);
+
+        // Call the DbHelper method to delete the section
+        $deleted = DbHelper::deleteSection($section_id);
+
+        if ($deleted) {
+            // Redirect back to sections page with success message
+            header('Location: ../sections.php?message=Section+deleted+successfully');
+            exit();
+        } else {
+            // Redirect back with error message
+            header('Location: ../sections.php?error=Failed+to+delete+section');
+            exit();
+        }
+    }
 }
