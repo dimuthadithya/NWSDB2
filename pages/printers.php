@@ -1,5 +1,8 @@
 <?php
 include '../components/sessions.php';
+require_once '../functions/DbHelper.php';
+
+$printers = DbHelper::getAllPrinters();
 ?>
 
 <!DOCTYPE html>
@@ -185,67 +188,91 @@ include '../components/sessions.php';
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <!-- Sample Row -->
-              <tr class="hover:bg-gray-50">
-                <td class="px-6 py-4">
-                  <div class="flex items-center">
-                    <i class="fas fa-print text-gray-400 mr-3"></i>
-                    <div>
-                      <div class="text-sm font-medium text-gray-900">HP LaserJet Pro</div>
-                      <div class="text-sm text-gray-500">ID: PR001</div>
-                      <div class="text-sm text-gray-500">Model: M404dn</div>
-                      <div class="text-sm text-gray-500">Purchase: 2023-05-20</div>
+              <?php
+              foreach ($printers as $key => $printer) { ?>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4">
+                    <div class="flex items-center">
+                      <i class="fas fa-print text-gray-400 mr-3"></i>
+                      <div>
+                        <div class="text-sm font-medium text-gray-900"><?php echo $printer['device_name'] ?></div>
+                        <div class="text-sm text-gray-500">ID: <?php echo $printer['device_id'] ?></div>
+                        <div class="text-sm text-gray-500">Model: <?php echo $printer['model'] ?? 'if need' ?></div>
+                        <div class="text-sm text-gray-500">Made in: <?php echo $printer['made_in'] ?? 'if need' ?></div>
+                        <div class="text-sm text-gray-500">Purchase: <?php echo $printer['purchase_date'] ?? 'if need' ?></div>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm text-gray-900">
-                    <div>Type: Laser Printer</div>
-                    <div>Print Speed: 38 ppm</div>
-                    <div>Resolution: 1200 x 1200 dpi</div>
-                    <div>Paper Size: A4, Letter, Legal</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm text-gray-900">
-                    <div>Duplex Printing: Yes</div>
-                    <div>Color Printing: No</div>
-                    <div>Paper Capacity: 250 sheets</div>
-                    <div>Monthly Duty: 80,000 pages</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm text-gray-900">
-                    <div>Network: Ethernet</div>
-                    <div>Wi-Fi: Yes</div>
-                    <div>USB: Yes</div>
-                    <div>IP: 192.168.1.101</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm text-gray-900">
-                    <div>Section: IT Department</div>
-                    <div>Location: 2nd Floor</div>
-                    <div>
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Active
-                      </span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm text-gray-900">
+                      <div>Processor: <?php echo $printer['processor'] ?? 'if need' ?></div>
+                      <div>RAM: <?php echo $printer['ram'] ?? 'if need' ?></div>
+                      <div>Hard Drive: <?php echo $printer['hard_drive_capacity'] ?? 'if need' ?></div>
+                      <div>OS: <?php echo $printer['operating_system'] ?? 'if need' ?></div>
                     </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 text-right text-sm font-medium">
-                  <div class="flex justify-end space-x-2">
-                    <button class="text-indigo-600 hover:text-indigo-900">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="text-red-600 hover:text-red-900">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                    <button class="text-gray-600 hover:text-gray-900">
-                      <i class="fas fa-history"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm text-gray-900">
+                      <div>Keyboard: <?php echo $printer['keyboard'] ?? 'if need' ?></div>
+                      <div>Mouse: <?php echo $printer['mouse'] ?? 'if need' ?></div>
+                      <div>Monitor: <?php echo $printer['monitor_info'] ?? 'if need' ?></div>
+                      <div>CPU Serial: <?php echo $printer['cpu_serial'] ?? 'if need' ?></div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm text-gray-900">
+                      <div>Network: <?php echo $printer['network_connectivity'] ?? 'if need' ?></div>
+                      <div>Printer Conn.: <?php echo $printer['printer_connectivity'] ?? 'if need' ?></div>
+                      <div>Virus Guard: <?php echo $printer['virus_guard'] ?? 'if need' ?></div>
+                      <div>IP: <?php echo $printer['ip_address'] ?? 'if need' ?></div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm text-gray-900">
+                      <div>Section: <?php echo $printer['section_id'] ?? 'Unassigned' ?></div>
+                      <div>Assigned To: <?php echo $printer['assigned_to'] ?? 'Unassigned' ?></div>
+                      <div>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                        <?php
+                        switch ($printer['status']) {
+                          case 'active':
+                            echo 'bg-green-100 text-green-800';
+                            break;
+                          case 'under_repair':
+                            echo 'bg-yellow-100 text-yellow-800';
+                            break;
+                          case 'retired':
+                            echo 'bg-red-100 text-red-800';
+                            break;
+                          case 'lost':
+                            echo 'bg-gray-100 text-gray-800';
+                            break;
+                          default:
+                            echo 'bg-gray-100 text-gray-800';
+                        }
+                        ?>">
+                          <?php echo ucfirst($printer['status'] ?? 'Unknown') ?>
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-right text-sm font-medium">
+                    <div class="flex justify-end space-x-2">
+                      <button class="text-indigo-600 hover:text-indigo-900">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="text-red-600 hover:text-red-900">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                      <button class="text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-history"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              <?php } ?>
+
+
             </tbody>
           </table>
         </div>

@@ -146,6 +146,17 @@ class DbHelper
         return $laptops ? $laptops : false;
     }
 
+    public static function getAllPrinters()
+    {
+        self::init();
+
+        $printerId = self::$db->getId('device_categories', 'category_name', 'Printer', 'category_id');
+
+        $printers = self::$db->select('devices', ['*'], ['category_id' => $printerId]);
+
+        return $printers ? $printers : false;
+    }
+
     public static function createBranch($branch_name, $branch_location)
     {
         self::init();
