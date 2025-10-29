@@ -40,12 +40,6 @@ $basePath = $basePath ?? false;
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo $basePath ? $basePath . 'repairs.php' : 'repairs.php' ?>" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'repairs.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
-                        <i class="fas fa-tools"></i>
-                        <span>Repair Details</span>
-                    </a>
-                </li>
-                <li>
                     <a href="<?php echo $basePath ? $basePath . 'site-offices.php' : 'site-offices.php' ?>" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'site-offices.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
                         <i class="fas fa-building"></i>
                         <span>Site Offices</span>
@@ -61,6 +55,12 @@ $basePath = $basePath ?? false;
                     <a href="<?php echo $basePath ? $basePath . 'other-devices.php' : 'other-devices.php' ?>" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'other-devices.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
                         <i class="fas fa-microchip"></i>
                         <span>Other Details</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo $basePath ? $basePath . 'repairs.php' : 'repairs.php' ?>" class="flex items-center space-x-3 px-3 py-2 rounded-lg <?php echo basename($_SERVER['PHP_SELF']) == 'repairs.php' ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'; ?>">
+                        <i class="fas fa-tools"></i>
+                        <span>Repair Details</span>
                     </a>
                 </li>
                 <li>
