@@ -133,50 +133,54 @@ $sections = DbHelper::getAllSections();
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <!-- Sample Row 1 -->
                             <?php
-                            foreach ($sections as $key => $section) {
-                            ?>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        <?php echo $key + 1; ?>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center">
-                                            <div class="text-sm font-medium text-gray-900"><?php echo $section['section_name'] ?></div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm text-gray-900">Bandarawela</div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            Active
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <?php echo $section['updated_at']; ?>
-                                    </td>
-                                    <td class="px-6 py-4 text-right text-sm font-medium">
-                                        <div class="flex justify-end space-x-2">
-                                            <button class="text-indigo-600 hover:text-indigo-900">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="text-red-600 hover:text-red-900 cousor-pointer">
-                                                <a href="./handlers/deleteHandler.php?section_id=<?php echo $section['section_id']; ?>&&action=delete_section">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
-                                            </button>
-                                            <button class="text-gray-600 hover:text-gray-900">
-                                                <i class="fas fa-info-circle"></i>
-                                            </button>
-                                        </div>
-                                    </td>
+                            if (is_array($sections) && count($sections) > 0) { ?>
+                                <?php
+                                foreach ($sections as $key => $section) {
+                                ?>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            <?php echo $key + 1; ?>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center">
+                                                <div class="text-sm font-medium text-gray-900"><?php echo $section['section_name'] ?></div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-sm text-gray-900">Bandarawela</div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                Active
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <?php echo $section['updated_at']; ?>
+                                        </td>
+                                        <td class="px-6 py-4 text-right text-sm font-medium">
+                                            <div class="flex justify-end space-x-2">
+                                                <button class="text-indigo-600 hover:text-indigo-900">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="text-red-600 hover:text-red-900 cousor-pointer">
+                                                    <a href="./handlers/deleteHandler.php?section_id=<?php echo $section['section_id']; ?>&&action=delete_section">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </button>
+                                                <button class="text-gray-600 hover:text-gray-900">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php
+                                } ?>
+                            <?php } else { ?>
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">No Sections found.</td>
                                 </tr>
-                            <?php
-                            }
-
-                            ?>
+                            <?php } ?>
                         </tbody>
                     </table>
                 </div>
