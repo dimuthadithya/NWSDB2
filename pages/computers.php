@@ -33,7 +33,7 @@ $computers = DbHelper::getAllComputers();
           <p class="mt-1 text-sm text-gray-600">Manage and track all computer devices in the system</p>
         </div>
         <div class="mt-4 md:mt-0 flex flex-col sm:flex-row gap-3">
-          <button class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <button onclick="openAddComputerModal()" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <i class="fas fa-plus mr-2"></i>
             Add New Computer
           </button>
@@ -330,6 +330,249 @@ $computers = DbHelper::getAllComputers();
     </main>
   </div>
 
+  <!-- Add New Computer Modal -->
+  <div id="addComputerModal" class="hidden fixed inset-0 overflow-y-auto h-full w-full z-50 backdrop-blur-sm bg-white/30 flex items-center justify-center p-4" onclick="closeAddComputerModal()">
+    <!-- Modal content -->
+    <div class="w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-lg rounded-lg bg-white" onclick="event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-4 border-b border-gray-200">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+            <i class="fas fa-desktop text-white"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Add New Computer</h3>
+            <p class="text-sm text-gray-600">Enter computer details and specifications</p>
+          </div>
+        </div>
+        <button onclick="closeAddComputerModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body with Scrollable Content -->
+      <div class="max-h-96 overflow-y-auto p-4">
+        <form id="addComputerForm">
+          <!-- Basic Information Section -->
+          <div class="mb-6">
+            <h4 class="text-md font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+              Basic Information
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Device Name *</label>
+                <input type="text" name="device_name" required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  placeholder="e.g., Desktop Computer, Workstation">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                <input type="text" name="model"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  placeholder="e.g., Dell OptiPlex 7090">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Made In</label>
+                <input type="text" name="made_in"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  placeholder="e.g., USA, China, Taiwan">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                <select name="category_id" required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200">
+                  <option value="">Select Category</option>
+                  <option value="1">Computer</option>
+                  <option value="2">Laptop</option>
+                  <option value="3">Workstation</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assignment Information Section -->
+          <div class="mb-6">
+            <h4 class="text-md font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-users text-blue-600 mr-2"></i>
+              Assignment Information
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
+                <select name="section_id"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200">
+                  <option value="">Select Section</option>
+                  <option value="1">IT Department</option>
+                  <option value="2">HR Department</option>
+                  <option value="3">Finance Department</option>
+                  <option value="4">Operations</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Assigned To</label>
+                <select name="assigned_to"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200">
+                  <option value="">Select User</option>
+                  <option value="1">John Smith</option>
+                  <option value="2">Jane Doe</option>
+                  <option value="3">Michael Johnson</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hardware Specifications Section -->
+          <div class="mb-6">
+            <h4 class="text-md font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-microchip text-blue-600 mr-2"></i>
+              Hardware Specifications
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Operating System</label>
+                <input type="text" name="operating_system"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  placeholder="e.g., Windows 11 Pro, Ubuntu 22.04">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Processor</label>
+                <input type="text" name="processor"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  placeholder="e.g., Intel i7-12700, AMD Ryzen 5 5600X">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">RAM</label>
+                <input type="text" name="ram"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  placeholder="e.g., 16GB DDR4, 32GB DDR5">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Hard Drive Capacity</label>
+                <input type="text" name="hard_drive_capacity"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  placeholder="e.g., 512GB SSD, 1TB HDD">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Keyboard</label>
+                <input type="text" name="keyboard"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  placeholder="e.g., Dell KB216, Logitech K120">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Mouse</label>
+                <input type="text" name="mouse"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  placeholder="e.g., Dell MS116, Logitech B100">
+              </div>
+            </div>
+          </div>
+
+          <!-- Connectivity & Network Section -->
+          <div class="mb-6">
+            <h4 class="text-md font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-network-wired text-blue-600 mr-2"></i>
+              Connectivity & Network
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Network Connectivity</label>
+                <input type="text" name="network_connectivity"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  placeholder="e.g., Ethernet, WiFi, Both">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Printer Connectivity</label>
+                <input type="text" name="printer_connectivity"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  placeholder="e.g., USB, Network, Wireless">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">IP Address</label>
+                <input type="text" name="ip_address"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  placeholder="e.g., 192.168.1.100">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Virus Guard</label>
+                <input type="text" name="virus_guard"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  placeholder="e.g., Windows Defender, Norton, McAfee">
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Information Section -->
+          <div class="mb-6">
+            <h4 class="text-md font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-clipboard-list text-blue-600 mr-2"></i>
+              Additional Information
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Monitor Info</label>
+                <input type="text" name="monitor_info"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  placeholder="e.g., 24inch LED, Dual Monitor Setup">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">CPU Serial</label>
+                <input type="text" name="cpu_serial"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  placeholder="Enter CPU serial number">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Purchase Date</label>
+                <input type="date" name="purchase_date"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select name="status"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200">
+                  <option value="active">Active</option>
+                  <option value="under_repair">Under Repair</option>
+                  <option value="retired">Retired</option>
+                  <option value="lost">Lost</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes Section -->
+          <div class="mb-6">
+            <h4 class="text-md font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-sticky-note text-blue-600 mr-2"></i>
+              Additional Notes
+            </h4>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+              <textarea name="notes" rows="4"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                placeholder="Enter any additional notes or comments about this computer..."></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-end gap-3 p-4 border-t border-gray-200">
+        <button onclick="closeAddComputerModal()"
+          class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+          <i class="fas fa-times mr-2"></i>Cancel
+        </button>
+        <button onclick="resetComputerForm()"
+          class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+          <i class="fas fa-refresh mr-2"></i>Reset
+        </button>
+        <button onclick="saveComputer()"
+          class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm">
+          <i class="fas fa-save mr-2"></i>Save Computer
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Filter functionality
     document.getElementById('search').addEventListener('keyup', function() {
@@ -338,6 +581,50 @@ $computers = DbHelper::getAllComputers();
 
     document.getElementById('status').addEventListener('change', function() {
       // Add status filter logic here
+    });
+
+    // Modal functionality
+    function openAddComputerModal() {
+      document.getElementById('addComputerModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    function closeAddComputerModal() {
+      document.getElementById('addComputerModal').classList.add('hidden');
+      document.body.style.overflow = 'auto'; // Restore background scrolling
+    }
+
+    function resetComputerForm() {
+      document.getElementById('addComputerForm').reset();
+    }
+
+    function saveComputer() {
+      // Get form data
+      const formData = new FormData(document.getElementById('addComputerForm'));
+
+      // Basic validation
+      const deviceName = formData.get('device_name');
+      const categoryId = formData.get('category_id');
+
+      if (!deviceName || !categoryId) {
+        alert('Please fill in all required fields (Device Name and Category)');
+        return;
+      }
+
+      // Here you would typically send the data to your PHP backend
+      console.log('Computer data to save:', Object.fromEntries(formData));
+
+      // For now, just show a success message and close modal
+      alert('Computer saved successfully! (Note: This is just a UI demo)');
+      closeAddComputerModal();
+      resetComputerForm();
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeAddComputerModal();
+      }
     });
   </script>
 
