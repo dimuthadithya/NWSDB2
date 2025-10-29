@@ -181,6 +181,58 @@ class DbHelper
         return self::$db->insert('device_categories', $categoryData);
     }
 
+    public static function createDevice(
+        $deviceName,
+        $model,
+        $madeIn,
+        $categoryId,
+        $sectionId,
+        $assignedTo,
+        $operatingSystem,
+        $processor,
+        $ram,
+        $hardDriveCapacity,
+        $keyboard,
+        $mouse,
+        $networkConnectivity,
+        $printerConnectivity,
+        $ipAddress,
+        $virusGuard,
+        $monitorInfo,
+        $cpuSerial,
+        $purchaseDate,
+        $status,
+        $notes
+    ) {
+        self::init();
+
+        // Implementation for creating a device goes here
+        $deviceData = [
+            'device_name' => $deviceName,
+            'model' => $model,
+            'made_in' => $madeIn,
+            'category_id' => $categoryId,
+            'section_id' => $sectionId,
+            'assigned_to' => $assignedTo,
+            'operating_system' => $operatingSystem,
+            'processor' => $processor,
+            'ram' => $ram,
+            'hard_drive_capacity' => $hardDriveCapacity,
+            'keyboard' => $keyboard,
+            'mouse' => $mouse,
+            'network_connectivity' => $networkConnectivity,
+            'printer_connectivity' => $printerConnectivity,
+            'ip_address' => $ipAddress,
+            'virus_guard' => $virusGuard,
+            'monitor_info' => $monitorInfo,
+            'cpu_serial' => $cpuSerial,
+            'purchase_date' => $purchaseDate,
+            'status' => $status,
+            'notes' => $notes
+        ];
+        return self::$db->insert('devices', $deviceData);
+    }
+
     public static function createSection($section_name, $branch_id)
     {
         self::init();
@@ -263,7 +315,6 @@ class DbHelper
         return $result ? $result : 0;
     }
 
-
     public static function getPrinterCount()
     {
         self::init();
@@ -291,5 +342,14 @@ class DbHelper
         $sections = self::$db->getSectionsByDeviceCount();
 
         return $sections ? $sections : false;
+    }
+
+    public static function getCategoryId($category)
+    {
+        self::init();
+
+        $categoryId = self::$db->getId('device_categories', 'category_name', $category, 'category_id');
+
+        return $categoryId ? $categoryId : null;
     }
 }

@@ -3,6 +3,7 @@ include '../components/sessions.php';
 require_once '../functions/DbHelper.php';
 
 $computers = DbHelper::getAllComputers();
+$ComputerCategoryId = DbHelper::getCategoryId('Computer')
 
 ?>
 
@@ -352,7 +353,7 @@ $computers = DbHelper::getAllComputers();
 
       <!-- Modal Body with Scrollable Content -->
       <div class="max-h-96 overflow-y-auto p-4">
-        <form id="addComputerForm">
+        <form id="addComputerForm" action="../handlers/addHandler.php" method="post">
           <!-- Basic Information Section -->
           <div class="mb-6">
             <h4 class="text-md font-semibold text-gray-900 mb-4 flex items-center">
@@ -383,9 +384,7 @@ $computers = DbHelper::getAllComputers();
                 <select name="category_id" required
                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200">
                   <option value="">Select Category</option>
-                  <option value="1">Computer</option>
-                  <option value="2">Laptop</option>
-                  <option value="3">Workstation</option>
+                  <option selected value="<?php echo $ComputerCategoryId; ?>">Computer</option>
                 </select>
               </div>
             </div>
@@ -565,8 +564,8 @@ $computers = DbHelper::getAllComputers();
           class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors duration-200">
           <i class="fas fa-refresh mr-2"></i>Reset
         </button>
-        <button onclick="saveComputer()"
-          class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm">
+        <button type="submit"
+          class="save-computer-btn px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm">
           <i class="fas fa-save mr-2"></i>Save Computer
         </button>
       </div>
@@ -574,15 +573,6 @@ $computers = DbHelper::getAllComputers();
   </div>
 
   <script>
-    // Filter functionality
-    document.getElementById('search').addEventListener('keyup', function() {
-      // Add search filter logic here
-    });
-
-    document.getElementById('status').addEventListener('change', function() {
-      // Add status filter logic here
-    });
-
     // Modal functionality
     function openAddComputerModal() {
       document.getElementById('addComputerModal').classList.remove('hidden');
@@ -598,33 +588,8 @@ $computers = DbHelper::getAllComputers();
       document.getElementById('addComputerForm').reset();
     }
 
-    function saveComputer() {
-      // Get form data
-      const formData = new FormData(document.getElementById('addComputerForm'));
-
-      // Basic validation
-      const deviceName = formData.get('device_name');
-      const categoryId = formData.get('category_id');
-
-      if (!deviceName || !categoryId) {
-        alert('Please fill in all required fields (Device Name and Category)');
-        return;
-      }
-
-      // Here you would typically send the data to your PHP backend
-      console.log('Computer data to save:', Object.fromEntries(formData));
-
-      // For now, just show a success message and close modal
-      alert('Computer saved successfully! (Note: This is just a UI demo)');
-      closeAddComputerModal();
-      resetComputerForm();
-    }
-
-    // Close modal with Escape key
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        closeAddComputerModal();
-      }
+    document.querySelector('.save-computer-btn').addEventListener('click', function() {
+      document.getElementById('addComputerForm').submit();
     });
   </script>
 
