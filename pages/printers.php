@@ -205,17 +205,11 @@ $printers = DbHelper::getAllPrinters();
                   </td>
                   <td class="px-6 py-4">
                     <div class="text-sm text-gray-900">
-                      <div>Processor: <?php echo $printer['processor'] ?? 'if need' ?></div>
                       <div>RAM: <?php echo $printer['ram'] ?? 'if need' ?></div>
-                      <div>Hard Drive: <?php echo $printer['hard_drive_capacity'] ?? 'if need' ?></div>
-                      <div>OS: <?php echo $printer['operating_system'] ?? 'if need' ?></div>
                     </div>
                   </td>
                   <td class="px-6 py-4">
                     <div class="text-sm text-gray-900">
-                      <div>Keyboard: <?php echo $printer['keyboard'] ?? 'if need' ?></div>
-                      <div>Mouse: <?php echo $printer['mouse'] ?? 'if need' ?></div>
-                      <div>Monitor: <?php echo $printer['monitor_info'] ?? 'if need' ?></div>
                       <div>CPU Serial: <?php echo $printer['cpu_serial'] ?? 'if need' ?></div>
                     </div>
                   </td>
@@ -223,7 +217,6 @@ $printers = DbHelper::getAllPrinters();
                     <div class="text-sm text-gray-900">
                       <div>Network: <?php echo $printer['network_connectivity'] ?? 'if need' ?></div>
                       <div>Printer Conn.: <?php echo $printer['printer_connectivity'] ?? 'if need' ?></div>
-                      <div>Virus Guard: <?php echo $printer['virus_guard'] ?? 'if need' ?></div>
                       <div>IP: <?php echo $printer['ip_address'] ?? 'if need' ?></div>
                     </div>
                   </td>
