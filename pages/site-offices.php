@@ -247,191 +247,89 @@ $branches = DbHelper::getAllBranches();
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <?php foreach ($branches as $key => $branch) { ?>
-                <tr class="hover:bg-gray-50">
-                  <!-- Branch Basic Info -->
-                  <td class="px-6 py-4">
-                    <div class="flex items-center">
-                      <i class="fas fa-building text-blue-500 mr-3 text-lg"></i>
-                      <div>
-                        <div class="text-sm font-medium text-gray-900">
-                          <?= htmlspecialchars($branch['branch_name'] ?? 'N/A') ?>
+              <?php
+              if (is_array($branches) && count($branches) > 0) { ?>
+                <?php foreach ($branches as $key => $branch) { ?>
+                  <tr class="hover:bg-gray-50">
+                    <!-- Branch Basic Info -->
+                    <td class="px-6 py-4">
+                      <div class="flex items-center">
+                        <i class="fas fa-building text-blue-500 mr-3 text-lg"></i>
+                        <div>
+                          <div class="text-sm font-medium text-gray-900">
+                            <?= htmlspecialchars($branch['branch_name'] ?? 'N/A') ?>
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            ID: <?= htmlspecialchars($branch['branch_id'] ?? 'N/A') ?>
+                          </div>
                         </div>
-                        <div class="text-sm text-gray-500">
-                          ID: <?= htmlspecialchars($branch['branch_id'] ?? 'N/A') ?>
+                      </div>
+                    </td>
+
+                    <!-- Location Details -->
+                    <td class="px-6 py-4">
+                      <div class="text-sm">
+                        <div class="flex items-center mb-1">
+                          <i class="fas fa-map-marker-alt text-gray-400 mr-2"></i>
+                          <span class="font-medium text-gray-900">
+                            <?= htmlspecialchars($branch['location'] ?? 'Location not specified') ?>
+                          </span>
+                        </div>
+                        <div class="text-xs text-gray-500">
+                          Full Address
                         </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  <!-- Location Details -->
-                  <td class="px-6 py-4">
-                    <div class="text-sm">
-                      <div class="flex items-center mb-1">
-                        <i class="fas fa-map-marker-alt text-gray-400 mr-2"></i>
-                        <span class="font-medium text-gray-900">
-                          <?= htmlspecialchars($branch['location'] ?? 'Location not specified') ?>
-                        </span>
+                    <!-- Date Information -->
+                    <td class="px-6 py-4">
+                      <div class="text-sm">
+                        <div class="flex items-center mb-1">
+                          <i class="fas fa-calendar-plus text-green-500 mr-2"></i>
+                          <span class="text-gray-900">Created:</span>
+                        </div>
+                        <div class="text-xs text-gray-600 mb-2">
+                          <?= htmlspecialchars($branch['created_at'] ?? 'N/A') ?>
+                        </div>
+                        <div class="flex items-center">
+                          <i class="fas fa-calendar-edit text-orange-500 mr-2"></i>
+                          <span class="text-gray-900">Updated:</span>
+                        </div>
+                        <div class="text-xs text-gray-600">
+                          <?= htmlspecialchars($branch['updated_at'] ?? 'N/A') ?>
+                        </div>
                       </div>
-                      <div class="text-xs text-gray-500">
-                        Full Address
-                      </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  <!-- Date Information -->
-                  <td class="px-6 py-4">
-                    <div class="text-sm">
-                      <div class="flex items-center mb-1">
-                        <i class="fas fa-calendar-plus text-green-500 mr-2"></i>
-                        <span class="text-gray-900">Created:</span>
-                      </div>
-                      <div class="text-xs text-gray-600 mb-2">
-                        <?= htmlspecialchars($branch['created_at'] ?? 'N/A') ?>
-                      </div>
-                      <div class="flex items-center">
-                        <i class="fas fa-calendar-edit text-orange-500 mr-2"></i>
-                        <span class="text-gray-900">Updated:</span>
-                      </div>
-                      <div class="text-xs text-gray-600">
-                        <?= htmlspecialchars($branch['updated_at'] ?? 'N/A') ?>
-                      </div>
-                    </div>
-                  </td>
+                    <!-- Status -->
+                    <td class="px-6 py-4">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <i class="fas fa-check-circle mr-1"></i>
+                        Active
+                      </span>
+                    </td>
 
-                  <!-- Status -->
-                  <td class="px-6 py-4">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      <i class="fas fa-check-circle mr-1"></i>
-                      Active
-                    </span>
-                  </td>
-
-                  <!-- Actions -->
-                  <td class="px-6 py-4 text-right text-sm font-medium">
-                    <div class="flex justify-end space-x-2">
-                      <button class="text-indigo-600 hover:text-indigo-900 p-2 hover:bg-indigo-50 rounded transition-colors duration-200" title="Edit Branch">
-                        <i class="fas fa-edit"></i>
-                      </button>
-                      <button class="text-green-600 hover:text-green-900 p-2 hover:bg-green-50 rounded transition-colors duration-200" title="View Details">
-                        <i class="fas fa-eye"></i>
-                      </button>
-                      <button class="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded transition-colors duration-200" title="Delete Branch">
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              <?php } ?>
-
-              <!-- Sample rows for demonstration if no data -->
-              <?php if (empty($branches)) { ?>
-                <tr class="hover:bg-gray-50">
-                  <td class="px-6 py-4">
-                    <div class="flex items-center">
-                      <i class="fas fa-building text-blue-500 mr-3 text-lg"></i>
-                      <div>
-                        <div class="text-sm font-medium text-gray-900">Bandarawela Main Office</div>
-                        <div class="text-sm text-gray-500">ID: BR-001</div>
+                    <!-- Actions -->
+                    <td class="px-6 py-4 text-right text-sm font-medium">
+                      <div class="flex justify-end space-x-2">
+                        <button class="text-indigo-600 hover:text-indigo-900 p-2 hover:bg-indigo-50 rounded transition-colors duration-200" title="Edit Branch">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-green-600 hover:text-green-900 p-2 hover:bg-green-50 rounded transition-colors duration-200" title="View Details">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="text-red-600 hover:text-red-900 cursor-pointer">
+                          <a href="../admin/handlers/deleteHandler.php?branch_id=<?php echo $branch['branch_id']; ?>&&action=delete_branch">
+                            <i class="fas fa-trash"></i>
+                          </a>
+                        </button>
                       </div>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4">
-                    <div class="text-sm">
-                      <div class="flex items-center mb-1">
-                        <i class="fas fa-map-marker-alt text-gray-400 mr-2"></i>
-                        <span class="font-medium text-gray-900">123 Main Street, Bandarawela</span>
-                      </div>
-                      <div class="text-xs text-gray-500">Central Region</div>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4">
-                    <div class="text-sm">
-                      <div class="flex items-center mb-1">
-                        <i class="fas fa-calendar-plus text-green-500 mr-2"></i>
-                        <span class="text-gray-900">Created:</span>
-                      </div>
-                      <div class="text-xs text-gray-600 mb-2">2023-10-20 14:30:00</div>
-                      <div class="flex items-center">
-                        <i class="fas fa-calendar-edit text-orange-500 mr-2"></i>
-                        <span class="text-gray-900">Updated:</span>
-                      </div>
-                      <div class="text-xs text-gray-600">2023-10-25 09:15:00</div>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      <i class="fas fa-check-circle mr-1"></i>
-                      Active
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 text-right text-sm font-medium">
-                    <div class="flex justify-end space-x-2">
-                      <button class="text-indigo-600 hover:text-indigo-900 p-2 hover:bg-indigo-50 rounded transition-colors duration-200" title="Edit Branch">
-                        <i class="fas fa-edit"></i>
-                      </button>
-                      <button class="text-green-600 hover:text-green-900 p-2 hover:bg-green-50 rounded transition-colors duration-200" title="View Details">
-                        <i class="fas fa-eye"></i>
-                      </button>
-                      <button class="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded transition-colors duration-200" title="Delete Branch">
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr class="hover:bg-gray-50">
-                  <td class="px-6 py-4">
-                    <div class="flex items-center">
-                      <i class="fas fa-building text-blue-500 mr-3 text-lg"></i>
-                      <div>
-                        <div class="text-sm font-medium text-gray-900">Badulla Branch Office</div>
-                        <div class="text-sm text-gray-500">ID: BR-002</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4">
-                    <div class="text-sm">
-                      <div class="flex items-center mb-1">
-                        <i class="fas fa-map-marker-alt text-gray-400 mr-2"></i>
-                        <span class="font-medium text-gray-900">45 Station Road, Badulla</span>
-                      </div>
-                      <div class="text-xs text-gray-500">Central Region</div>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4">
-                    <div class="text-sm">
-                      <div class="flex items-center mb-1">
-                        <i class="fas fa-calendar-plus text-green-500 mr-2"></i>
-                        <span class="text-gray-900">Created:</span>
-                      </div>
-                      <div class="text-xs text-gray-600 mb-2">2023-10-18 11:45:00</div>
-                      <div class="flex items-center">
-                        <i class="fas fa-calendar-edit text-orange-500 mr-2"></i>
-                        <span class="text-gray-900">Updated:</span>
-                      </div>
-                      <div class="text-xs text-gray-600">2023-10-24 16:20:00</div>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      <i class="fas fa-check-circle mr-1"></i>
-                      Active
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 text-right text-sm font-medium">
-                    <div class="flex justify-end space-x-2">
-                      <button class="text-indigo-600 hover:text-indigo-900 p-2 hover:bg-indigo-50 rounded transition-colors duration-200" title="Edit Branch">
-                        <i class="fas fa-edit"></i>
-                      </button>
-                      <button class="text-green-600 hover:text-green-900 p-2 hover:bg-green-50 rounded transition-colors duration-200" title="View Details">
-                        <i class="fas fa-eye"></i>
-                      </button>
-                      <button class="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded transition-colors duration-200" title="Delete Branch">
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </td>
+                    </td>
+                  </tr>
+                <?php } ?>
+              <?php } else { ?>
+                <tr>
+                  <td colspan="5" class="text-center py-4">No branches found.</td>
                 </tr>
               <?php } ?>
             </tbody>

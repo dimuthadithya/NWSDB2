@@ -12,11 +12,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         if ($deleted) {
             // Redirect back to site offices page with success message
-            header('Location: ../site_offices.php?message=Branch+deleted+successfully');
+            header('Location: ../../pages/site-offices.php?message=Branch+deleted+successfully');
             exit();
         } else {
             // Redirect back with error message
-            header('Location: ../site_offices.php?error=Failed+to+delete+branch');
+            header('Location: ../../pages/site-offices.php?error=Failed+to+delete+branch');
             exit();
         }
     }

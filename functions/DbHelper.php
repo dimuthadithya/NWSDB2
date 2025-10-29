@@ -112,7 +112,7 @@ class DbHelper
 
         $branches = self::$db->select('branches');
 
-        return $branches ? $branches : false;
+        return $branches ? $branches : [];
     }
 
     public static function getAllSections()
