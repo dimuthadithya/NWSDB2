@@ -189,85 +189,91 @@ $LaptopCategoryId = DbHelper::getCategoryId('Laptop')
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <!-- Sample Row -->
-              <?php foreach ($laptops as $laptop): ?>
-                <tr class="hover:bg-gray-50">
-                  <td class="px-6 py-4">
-                    <div class="flex items-center">
-                      <i class="fas fa-laptop text-gray-400 mr-3"></i>
-                      <div>
-                        <div class="text-sm font-medium text-gray-900">
-                          Device: <?php echo $laptop['device_name'] ?? 'if need'; ?>
-                        </div>
-                        <div class="text-sm text-gray-500">
-                          Model: <?php echo $laptop['model'] ?? 'if need'; ?>
-                        </div>
-                        <div class="text-sm text-gray-500">
-                          Made in: <?php echo $laptop['made_in'] ?? 'if need'; ?>
-                        </div>
-                        <div class="text-sm text-gray-500">
-                          Purchase: <?php echo $laptop['purchase_date'] ?? 'if need'; ?>
+              <?php
+              if (is_array($laptops) && count($laptops) > 0) { ?>
+                <?php foreach ($laptops as $laptop): ?>
+                  <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4">
+                      <div class="flex items-center">
+                        <i class="fas fa-laptop text-gray-400 mr-3"></i>
+                        <div>
+                          <div class="text-sm font-medium text-gray-900">
+                            Device: <?php echo $laptop['device_name'] ?? 'if need'; ?>
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            Model: <?php echo $laptop['model'] ?? 'if need'; ?>
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            Made in: <?php echo $laptop['made_in'] ?? 'if need'; ?>
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            Purchase: <?php echo $laptop['purchase_date'] ?? 'if need'; ?>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  <td class="px-6 py-4">
-                    <div class="text-sm">
-                      <div>Processor: <?php echo $laptop['processor'] ?? 'if need'; ?></div>
-                      <div>RAM: <?php echo $laptop['ram'] ?? 'if need'; ?></div>
-                      <div>Storage: <?php echo $laptop['hard_drive_capacity'] ?? 'if need'; ?></div>
-                      <div>Monitor: <?php echo $laptop['monitor_info'] ?? 'if need'; ?></div>
-                      <div>Serial: <?php echo $laptop['cpu_serial'] ?? 'if need'; ?></div>
-                    </div>
-                  </td>
+                    <td class="px-6 py-4">
+                      <div class="text-sm">
+                        <div>Processor: <?php echo $laptop['processor'] ?? 'if need'; ?></div>
+                        <div>RAM: <?php echo $laptop['ram'] ?? 'if need'; ?></div>
+                        <div>Storage: <?php echo $laptop['hard_drive_capacity'] ?? 'if need'; ?></div>
+                        <div>Monitor: <?php echo $laptop['monitor_info'] ?? 'if need'; ?></div>
+                        <div>Serial: <?php echo $laptop['cpu_serial'] ?? 'if need'; ?></div>
+                      </div>
+                    </td>
 
-                  <td class="px-6 py-4">
-                    <div class="text-sm">
-                      <div>Keyboard: <?php echo $laptop['keyboard'] ?? 'if need'; ?></div>
-                      <div>Mouse: <?php echo $laptop['mouse'] ?? 'if need'; ?></div>
-                      <div>Printer Connectivity: <?php echo $laptop['printer_connectivity'] ?? 'if need'; ?></div>
-                      <div>Virus Guard: <?php echo $laptop['virus_guard'] ?? 'if need'; ?></div>
-                    </div>
-                  </td>
+                    <td class="px-6 py-4">
+                      <div class="text-sm">
+                        <div>Keyboard: <?php echo $laptop['keyboard'] ?? 'if need'; ?></div>
+                        <div>Mouse: <?php echo $laptop['mouse'] ?? 'if need'; ?></div>
+                        <div>Printer Connectivity: <?php echo $laptop['printer_connectivity'] ?? 'if need'; ?></div>
+                        <div>Virus Guard: <?php echo $laptop['virus_guard'] ?? 'if need'; ?></div>
+                      </div>
+                    </td>
 
-                  <td class="px-6 py-4">
-                    <div class="text-sm">
-                      <div>IP Address: <?php echo $laptop['ip_address'] ?? 'if need'; ?></div>
-                      <div>Network: <?php echo $laptop['network_connectivity'] ?? 'if need'; ?></div>
-                      <div>OS: <?php echo $laptop['operating_system'] ?? 'if need'; ?></div>
-                    </div>
-                  </td>
+                    <td class="px-6 py-4">
+                      <div class="text-sm">
+                        <div>IP Address: <?php echo $laptop['ip_address'] ?? 'if need'; ?></div>
+                        <div>Network: <?php echo $laptop['network_connectivity'] ?? 'if need'; ?></div>
+                        <div>OS: <?php echo $laptop['operating_system'] ?? 'if need'; ?></div>
+                      </div>
+                    </td>
 
-                  <td class="px-6 py-4">
-                    <div class="text-sm mb-2">
-                      <div>Section: <?php echo $laptop['section_name'] ?? 'if need'; ?></div>
-                      <div>Assigned to: <?php echo $laptop['user_name'] ?? 'if need'; ?></div>
-                    </div>
+                    <td class="px-6 py-4">
+                      <div class="text-sm mb-2">
+                        <div>Section: <?php echo $laptop['section_name'] ?? 'if need'; ?></div>
+                        <div>Assigned to: <?php echo $laptop['user_name'] ?? 'if need'; ?></div>
+                      </div>
 
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
         <?php echo ($laptop['status'] == 'active') ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'; ?>">
-                      <?php echo ucfirst($laptop['status'] ?? 'if need'); ?>
-                    </span>
+                        <?php echo ucfirst($laptop['status'] ?? 'if need'); ?>
+                      </span>
 
-                    <div class="text-xs text-gray-500 mt-2">
-                      <i class="fas fa-info-circle"></i>
-                      <?php echo !empty($laptop['notes']) ? htmlspecialchars($laptop['notes']) : 'if need'; ?>
-                    </div>
-                  </td>
+                      <div class="text-xs text-gray-500 mt-2">
+                        <i class="fas fa-info-circle"></i>
+                        <?php echo !empty($laptop['notes']) ? htmlspecialchars($laptop['notes']) : 'if need'; ?>
+                      </div>
+                    </td>
 
-                  <td class="px-6 py-4 text-right text-sm font-medium">
-                    <button class="text-blue-600 hover:text-blue-900 mr-3">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="text-red-600 hover:text-red-900">
-                      <a href="../handlers/deleteHandler.php?action=delete_device&page=laptop&device_id=<?php echo $laptop['device_id'] ?? ''; ?>">
-                        <i class="fas fa-trash"></i>
-                      </a>
-                    </button>
-                  </td>
+                    <td class="px-6 py-4 text-right text-sm font-medium">
+                      <button class="text-blue-600 hover:text-blue-900 mr-3">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="text-red-600 hover:text-red-900">
+                        <a href="../handlers/deleteHandler.php?action=delete_device&page=laptop&device_id=<?php echo $laptop['device_id'] ?? ''; ?>">
+                          <i class="fas fa-trash"></i>
+                        </a>
+                      </button>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php } else { ?>
+                <tr>
+                  <td colspan="5" class="text-center py-4">No Laptops found.</td>
                 </tr>
-              <?php endforeach; ?>
+              <?php } ?>
             </tbody>
           </table>
         </div>

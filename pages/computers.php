@@ -1,4 +1,7 @@
 <?php
+
+use function PHPSTORM_META\type;
+
 include '../components/sessions.php';
 require_once '../functions/DbHelper.php';
 
@@ -190,102 +193,108 @@ $ComputerCategoryId = DbHelper::getCategoryId('Computer')
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <?php foreach ($computers as $key => $computer) { ?>
-                <tr class="hover:bg-gray-50">
-                  <!-- Device Basic Info -->
-                  <td class="px-6 py-4">
-                    <div class="flex items-center">
-                      <i class="fas fa-desktop text-gray-400 mr-3"></i>
-                      <div>
-                        <div class="text-sm font-medium text-gray-900">
-                          <?= htmlspecialchars($computer['device_name'] ?? 'if need') ?>
-                        </div>
-                        <div class="text-sm text-gray-500">
-                          ID: <?= htmlspecialchars($computer['device_id'] ?? 'if need') ?>
-                        </div>
-                        <div class="text-sm text-gray-500">
-                          Model: <?= htmlspecialchars($computer['model'] ?? 'if need') ?>
-                        </div>
-                        <div class="text-sm text-gray-500">
-                          Purchase: <?= htmlspecialchars($computer['purchase_date'] ?? 'if need') ?>
+              <?php
+              if (is_array($computers) && count($computers) > 0) { ?>
+                <?php foreach ($computers as $key => $computer) { ?>
+                  <tr class="hover:bg-gray-50">
+                    <!-- Device Basic Info -->
+                    <td class="px-6 py-4">
+                      <div class="flex items-center">
+                        <i class="fas fa-desktop text-gray-400 mr-3"></i>
+                        <div>
+                          <div class="text-sm font-medium text-gray-900">
+                            <?= htmlspecialchars($computer['device_name'] ?? 'if need') ?>
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            ID: <?= htmlspecialchars($computer['device_id'] ?? 'if need') ?>
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            Model: <?= htmlspecialchars($computer['model'] ?? 'if need') ?>
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            Purchase: <?= htmlspecialchars($computer['purchase_date'] ?? 'if need') ?>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
 
-                  <!-- Hardware Info -->
-                  <td class="px-6 py-4">
-                    <div class="text-sm">
-                      <div>Processor: <?= htmlspecialchars($computer['processor'] ?? 'if need') ?></div>
-                      <div>RAM: <?= htmlspecialchars($computer['ram'] ?? 'if need') ?></div>
-                      <div>Storage: <?= htmlspecialchars($computer['hard_drive_capacity'] ?? 'if need') ?></div>
-                      <div>Keyboard: <?= htmlspecialchars($computer['keyboard'] ?? 'if need') ?></div>
-                      <div>Mouse: <?= htmlspecialchars($computer['mouse'] ?? 'if need') ?></div>
-                    </div>
-                  </td>
+                    <!-- Hardware Info -->
+                    <td class="px-6 py-4">
+                      <div class="text-sm">
+                        <div>Processor: <?= htmlspecialchars($computer['processor'] ?? 'if need') ?></div>
+                        <div>RAM: <?= htmlspecialchars($computer['ram'] ?? 'if need') ?></div>
+                        <div>Storage: <?= htmlspecialchars($computer['hard_drive_capacity'] ?? 'if need') ?></div>
+                        <div>Keyboard: <?= htmlspecialchars($computer['keyboard'] ?? 'if need') ?></div>
+                        <div>Mouse: <?= htmlspecialchars($computer['mouse'] ?? 'if need') ?></div>
+                      </div>
+                    </td>
 
-                  <!-- OS & Monitor Info -->
-                  <td class="px-6 py-4">
-                    <div class="text-sm">
-                      <div>OS: <?= htmlspecialchars($computer['operating_system'] ?? 'if need') ?></div>
-                      <div>Monitor: <?= htmlspecialchars($computer['monitor_info'] ?? 'if need') ?></div>
-                      <div>CPU Serial: <?= htmlspecialchars($computer['cpu_serial'] ?? 'if need') ?></div>
-                      <div>Made In: <?= htmlspecialchars($computer['made_in'] ?? 'if need') ?></div>
-                    </div>
-                  </td>
+                    <!-- OS & Monitor Info -->
+                    <td class="px-6 py-4">
+                      <div class="text-sm">
+                        <div>OS: <?= htmlspecialchars($computer['operating_system'] ?? 'if need') ?></div>
+                        <div>Monitor: <?= htmlspecialchars($computer['monitor_info'] ?? 'if need') ?></div>
+                        <div>CPU Serial: <?= htmlspecialchars($computer['cpu_serial'] ?? 'if need') ?></div>
+                        <div>Made In: <?= htmlspecialchars($computer['made_in'] ?? 'if need') ?></div>
+                      </div>
+                    </td>
 
-                  <!-- Network Info -->
-                  <td class="px-6 py-4">
-                    <div class="text-sm">
-                      <div>IP Address: <?= htmlspecialchars($computer['ip_address'] ?? 'if need') ?></div>
-                      <div>Network: <?= htmlspecialchars($computer['network_connectivity'] ?? 'if need') ?></div>
-                      <div>Printer Conn: <?= htmlspecialchars($computer['printer_connectivity'] ?? 'if need') ?></div>
-                      <div>Virus Guard: <?= htmlspecialchars($computer['virus_guard'] ?? 'if need') ?></div>
-                    </div>
-                  </td>
+                    <!-- Network Info -->
+                    <td class="px-6 py-4">
+                      <div class="text-sm">
+                        <div>IP Address: <?= htmlspecialchars($computer['ip_address'] ?? 'if need') ?></div>
+                        <div>Network: <?= htmlspecialchars($computer['network_connectivity'] ?? 'if need') ?></div>
+                        <div>Printer Conn: <?= htmlspecialchars($computer['printer_connectivity'] ?? 'if need') ?></div>
+                        <div>Virus Guard: <?= htmlspecialchars($computer['virus_guard'] ?? 'if need') ?></div>
+                      </div>
+                    </td>
 
-                  <!-- Assignment Info -->
-                  <td class="px-6 py-4">
-                    <div class="text-sm mb-2">
-                      <div>Section: <?= htmlspecialchars($computer['section_name'] ?? 'if need') ?></div>
-                      <div>Assigned to: <?= htmlspecialchars($computer['assigned_to_name'] ?? 'if need') ?></div>
-                    </div>
+                    <!-- Assignment Info -->
+                    <td class="px-6 py-4">
+                      <div class="text-sm mb-2">
+                        <div>Section: <?= htmlspecialchars($computer['section_name'] ?? 'if need') ?></div>
+                        <div>Assigned to: <?= htmlspecialchars($computer['assigned_to_name'] ?? 'if need') ?></div>
+                      </div>
 
-                    <?php
-                    $status = $computer['status'] ?? 'if need';
-                    $statusColors = [
-                      'active' => 'bg-green-100 text-green-800',
-                      'under_repair' => 'bg-yellow-100 text-yellow-800',
-                      'retired' => 'bg-gray-100 text-gray-800',
-                      'lost' => 'bg-red-100 text-red-800'
-                    ];
-                    $statusClass = $statusColors[$status] ?? 'bg-gray-100 text-gray-600';
-                    ?>
+                      <?php
+                      $status = $computer['status'] ?? 'if need';
+                      $statusColors = [
+                        'active' => 'bg-green-100 text-green-800',
+                        'under_repair' => 'bg-yellow-100 text-yellow-800',
+                        'retired' => 'bg-gray-100 text-gray-800',
+                        'lost' => 'bg-red-100 text-red-800'
+                      ];
+                      $statusClass = $statusColors[$status] ?? 'bg-gray-100 text-gray-600';
+                      ?>
 
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?= $statusClass ?>">
-                      <?= htmlspecialchars(ucwords($status)) ?>
-                    </span>
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?= $statusClass ?>">
+                        <?= htmlspecialchars(ucwords($status)) ?>
+                      </span>
 
-                    <div class="text-xs text-gray-500 mt-2">
-                      <i class="fas fa-info-circle"></i>
-                      <?= !empty($computer['notes']) ? htmlspecialchars($computer['notes']) : 'Click for notes' ?>
-                    </div>
-                  </td>
+                      <div class="text-xs text-gray-500 mt-2">
+                        <i class="fas fa-info-circle"></i>
+                        <?= !empty($computer['notes']) ? htmlspecialchars($computer['notes']) : 'Click for notes' ?>
+                      </div>
+                    </td>
 
-                  <!-- Action Buttons -->
-                  <td class="px-6 py-4 text-right text-sm font-medium">
-                    <button class="text-blue-600 hover:text-blue-900 mr-3">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="text-red-600 hover:text-red-900">
-                      <a href="../handlers/deleteHandler.php?action=delete_device&page=computer&device_id=<?php echo $computer['device_id'] ?? ''; ?>">
-                        <i class="fas fa-trash"></i>
-                      </a>
-                    </button>
-                  </td>
+                    <!-- Action Buttons -->
+                    <td class="px-6 py-4 text-right text-sm font-medium">
+                      <button class="text-blue-600 hover:text-blue-900 mr-3">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="text-red-600 hover:text-red-900">
+                        <a href="../handlers/deleteHandler.php?action=delete_device&page=computer&device_id=<?php echo $computer['device_id'] ?? ''; ?>">
+                          <i class="fas fa-trash"></i>
+                        </a>
+                      </button>
+                    </td>
+                  </tr>
+                <?php } ?>
+              <?php } else { ?>
+                <tr>
+                  <td colspan="5" class="text-center py-4">No computers found.</td>
                 </tr>
               <?php } ?>
-
             </tbody>
           </table>
         </div>
