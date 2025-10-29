@@ -32,7 +32,7 @@ $printers = DbHelper::getAllPrinters();
           <p class="mt-1 text-sm text-gray-600">Manage and track all printer devices in the system</p>
         </div>
         <div class="mt-4 md:mt-0 flex flex-col sm:flex-row gap-3">
-          <button class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <button command="show-modal" commandfor="addPrinterDialog" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <i class="fas fa-plus mr-2"></i>
             Add New Printer
           </button>
@@ -187,7 +187,6 @@ $printers = DbHelper::getAllPrinters();
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <!-- Sample Row -->
               <?php
               foreach ($printers as $key => $printer) { ?>
                 <tr class="hover:bg-gray-50">
@@ -310,51 +309,173 @@ $printers = DbHelper::getAllPrinters();
           </div>
         </div>
       </div>
+
+      <!-- Add Printer Modal -->
+      <dialog id="addPrinterDialog" aria-labelledby="dialog-title" class="fixed inset-0 z-50 overflow-y-auto bg-transparent backdrop:bg-transparent">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-gray-900/50 transition-opacity" onclick="document.getElementById('addPrinterDialog').close()"></div>
+
+        <!-- Modal panel container -->
+        <div tabindex="0" class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0" onclick="if(event.target === this) document.getElementById('addPrinterDialog').close()">
+          <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
+            <form id="addPrinterForm">
+              <!-- Header -->
+              <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                  <div class="w-full">
+                    <h3 id="dialog-title" class="text-lg font-semibold text-gray-900 mb-5">Add New Printer</h3>
+                    <div class="space-y-4">
+
+                      <!-- Basic Info -->
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">Printer Name *</label>
+                          <input type="text" name="device_name" required
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                            placeholder="HP LaserJet Pro M404dn">
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                          <input type="text" name="model"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                            placeholder="M404dn">
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">Made In</label>
+                          <input type="text" name="made_in"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                            placeholder="Vietnam">
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                          <select name="category_id" required
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
+                            <option value="">Select Category</option>
+                            <option value="4">Printer</option>
+                            <option value="5">Multifunction Printer</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Assignment Info -->
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
+                          <select name="section_id"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
+                            <option value="">Select Section</option>
+                            <option value="1">IT Department</option>
+                            <option value="2">HR Department</option>
+                            <option value="3">Finance Department</option>
+                            <option value="4">Operations</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">Assigned To</label>
+                          <select name="assigned_to"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
+                            <option value="">Select User</option>
+                            <option value="1">John Smith</option>
+                            <option value="2">Jane Doe</option>
+                            <option value="3">Michael Johnson</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Connectivity -->
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">Network Connectivity</label>
+                          <input type="text" name="network_connectivity"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                            placeholder="WiFi, Ethernet, Both">
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">Printer Connectivity</label>
+                          <input type="text" name="printer_connectivity"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                            placeholder="USB, Network, Wireless">
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">IP Address</label>
+                          <input type="text" name="ip_address"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                            placeholder="192.168.1.25">
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">CPU Serial / Printer ID</label>
+                          <input type="text" name="cpu_serial"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                            placeholder="PRN-2024">
+                        </div>
+                      </div>
+
+                      <!-- Additional Info -->
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">Purchase Date</label>
+                          <input type="date" name="purchase_date"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                          <select name="status"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
+                            <option value="active">Active</option>
+                            <option value="under_repair">Under Repair</option>
+                            <option value="retired">Retired</option>
+                            <option value="lost">Lost</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Notes -->
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                        <textarea name="notes" rows="3"
+                          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                          placeholder="Additional notes about this printer..."></textarea>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                <button type="submit"
+                  class="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-700 sm:ml-3 sm:w-auto">
+                  Save Printer
+                </button>
+                <button type="button" onclick="document.getElementById('addPrinterDialog').close()"
+                  class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+                  Cancel
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </dialog>
+
     </main>
   </div>
-</body>
 
-</html>
-<p class="text-sm text-gray-700">
-  Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium">20</span> results
-</p>
-</div>
-<div>
-  <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-    <a href="#" class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
-      <span class="sr-only">Previous</span>
-      <i class="fas fa-chevron-left h-5 w-5"></i>
-    </a>
-    <a href="#" aria-current="page" class="relative z-10 inline-flex items-center bg-blue-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">1</a>
-    <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">2</a>
-    <a href="#" class="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex">3</a>
-    <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span>
-    <a href="#" class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
-      <span class="sr-only">Next</span>
-      <i class="fas fa-chevron-right h-5 w-5"></i>
-    </a>
-  </nav>
-</div>
-</div>
-</div>
-</div>
-</main>
-</div>
+  <script>
+    // Filter functionality
+    document.getElementById('search').addEventListener('keyup', function() {
+      // Add search filter logic here
+    });
 
-<script>
-  // Filter functionality
-  document.getElementById('search').addEventListener('keyup', function() {
-    // Add search filter logic here
-  });
+    document.getElementById('status').addEventListener('change', function() {
+      // Add status filter logic here
+    });
 
-  document.getElementById('status').addEventListener('change', function() {
-    // Add status filter logic here
-  });
-
-  document.getElementById('type').addEventListener('change', function() {
-    // Add type filter logic here
-  });
-</script>
+    document.getElementById('type').addEventListener('change', function() {
+      // Add type filter logic here
+    });
+  </script>
 </body>
 
 </html>
