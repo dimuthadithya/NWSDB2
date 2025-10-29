@@ -18,6 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             } elseif ($page == 'laptop') {
                 header('Location: ../pages/laptops.php?success=Device+deleted+successfully');
                 exit();
+            } elseif ($page == 'printer') {
+                header('Location: ../pages/printers.php?success=Device+deleted+successfully');
+                exit();
             }
         } else {
             // Redirect back with error message
