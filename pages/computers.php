@@ -551,6 +551,10 @@ $ComputerCategoryId = DbHelper::getCategoryId('Computer')
                 placeholder="Enter any additional notes or comments about this computer..."></textarea>
             </div>
           </div>
+          <button type="submit" name="save_computers"
+            class="save-computer-btn px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm">
+            <i class="fas fa-save mr-2"></i>Save Computer
+          </button>
         </form>
       </div>
 
@@ -563,10 +567,6 @@ $ComputerCategoryId = DbHelper::getCategoryId('Computer')
         <button onclick="resetComputerForm()"
           class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors duration-200">
           <i class="fas fa-refresh mr-2"></i>Reset
-        </button>
-        <button type="submit"
-          class="save-computer-btn px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm">
-          <i class="fas fa-save mr-2"></i>Save Computer
         </button>
       </div>
     </div>
