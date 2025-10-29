@@ -261,7 +261,9 @@ $LaptopCategoryId = DbHelper::getCategoryId('Laptop')
                       <i class="fas fa-edit"></i>
                     </button>
                     <button class="text-red-600 hover:text-red-900">
-                      <i class="fas fa-trash"></i>
+                      <a href="../handlers/deleteHandler.php?action=delete_device&page=laptop&device_id=<?php echo $laptop['device_id'] ?? ''; ?>">
+                        <i class="fas fa-trash"></i>
+                      </a>
                     </button>
                   </td>
                 </tr>

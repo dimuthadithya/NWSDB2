@@ -281,6 +281,18 @@ class DbHelper
         return self::$db->delete('sections', $where);
     }
 
+    public static function deleteDevice($device_id)
+    {
+        self::init();
+
+        if (!is_numeric($device_id)) {
+            return false;
+        }
+
+        $where = ['device_id' => $device_id];
+        return self::$db->delete('devices', $where);
+    }
+
     public static function getComputerCount()
     {
         self::init();
