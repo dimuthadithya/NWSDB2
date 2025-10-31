@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            animation: {
+              'fade-in': 'fadeIn 1s ease-in-out',
+              'fade-in-up': 'fadeInUp 1s ease-in-out',
+              'fade-in-right': 'fadeInRight 1s ease-in-out',
+              'slide-up': 'slideUp 0.8s ease-out',
+              'slide-up-delay': 'slideUp 0.8s ease-out 0.2s both',
+              'slide-up-delay-2': 'slideUp 0.8s ease-out 0.4s both',
+              'fade-in-up-delay': 'fadeInUp 1s ease-in-out 0.6s both',
+              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(30px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              fadeInRight: {
+                '0%': { opacity: '0', transform: 'translateX(30px)' },
+                '100%': { opacity: '1', transform: 'translateX(0)' },
+              },
+              slideUp: {
+                '0%': { opacity: '0', transform: 'translateY(50px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="shortcut icon"
+      href="./src/assets/images/favicon.png"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="./src/assets/css/main.css" />
+    <title>National Water Supply and Drainage Board</title>
+
+    <!-- Loader Styles -->
+    <style>
+      /* Loader Overlay */
+      #loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          #1e40af 0%,
+          #3b82f6 50%,
+          #60a5fa 100%
+        );
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+      }
+
+      #loader.fade-out {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      /* Logo Animation */
+      .loader-logo {
+        animation: logoFloat 2s ease-in-out infinite alternate;
+        margin-bottom: 2rem;
+      }
+
+      @keyframes logoFloat {
+        0% {
+          transform: translateY(0px) scale(1);
+        }
+        100% {
+          transform: translateY(-10px) scale(1.05);
+        }
+      }
+
+      /* Water Drop Loader */
+      .water-loader {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        margin-bottom: 2rem;
+      }
+
+      .drop {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        animation: dropFall 1.5s ease-in-out infinite;
+      }
+
+      .drop:nth-child(1) {
+        animation-delay: 0s;
+        left: 10px;
+      }
+      .drop:nth-child(2) {
+        animation-delay: 0.3s;
+        left: 30px;
+      }
+      .drop:nth-child(3) {
+        animation-delay: 0.6s;
+        left: 50px;
+      }
+
+      @keyframes dropFall {
+        0%,
+        100% {
+          transform: rotate(-45deg) translateY(0px);
+          opacity: 1;
+        }
+        50% {
+          transform: rotate(-45deg) translateY(30px);
+          opacity: 0.7;
+        }
+      }
+
+      /* Progress Bar */
+      .progress-container {
+        width: 300px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+      }
+
+      .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #ffffff, #e0f2fe, #ffffff);
+        background-size: 200% 100%;
+        animation: progressShine 1s ease-in-out infinite;
+        width: 0%;
+        transition: width 0.1s ease-out;
+      }
+
+      /* Remove the automatic CSS animation, we'll control it with JavaScript */
+      @keyframes progressShine {
+        0% {
+          background-position: -200% 0;
+        }
+        100% {
+          background-position: 200% 0;
+        }
+      }
+
+      /* Progress percentage text */
+      .progress-text {
+        color: white;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-top: 0.5rem;
+        text-align: center;
+      }
+
+      /* Loading Text */
+      .loading-text {
+        color: white;
+        font-family: 'Inter', sans-serif;
+        font-size: 1.2rem;
+        font-weight: 500;
+        text-align: center;
+        animation: textPulse 2s ease-in-out infinite;
+      }
+
+      @keyframes textPulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      /* Hide main content initially */
+      body.loading .main-content {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      body.loaded .main-content {
+        opacity: 1;
+        pointer-events: auto;
+        transition: opacity 0.5s ease-in;
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white text-gray-800 loading"
+  >
+    <!-- LOADER -->
+    <div id="loader">
+      <!-- Logo with Animation -->
+      <div class="loader-logo">
+        <div class="flex items-center space-x-4">
+          <img
+            src="./src/assets/images/logo/nationalsign.png"
+            alt="Sri Lanka National Emblem"
+            class="h-16 w-auto"
+            onerror="this.style.display='none'"
+          />
+          <img
+            src="./src/assets/images/logo/logo.png"
+            alt="NWSDB logo"
+            class="h-12 w-auto"
+            onerror="this.style.display='none'"
+          />
+        </div>
+      </div>
+
+      <!-- Water Drop Animation -->
+      <div class="water-loader">
+        <div class="drop"></div>
+        <div class="drop"></div>
+        <div class="drop"></div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="progress-text" id="progressText">0%</div>
+
+      <!-- Loading Text -->
+      <div class="loading-text">
+        <div id="loadingMessage">Initializing NWSDB Portal...</div>
+        <div class="text-sm opacity-80 mt-2">
+          Customer Details Upload System
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <!-- NAVBAR -->
+      <header
+        class="bg-white/95 backdrop-blur-lg shadow-lg sticky top-0 z-50 border-b border-gray-200"
+      >
+        <div
+          class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 xl:px-20 h-16 sm:h-20 flex items-center justify-between"
+        >
+          <!-- Logo Section -->
+          <a
+            href="/index.html"
+            class="flex items-center space-x-3 sm:space-x-4 group"
+          >
+            <img
+              src="./src/assets/images/logo/nationalsign.png"
+              alt="Sri Lanka National Emblem"
+              class="h-10 sm:h-16 w-auto transition-all duration-300"
+            />
+            <img
+              src="./src/assets/images/logo/logo.png"
+              alt="NWSDB logo"
+              class="h-8 sm:h-12 w-auto transition-all duration-300"
+            />
+          </a>
+
+          <!-- Desktop Navigation -->
+          <nav class="hidden sm:flex items-center space-x-1">
+            <span
+              class="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 text-sm font-medium"
+            >
+              SignIn From Here
+            </span>
+            <a
+              href="./src/pages/Auth/login.html"
+              class="ml-4 px-6 py-2.5 text-sm font-semibold rounded-full text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 active:scale-95 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/25"
+            >
+              <i class="fas fa-sign-in-alt mr-2"></i>Login
+            </a>
+          </nav>
+        </div>
+      </header>
+
+      <!-- HERO SECTION -->
+      <main class="flex-grow">
+        <section
+          class="relative min-h-screen sm:min-h-[600px] bg-cover bg-center bg-no-repeat overflow-hidden"
+          style="
+            background-image: linear-gradient(
+                rgba(0, 0, 0, 0.5),
+                rgba(0, 0, 0, 0.3)
+              ),
+              url('./src/assets/images/backgrounds/hero_background_landing.jpg');
+          "
+        >
+          <!-- Animated background elements -->
+          <div class="absolute inset-0">
+            <div
+              class="absolute top-10 left-10 w-2 h-2 bg-blue-400 rounded-full animate-pulse"
+            ></div>
+            <div
+              class="absolute top-20 right-20 w-3 h-3 bg-white/30 rounded-full animate-bounce"
+            ></div>
+            <div
+              class="absolute bottom-20 left-20 w-2 h-2 bg-blue-300 rounded-full animate-ping"
+            ></div>
+            <div
+              class="absolute bottom-10 right-10 w-4 h-4 bg-white/20 rounded-full animate-pulse"
+            ></div>
+          </div>
+
+          <div
+            class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 xl:px-20 2xl:px-32 py-16 sm:py-20 lg:py-24 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 xl:gap-20 items-center h-full relative z-10"
+          >
+            <!-- TEXT -->
+            <div class="text-center lg:text-left space-y-6 animate-fade-in-up">
+              <div
+                class="inline-block px-4 py-2 bg-blue-500/20 border border-blue-400/30 rounded-full text-blue-200 text-sm font-medium mb-4 backdrop-blur-sm animate-fade-in"
+              >
+                <i class="fas fa-star mr-2"></i>Official NWSDB Portal
+              </div>
+
+              <h1
+                class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-white leading-tight drop-shadow-lg animate-slide-up"
+              >
+                <span class="block">Customer Details</span>
+                <span
+                  class="block bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent"
+                  >Upload System</span
+                >
+              </h1>
+
+              <p
+                class="text-base sm:text-lg lg:text-xl text-gray-100 max-w-lg mx-auto lg:mx-0 drop-shadow-md leading-relaxed animate-slide-up-delay"
+              >
+                A secure and efficient platform to upload and manage customer
+                data for the
+                <span class="font-semibold text-blue-300"
+                  >National Water Supply and Drainage Board — Bandarawela
+                  Center.</span
+                >
+              </p>
+
+              <div
+                class="flex flex-col sm:flex-row gap-4 animate-slide-up-delay-2"
+              >
+                <a
+                  href="./src/pages/Auth/login.html"
+                  class="group inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full font-semibold shadow-lg hover:from-blue-600 hover:to-blue-700 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/25 transition-all duration-300 transform"
+                >
+                  <i class="fas fa-rocket mr-2 group-hover:animate-bounce"></i>
+                  Get Started
+                  <i
+                    class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform duration-300"
+                  ></i>
+                </a>
+
+                <span
+                  class="inline-flex items-center justify-center px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-full font-medium hover:bg-white/20 hover:scale-105 transition-all duration-300 transform"
+                >
+                  <i class="fas fa-info-circle mr-2"></i>
+                  Protected By NWSDB
+                </span>
+              </div>
+
+              <!-- Stats -->
+              <div class="grid grid-cols-3 gap-4 pt-8 animate-fade-in-up-delay">
+                <div class="text-center">
+                  <div class="text-2xl sm:text-3xl font-bold text-white">
+                    1000+
+                  </div>
+                  <div class="text-xs sm:text-sm text-blue-200">Customers</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-2xl sm:text-3xl font-bold text-white">
+                    99.9%
+                  </div>
+                  <div class="text-xs sm:text-sm text-blue-200">Uptime</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-2xl sm:text-3xl font-bold text-white">
+                    24/7
+                  </div>
+                  <div class="text-xs sm:text-sm text-blue-200">Support</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- MODERN VISUAL ELEMENT -->
+            <div
+              class="flex justify-center lg:justify-end animate-fade-in-right"
+            >
+              <div class="relative">
+                <!-- Main card with glassmorphism effect -->
+                <div
+                  class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-6 sm:p-8 shadow-2xl transform hover:scale-105 transition-all duration-500 hover:rotate-1"
+                >
+                  <!-- Floating elements -->
+                  <div class="relative">
+                    <!-- Central icon -->
+                    <div
+                      class="w-24 h-24 sm:w-32 sm:h-32 mx-auto bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg animate-pulse-slow"
+                    >
+                      <i
+                        class="fas fa-database text-2xl sm:text-4xl text-white"
+                      ></i>
+                    </div>
+
+                    <!-- Orbiting elements -->
+                    <div
+                      class="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-full flex items-center justify-center animate-bounce"
+                    >
+                      <i
+                        class="fas fa-upload text-white text-sm sm:text-xl"
+                      ></i>
+                    </div>
+
+                    <div
+                      class="absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-full flex items-center justify-center animate-pulse"
+                    >
+                      <i
+                        class="fas fa-shield-alt text-white text-sm sm:text-xl"
+                      ></i>
+                    </div>
+
+                    <div
+                      class="absolute top-1/2 -left-4 sm:-left-8 w-10 h-10 sm:w-12 sm:h-12 bg-white/15 rounded-full flex items-center justify-center animate-ping"
+                    >
+                      <i
+                        class="fas fa-search text-white text-xs sm:text-base"
+                      ></i>
+                    </div>
+                  </div>
+
+                  <!-- Card content -->
+                  <div class="mt-6 text-center">
+                    <h3 class="text-lg sm:text-xl font-bold text-white mb-2">
+                      Secure & Efficient
+                    </h3>
+                    <p class="text-white/80 text-xs sm:text-sm">
+                      Customer Data Management
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scroll indicator -->
+          <div
+            class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce"
+          >
+            <div
+              class="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center"
+            >
+              <div
+                class="w-1 h-3 bg-white/60 rounded-full mt-2 animate-pulse"
+              ></div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- FOOTER -->
+      <footer
+        class="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-t border-gray-200"
+      >
+        <div
+          class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 xl:px-20 2xl:px-32 py-12"
+        >
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- About Section -->
+            <div class="footer-section">
+              <h3 class="text-lg font-semibold mb-4 text-blue-600">
+                NWSDB Bandarawela
+              </h3>
+              <p class="text-gray-600 text-sm leading-relaxed">
+                National Water Supply and Drainage Board, Bandarawela Center is
+                committed to providing reliable water services and maintaining
+                quality customer records.
+              </p>
+              <div class="mt-4 flex space-x-4">
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-blue-600 transition-colors duration-300"
+                >
+                  <i class="fab fa-facebook-f text-xl"></i>
+                </a>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-blue-600 transition-colors duration-300"
+                >
+                  <i class="fab fa-twitter text-xl"></i>
+                </a>
+                <a
+                  href="#"
+                  class="text-gray-400 hover:text-blue-600 transition-colors duration-300"
+                >
+                  <i class="fab fa-linkedin-in text-xl"></i>
+                </a>
+              </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="footer-section">
+              <h3 class="text-lg font-semibold mb-4 text-blue-600">
+                Contact Information
+              </h3>
+              <div class="space-y-3 text-gray-600 text-sm">
+                <div
+                  class="flex items-start space-x-3 hover:text-gray-800 transition-colors duration-300"
+                >
+                  <i
+                    class="fas fa-map-marker-alt text-blue-500 mt-1 flex-shrink-0"
+                  ></i>
+                  <span>No. 15, Bandarawela Road, Bandarawela 90100</span>
+                </div>
+                <div
+                  class="flex items-center space-x-3 hover:text-gray-800 transition-colors duration-300"
+                >
+                  <i class="fas fa-phone text-blue-500 flex-shrink-0"></i>
+                  <a href="tel:+94572223456" class="hover:underline"
+                    >+94 57 222 3456</a
+                  >
+                </div>
+                <div
+                  class="flex items-center space-x-3 hover:text-gray-800 transition-colors duration-300"
+                >
+                  <i class="fas fa-envelope text-blue-500 flex-shrink-0"></i>
+                  <a
+                    href="mailto:info.bandarawela@nwsdb.lk"
+                    class="hover:underline"
+                    >info.bandarawela@nwsdb.lk</a
+                  >
+                </div>
+                <div
+                  class="flex items-center space-x-3 hover:text-gray-800 transition-colors duration-300"
+                >
+                  <i class="fas fa-clock text-blue-500 flex-shrink-0"></i>
+                  <span>Mon - Fri: 8:00 AM - 4:30 PM</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div
+              class="footer-section hidden md:block sm:col-span-2 lg:col-span-1"
+            >
+              <img
+                src="./src/assets/images/logo/footer_logo.png"
+                alt=""
+                class="h-48 w-auto"
+              />
+            </div>
+          </div>
+
+          <!-- Bottom Bar -->
+          <div
+            class="border-t border-gray-300 mt-8 pt-6 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500 space-y-4 sm:space-y-0"
+          >
+            <p class="text-center sm:text-left">
+              © <span id="year"></span> National Water Supply and Drainage Board
+              — Bandarawela Center. All rights reserved.
+            </p>
+            <p class="text-center sm:text-right">
+              Made with <span class="text-red-500 animate-pulse">♥</span> —
+              Oshadi Perera
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+    <!-- End main-content -->
+
+    <script>
+      // Loader Management with Progress Control
+      let progress = 0;
+      let progressInterval;
+
+      const progressBar = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
+      const loadingMessage = document.getElementById('loadingMessage');
+
+      // Loading messages for different stages
+      const loadingStages = [
+        { percent: 0, message: 'Initializing NWSDB Portal...' },
+        { percent: 25, message: 'Loading Security Protocols...' },
+        { percent: 50, message: 'Connecting to Database...' },
+        { percent: 75, message: 'Preparing User Interface...' },
+        { percent: 90, message: 'Finalizing Setup...' },
+        { percent: 100, message: 'Ready! Loading Complete.' },
+      ];
+
+      function updateProgress() {
+        // Increase progress gradually
+        progress += Math.random() * 3 + 1; // Random increment between 1-4
+
+        if (progress > 100) {
+          progress = 100;
+        }
+
+        // Update progress bar width
+        progressBar.style.width = progress + '%';
+        progressText.textContent = Math.floor(progress) + '%';
+
+        // Update loading message based on progress
+        const currentStage = loadingStages.find(
+          (stage) => progress >= stage.percent
+        );
+        if (
+          currentStage &&
+          loadingMessage.textContent !== currentStage.message
+        ) {
+          loadingMessage.textContent = currentStage.message;
+        }
+
+        // When progress reaches 100%, wait a moment then hide loader
+        if (progress >= 100) {
+          clearInterval(progressInterval);
+          progressText.textContent = '100%';
+          loadingMessage.textContent = 'Ready! Loading Complete.';
+
+          // Wait 800ms after completion before hiding loader
+          setTimeout(() => {
+            hideLoader();
+          }, 800);
+        }
+      }
+
+      function hideLoader() {
+        const loader = document.getElementById('loader');
+        const body = document.body;
+
+        // Add fade-out class to loader
+        loader.classList.add('fade-out');
+
+        // Remove loading class from body and add loaded class
+        body.classList.remove('loading');
+        body.classList.add('loaded');
+
+        // Remove loader from DOM after animation completes
+        setTimeout(() => {
+          loader.style.display = 'none';
+        }, 500);
+      }
+
+      // Start progress animation when page loads
+      function startLoader() {
+        // Start the progress bar animation
+        progressInterval = setInterval(updateProgress, 100); // Update every 100ms
+
+        // Fallback: If something goes wrong, hide loader after 8 seconds maximum
+        setTimeout(() => {
+          if (document.body.classList.contains('loading')) {
+            clearInterval(progressInterval);
+            progress = 100;
+            updateProgress();
+          }
+        }, 8000);
+      }
+
+      // Initialize loader when DOM is ready
+      document.addEventListener('DOMContentLoaded', startLoader);
+
+      // Also start if already loaded
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startLoader);
+      } else {
+        startLoader();
+      }
+
+      // Set current year in footer
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // Add scroll effect to navbar
+      window.addEventListener('scroll', () => {
+        const header = document.querySelector('header');
+        if (window.scrollY > 100) {
+          header.classList.add('backdrop-blur-xl', 'bg-white/98', 'shadow-xl');
+        } else {
+          header.classList.remove(
+            'backdrop-blur-xl',
+            'bg-white/98',
+            'shadow-xl'
+          );
+        }
+      });
+
+      // Intersection Observer for animations
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px',
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-fade-in-up');
+          }
+        });
+      }, observerOptions);
+
+      // Observe elements for animations
+      document
+        .querySelectorAll('.footer-section')
+        .forEach((el) => observer.observe(el));
+
+      // Add loading animation
+      window.addEventListener('load', () => {
+        document.body.classList.add('loaded');
+      });
+    </script>
+  </body>
+</html>
