@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NWSDB - Computer Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-fade-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+      }
+
+      .stat-card {
+        transition: all 0.3s ease;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar-link {
+        transition: all 0.2s ease;
+      }
+
+      .sidebar-link:hover {
+        transform: translateX(5px);
+      }
+
+      .table-row {
+        transition: all 0.2s ease;
+      }
+
+      .table-row:hover {
+        background: rgba(59, 130, 246, 0.03);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen"
+  >
+    <!-- Mobile Menu Toggle -->
+    <button
+      id="mobileMenuBtn"
+      class="lg:hidden fixed top-4 left-4 z-50 bg-white p-3 rounded-xl shadow-lg hover:shadow-xl transition-all"
+    >
+      <i class="fas fa-bars text-blue-600"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <aside
+      id="sidebar"
+      class="fixed top-0 left-0 h-full w-64 bg-white shadow-2xl transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-40 overflow-y-auto"
+    >
+      <div class="p-6 border-b border-gray-100">
+        <div class="flex items-center space-x-3">
+          <div
+            class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center"
+          >
+            <i class="fas fa-database text-white text-xl"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-gray-800">NWSDB</h2>
+            <p class="text-xs text-gray-500">Device Manager</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="p-4">
+        <div class="space-y-1">
+          <a
+            href="#"
+            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+          >
+            <i class="fas fa-home w-5"></i>
+            <span>Dashboard</span>
+          </a>
+          <a
+            href="#"
+            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600"
+          >
+            <i class="fas fa-desktop w-5"></i>
+            <span class="font-medium">Computers</span>
+          </a>
+          <a
+            href="#"
+            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+          >
+            <i class="fas fa-laptop w-5"></i>
+            <span>Laptops</span>
+          </a>
+          <a
+            href="#"
+            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+          >
+            <i class="fas fa-print w-5"></i>
+            <span>Printers</span>
+          </a>
+          <a
+            href="#"
+            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+          >
+            <i class="fas fa-microchip w-5"></i>
+            <span>Other Devices</span>
+          </a>
+          <a
+            href="#"
+            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+          >
+            <i class="fas fa-tools w-5"></i>
+            <span>Repairs</span>
+          </a>
+          <a
+            href="#"
+            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+          >
+            <i class="fas fa-exclamation-triangle w-5"></i>
+            <span>Issues</span>
+          </a>
+          <a
+            href="#"
+            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+          >
+            <i class="fas fa-building w-5"></i>
+            <span>Branches</span>
+          </a>
+          <a
+            href="#"
+            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+          >
+            <i class="fas fa-sitemap w-5"></i>
+            <span>Sections</span>
+          </a>
+        </div>
+
+        <div class="mt-8 pt-8 border-t border-gray-100">
+          <p class="text-xs font-semibold text-gray-400 uppercase px-4 mb-3">
+            Administration
+          </p>
+          <div class="space-y-1">
+            <a
+              href="#"
+              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+            >
+              <i class="fas fa-users w-5"></i>
+              <span>Users</span>
+            </a>
+            <a
+              href="#"
+              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+            >
+              <i class="fas fa-tags w-5"></i>
+              <span>Categories</span>
+            </a>
+            <a
+              href="#"
+              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+            >
+              <i class="fas fa-chart-line w-5"></i>
+              <span>Reports</span>
+            </a>
+            <a
+              href="#"
+              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+            >
+              <i class="fas fa-cog w-5"></i>
+              <span>Settings</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+
+      <div class="p-4 border-t border-gray-100 mt-auto">
+        <a
+          href="#"
+          class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50"
+        >
+          <i class="fas fa-sign-out-alt w-5"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="lg:ml-64 min-h-screen">
+      <!-- Header -->
+      <header
+        class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-30 border-b border-gray-100"
+      >
+        <div class="px-6 py-4 flex items-center justify-between">
+          <div class="animate-fade-up">
+            <h1 class="text-2xl font-bold text-gray-800">
+              Computer Management
+            </h1>
+            <p class="text-sm text-gray-500 mt-1">
+              Manage and track all computer devices
+            </p>
+          </div>
+          <div class="flex items-center space-x-4">
+            <button
+              class="relative p-2 text-gray-600 hover:text-blue-600 transition-colors"
+            >
+              <i class="fas fa-bell text-xl"></i>
+              <span
+                class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"
+              ></span>
+            </button>
+            <div
+              class="flex items-center space-x-3 pl-4 border-l border-gray-200"
+            >
+              <div class="text-right">
+                <p class="text-sm font-medium text-gray-800">Admin User</p>
+                <p class="text-xs text-gray-500">Administrator</p>
+              </div>
+              <div
+                class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center"
+              >
+                <i class="fas fa-user text-white text-sm"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="p-6 space-y-6">
+        <!-- Summary Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div
+            class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg animate-fade-up"
+            style="animation-delay: 0.1s"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center"
+              >
+                <i class="fas fa-desktop text-2xl"></i>
+              </div>
+              <span class="text-sm bg-white/20 px-3 py-1 rounded-full"
+                >Total</span
+              >
+            </div>
+            <h3 class="text-3xl font-bold mb-1">42</h3>
+            <p class="text-blue-100 text-sm">Total Computers</p>
+          </div>
+
+          <div
+            class="stat-card bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-lg animate-fade-up"
+            style="animation-delay: 0.2s"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center"
+              >
+                <i class="fas fa-check-circle text-2xl"></i>
+              </div>
+              <span class="text-sm bg-white/20 px-3 py-1 rounded-full"
+                >Active</span
+              >
+            </div>
+            <h3 class="text-3xl font-bold mb-1">38</h3>
+            <p class="text-green-100 text-sm">Active Devices</p>
+          </div>
+
+          <div
+            class="stat-card bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 text-white shadow-lg animate-fade-up"
+            style="animation-delay: 0.3s"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center"
+              >
+                <i class="fas fa-wrench text-2xl"></i>
+              </div>
+              <span class="text-sm bg-white/20 px-3 py-1 rounded-full"
+                >Repair</span
+              >
+            </div>
+            <h3 class="text-3xl font-bold mb-1">3</h3>
+            <p class="text-orange-100 text-sm">Under Repair</p>
+          </div>
+
+          <div
+            class="stat-card bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg animate-fade-up"
+            style="animation-delay: 0.4s"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center"
+              >
+                <i class="fas fa-exclamation-triangle text-2xl"></i>
+              </div>
+              <span class="text-sm bg-white/20 px-3 py-1 rounded-full"
+                >Issues</span
+              >
+            </div>
+            <h3 class="text-3xl font-bold mb-1">2</h3>
+            <p class="text-purple-100 text-sm">Open Issues</p>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="flex flex-wrap gap-3">
+          <button
+            onclick="openAddComputerModal()"
+            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all"
+          >
+            <i class="fas fa-plus mr-2"></i>
+            Add New Computer
+          </button>
+          <button
+            class="inline-flex items-center px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm border border-gray-200 transition-all"
+          >
+            <i class="fas fa-file-excel mr-2 text-green-600"></i>
+            Export to Excel
+          </button>
+          <button
+            class="inline-flex items-center px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm border border-gray-200 transition-all"
+          >
+            <i class="fas fa-file-pdf mr-2 text-red-600"></i>
+            Export to PDF
+          </button>
+        </div>
+
+        <!-- Filters Section -->
+        <div
+          class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up"
+          style="animation-delay: 0.5s"
+        >
+          <div
+            class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center"
+                >
+                  <i class="fas fa-filter text-white"></i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900">
+                    Filter Computers
+                  </h3>
+                  <p class="text-sm text-gray-600">
+                    Refine your search results
+                  </p>
+                </div>
+              </div>
+              <button
+                onclick="clearFilters()"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <i class="fas fa-times mr-2"></i>Clear All
+              </button>
+            </div>
+          </div>
+
+          <div class="p-6">
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Quick Search</label
+              >
+              <div class="relative">
+                <input
+                  type="text"
+                  placeholder="Search by name, model, or serial number..."
+                  class="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                />
+                <i
+                  class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                ></i>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  <i class="fas fa-circle-dot text-blue-600 mr-2"></i>Status
+                </label>
+                <select
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white"
+                >
+                  <option value="">All Status</option>
+                  <option value="active">✓ Active</option>
+                  <option value="under_repair">⚠ Under Repair</option>
+                  <option value="retired">✕ Retired</option>
+                  <option value="lost">🔴 Lost</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  <i class="fas fa-building text-blue-600 mr-2"></i>Section
+                </label>
+                <select
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white"
+                >
+                  <option value="">All Sections</option>
+                  <option value="it">IT Department</option>
+                  <option value="hr">HR Department</option>
+                  <option value="finance">Finance</option>
+                  <option value="operations">Operations</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  <i class="fas fa-microchip text-blue-600 mr-2"></i>Processor
+                </label>
+                <select
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white"
+                >
+                  <option value="">All Processors</option>
+                  <option value="intel_i3">Intel i3</option>
+                  <option value="intel_i5">Intel i5</option>
+                  <option value="intel_i7">Intel i7</option>
+                  <option value="amd">AMD Ryzen</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  <i class="fas fa-memory text-blue-600 mr-2"></i>RAM
+                </label>
+                <select
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white"
+                >
+                  <option value="">All RAM</option>
+                  <option value="4gb">4GB</option>
+                  <option value="8gb">8GB</option>
+                  <option value="16gb">16GB</option>
+                  <option value="32gb">32GB+</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-4 flex justify-end gap-3">
+              <button
+                class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <i class="fas fa-rotate-right mr-2"></i>Reset
+              </button>
+              <button
+                class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+              >
+                <i class="fas fa-check mr-2"></i>Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Computers Table -->
+        <div
+          class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up"
+          style="animation-delay: 0.6s"
+        >
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+                <tr>
+                  <th
+                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                  >
+                    <i class="fas fa-info-circle mr-2 text-blue-600"></i>Basic
+                    Info
+                  </th>
+                  <th
+                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                  >
+                    <i class="fas fa-microchip mr-2 text-blue-600"></i>Hardware
+                  </th>
+                  <th
+                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                  >
+                    <i class="fas fa-desktop mr-2 text-blue-600"></i>System
+                  </th>
+                  <th
+                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                  >
+                    <i class="fas fa-network-wired mr-2 text-blue-600"></i
+                    >Network
+                  </th>
+                  <th
+                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                  >
+                    <i class="fas fa-user mr-2 text-blue-600"></i>Assignment
+                  </th>
+                  <th
+                    class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                  >
+                    <i class="fas fa-cog mr-2 text-blue-600"></i>Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <!-- Computer Row 1 -->
+                <tr class="table-row">
+                  <td class="px-6 py-4">
+                    <div class="flex items-start">
+                      <div
+                        class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0"
+                      >
+                        <i class="fas fa-desktop text-blue-600"></i>
+                      </div>
+                      <div>
+                        <div class="text-sm font-semibold text-gray-900">
+                          Desktop PC #001
+                        </div>
+                        <div class="text-xs text-gray-500">
+                          Dell OptiPlex 7090
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">
+                          ID: DT-2024-001
+                        </div>
+                        <div class="text-xs text-gray-400">
+                          Purchased: Jan 15, 2024
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm space-y-1">
+                      <div class="flex items-center">
+                        <i
+                          class="fas fa-microchip text-gray-400 text-xs mr-2 w-4"
+                        ></i>
+                        <span class="text-gray-700">Intel i7-12700</span>
+                      </div>
+                      <div class="flex items-center">
+                        <i
+                          class="fas fa-memory text-gray-400 text-xs mr-2 w-4"
+                        ></i>
+                        <span class="text-gray-700">16GB DDR4</span>
+                      </div>
+                      <div class="flex items-center">
+                        <i
+                          class="fas fa-hdd text-gray-400 text-xs mr-2 w-4"
+                        ></i>
+                        <span class="text-gray-700">512GB SSD</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm space-y-1">
+                      <div class="text-gray-700">Windows 11 Pro</div>
+                      <div class="text-gray-600 text-xs">Monitor: 24" LED</div>
+                      <div class="text-gray-600 text-xs">KB: Dell KB216</div>
+                      <div class="text-gray-600 text-xs">Mouse: Dell MS116</div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm space-y-1">
+                      <div class="flex items-center">
+                        <i
+                          class="fas fa-network-wired text-gray-400 text-xs mr-2"
+                        ></i>
+                        <span class="text-gray-700">192.168.1.101</span>
+                      </div>
+                      <div class="text-gray-600 text-xs">Ethernet</div>
+                      <div class="text-gray-600 text-xs">Windows Defender</div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm mb-2">
+                      <div class="font-medium text-gray-900">IT Department</div>
+                      <div class="text-gray-600 text-xs">John Smith</div>
+                    </div>
+                    <span
+                      class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-green-100 text-green-800"
+                    >
+                      <i class="fas fa-circle text-xs mr-1"></i>Active
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <div class="flex items-center justify-end space-x-2">
+                      <button
+                        class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="View Details"
+                      >
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button
+                        class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        title="Edit"
+                      >
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button
+                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete"
+                      >
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Computer Row 2 -->
+                <tr class="table-row">
+                  <td class="px-6 py-4">
+                    <div class="flex items-start">
+                      <div
+                        class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0"
+                      >
+                        <i class="fas fa-desktop text-blue-600"></i>
+                      </div>
+                      <div>
+                        <div class="text-sm font-semibold text-gray-900">
+                          Workstation #002
+                        </div>
+                        <div class="text-xs text-gray-500">
+                          HP EliteDesk 800 G8
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">
+                          ID: DT-2024-002
+                        </div>
+                        <div class="text-xs text-gray-400">
+                          Purchased: Feb 20, 2024
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm space-y-1">
+                      <div class="flex items-center">
+                        <i
+                          class="fas fa-microchip text-gray-400 text-xs mr-2 w-4"
+                        ></i>
+                        <span class="text-gray-700">Intel i5-11500</span>
+                      </div>
+                      <div class="flex items-center">
+                        <i
+                          class="fas fa-memory text-gray-400 text-xs mr-2 w-4"
+                        ></i>
+                        <span class="text-gray-700">8GB DDR4</span>
+                      </div>
+                      <div class="flex items-center">
+                        <i
+                          class="fas fa-hdd text-gray-400 text-xs mr-2 w-4"
+                        ></i>
+                        <span class="text-gray-700">256GB SSD</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm space-y-1">
+                      <div class="text-gray-700">Windows 10 Pro</div>
+                      <div class="text-gray-600 text-xs">Monitor: 22" LED</div>
+                      <div class="text-gray-600 text-xs">KB: HP Standard</div>
+                      <div class="text-gray-600 text-xs">
+                        Mouse: HP Wireless
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm space-y-1">
+                      <div class="flex items-center">
+                        <i
+                          class="fas fa-network-wired text-gray-400 text-xs mr-2"
+                        ></i>
+                        <span class="text-gray-700">192.168.1.102</span>
+                      </div>
+                      <div class="text-gray-600 text-xs">WiFi + Ethernet</div>
+                      <div class="text-gray-600 text-xs">Norton Antivirus</div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm mb-2">
+                      <div class="font-medium text-gray-900">HR Department</div>
+                      <div class="text-gray-600 text-xs">Jane Doe</div>
+                    </div>
+                    <span
+                      class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-green-100 text-green-800"
+                    >
+                      <i class="fas fa-circle text-xs mr-1"></i>Active
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <div class="flex items-center justify-end space-x-2">
+                      <button
+                        class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="View Details"
+                      >
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button
+                        class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        title="Edit"
+                      >
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button
+                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete"
+                      >
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Computer Row 3 -->
+                <tr class="table-row">
+                  <td class="px-6 py-4">
+                    <div class="flex items-start">
+                      <div
+                        class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0"
+                      >
+                        <i class="fas fa-desktop text-orange-600"></i>
+                      </div>
+                      <div>
+                        <div class="text-sm font-semibold text-gray-900">
+                          Desktop PC #003
+                        </div>
+                        <div class="text-xs text-gray-500">
+                          Lenovo ThinkCentre M90
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">
+                          ID: DT-2023-015
+                        </div>
+                        <div class="text-xs text-gray-400">
+                          Purchased: Nov 10, 2023
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm space-y-1">
+                      <div class="flex items-center">
+                        <i
+                          class="fas fa-microchip text-gray-400 text-xs mr-2 w-4"
+                        ></i>
+                        <span class="text-gray-700">AMD Ryzen 5 5600</span>
+                      </div>
+                      <div class="flex items-center">
+                        <i
+                          class="fas fa-memory text-gray-400 text-xs mr-2 w-4"
+                        ></i>
+                        <span class="text-gray-700">16GB DDR4</span>
+                      </div>
+                      <div class="flex items-center">
+                        <i
+                          class="fas fa-hdd text-gray-400 text-xs mr-2 w-4"
+                        ></i>
+                        <span class="text-gray-700">1TB HDD</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm space-y-1">
+                      <div class="text-gray-700">Windows 11 Pro</div>
+                      <div class="text-gray-600 text-xs">Monitor: 27" LED</div>
+                      <div class="text-gray-600 text-xs">KB: Logitech K120</div>
+                      <div class="text-gray-600 text-xs">
+                        Mouse: Logitech B100
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm space-y-1">
+                      <div class="flex items-center">
+                        <i
+                          class="fas fa-network-wired text-gray-400 text-xs mr-2"
+                        ></i>
+                        <span class="text-gray-700">192.168.1.105</span>
+                      </div>
+                      <div class="text-gray-600 text-xs">Ethernet</div>
+                      <div class="text-gray-600 text-xs">McAfee Security</div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm mb-2">
+                      <div class="font-medium text-gray-900">Finance</div>
+                      <div class="text-gray-600 text-xs">Michael Johnson</div>
+                    </div>
+                    <span
+                      class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-orange-100 text-orange-800"
+                    >
+                      <i class="fas fa-wrench text-xs mr-1"></i>Under Repair
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <div class="flex items-center justify-end space-x-2">
+                      <button
+                        class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="View Details"
+                      >
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button
+                        class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        title="Edit"
+                      >
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button
+                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete"
+                      >
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Computer Row 4 -->
+                <tr class="table-row">
+                  <td class="px-6 py-4">
+                    <div class="flex items-start">
+                      <div
+                        class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0"
+                      >
+                        <i class="fas fa-desktop text-blue-600"></i>
+                      </div>
+                      <div>
+                        <div class="text-sm font-semibold text-gray-900">
+                          Desktop PC #004
+                        </div>
+                        <div class="text-xs text-gray-500">
+                          Acer Veriton M480G
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">
+                          ID: DT-2024-004
+                        </div>
+                        <div class="text-xs text-gray-400">
+                          Purchased: Mar 5, 2024
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm space-y-1">
+                      <div class="flex items-center">
+                        <i
+                          class="fas fa-microchip text-gray-400 text-xs mr-2 w-4"
+                        ></i>
+                        <span class="text-gray-700">Intel i3-10100</span>
+                      </div>
+                      <div class="flex items-center">
+                        <i
+                          class="fas fa-memory text-gray-400 text-xs mr-2 w-4"
+                        ></i>
+                        <span class="text-gray-700">8GB DDR4</span>
+                      </div>
+                      <div class="flex items-center">
+                        <i
+                          class="fas fa-hdd text-gray-400 text-xs mr-2 w-4"
+                        ></i>
+                        <span class="text-gray-700">500GB HDD</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm space-y-1">
+                      <div class="text-gray-700">Windows 10 Pro</div>
+                      <div class="text-gray-600 text-xs">
+                        Monitor: 21.5" LED
+                      </div>
+                      <div class="text-gray-600 text-xs">KB: Generic USB</div>
+                      <div class="text-gray-600 text-xs">
+                        Mouse: Generic USB
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm space-y-1">
+                      <div class="flex items-center">
+                        <i
+                          class="fas fa-network-wired text-gray-400 text-xs mr-2"
+                        ></i>
+                        <span class="text-gray-700">192.168.1.108</span>
+                      </div>
+                      <div class="text-gray-600 text-xs">WiFi</div>
+                      <div class="text-gray-600 text-xs">Windows Defender</div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm mb-2">
+                      <div class="font-medium text-gray-900">Operations</div>
+                      <div class="text-gray-600 text-xs">Sarah Wilson</div>
+                    </div>
+                    <span
+                      class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-green-100 text-green-800"
+                    >
+                      <i class="fas fa-circle text-xs mr-1"></i>Active
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <div class="flex items-center justify-end space-x-2">
+                      <button
+                        class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="View Details"
+                      >
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button
+                        class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        title="Edit"
+                      >
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button
+                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete"
+                      >
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+            <div class="flex items-center justify-between">
+              <div class="text-sm text-gray-700">
+                Showing <span class="font-medium">1</span> to
+                <span class="font-medium">4</span> of
+                <span class="font-medium">42</span> results
+              </div>
+              <nav class="flex items-center space-x-2">
+                <button
+                  class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <button
+                  class="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium"
+                >
+                  1
+                </button>
+                <button
+                  class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  2
+                </button>
+                <button
+                  class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  3
+                </button>
+                <span class="px-2 text-gray-500">...</span>
+                <button
+                  class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  11
+                </button>
+                <button
+                  class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Add Computer Modal -->
+    <div
+      id="addComputerModal"
+      class="hidden fixed inset-0 overflow-y-auto h-full w-full z-50 backdrop-blur-sm bg-black/30 flex items-center justify-center p-4"
+    >
+      <div
+        class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-hidden flex flex-col"
+        onclick="event.stopPropagation()"
+      >
+        <!-- Modal Header -->
+        <div
+          class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center"
+            >
+              <i class="fas fa-desktop text-white text-xl"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-bold text-gray-900">Add New Computer</h3>
+              <p class="text-sm text-gray-600">
+                Enter computer details and specifications
+              </p>
+            </div>
+          </div>
+          <button
+            onclick="closeAddComputerModal()"
+            class="text-gray-400 hover:text-gray-600 focus:outline-none"
+          >
+            <i class="fas fa-times text-2xl"></i>
+          </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="flex-1 overflow-y-auto p-6">
+          <form id="addComputerForm" class="space-y-6">
+            <!-- Basic Information -->
+            <div>
+              <h4
+                class="text-lg font-semibold text-gray-900 mb-4 flex items-center"
+              >
+                <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                Basic Information
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Device Name *</label
+                  >
+                  <input
+                    type="text"
+                    name="device_name"
+                    required
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    placeholder="e.g., Desktop Computer"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Model</label
+                  >
+                  <input
+                    type="text"
+                    name="model"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    placeholder="e.g., Dell OptiPlex 7090"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Made In</label
+                  >
+                  <input
+                    type="text"
+                    name="made_in"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    placeholder="e.g., USA, China"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Purchase Date</label
+                  >
+                  <input
+                    type="date"
+                    name="purchase_date"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Assignment Information -->
+            <div>
+              <h4
+                class="text-lg font-semibold text-gray-900 mb-4 flex items-center"
+              >
+                <i class="fas fa-users text-blue-600 mr-2"></i>
+                Assignment Information
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Section</label
+                  >
+                  <select
+                    name="section_id"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                  >
+                    <option value="">Select Section</option>
+                    <option value="1">IT Department</option>
+                    <option value="2">HR Department</option>
+                    <option value="3">Finance</option>
+                    <option value="4">Operations</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Assigned To</label
+                  >
+                  <select
+                    name="assigned_to"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                  >
+                    <option value="">Select User</option>
+                    <option value="1">John Smith</option>
+                    <option value="2">Jane Doe</option>
+                    <option value="3">Michael Johnson</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hardware Specifications -->
+            <div>
+              <h4
+                class="text-lg font-semibold text-gray-900 mb-4 flex items-center"
+              >
+                <i class="fas fa-microchip text-blue-600 mr-2"></i>
+                Hardware Specifications
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Operating System</label
+                  >
+                  <input
+                    type="text"
+                    name="operating_system"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    placeholder="e.g., Windows 11 Pro"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Processor</label
+                  >
+                  <input
+                    type="text"
+                    name="processor"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    placeholder="e.g., Intel i7-12700"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >RAM</label
+                  >
+                  <input
+                    type="text"
+                    name="ram"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    placeholder="e.g., 16GB DDR4"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Storage</label
+                  >
+                  <input
+                    type="text"
+                    name="hard_drive_capacity"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    placeholder="e.g., 512GB SSD"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Keyboard</label
+                  >
+                  <input
+                    type="text"
+                    name="keyboard"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    placeholder="e.g., Dell KB216"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Mouse</label
+                  >
+                  <input
+                    type="text"
+                    name="mouse"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    placeholder="e.g., Dell MS116"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Network & Connectivity -->
+            <div>
+              <h4
+                class="text-lg font-semibold text-gray-900 mb-4 flex items-center"
+              >
+                <i class="fas fa-network-wired text-blue-600 mr-2"></i>
+                Network & Connectivity
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >IP Address</label
+                  >
+                  <input
+                    type="text"
+                    name="ip_address"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    placeholder="e.g., 192.168.1.100"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Network Connectivity</label
+                  >
+                  <input
+                    type="text"
+                    name="network_connectivity"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    placeholder="e.g., Ethernet, WiFi"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Printer Connectivity</label
+                  >
+                  <input
+                    type="text"
+                    name="printer_connectivity"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    placeholder="e.g., USB, Network"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Virus Guard</label
+                  >
+                  <input
+                    type="text"
+                    name="virus_guard"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    placeholder="e.g., Windows Defender"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div>
+              <h4
+                class="text-lg font-semibold text-gray-900 mb-4 flex items-center"
+              >
+                <i class="fas fa-clipboard-list text-blue-600 mr-2"></i>
+                Additional Information
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Monitor Info</label
+                  >
+                  <input
+                    type="text"
+                    name="monitor_info"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    placeholder="e.g., 24 inch LED"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >CPU Serial</label
+                  >
+                  <input
+                    type="text"
+                    name="cpu_serial"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    placeholder="Enter CPU serial"
+                  />
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Status</label
+                  >
+                  <select
+                    name="status"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                  >
+                    <option value="active">Active</option>
+                    <option value="under_repair">Under Repair</option>
+                    <option value="retired">Retired</option>
+                    <option value="lost">Lost</option>
+                  </select>
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Notes</label
+                  >
+                  <textarea
+                    name="notes"
+                    rows="3"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    placeholder="Additional notes..."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Modal Footer -->
+        <div
+          class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50"
+        >
+          <button
+            onclick="closeAddComputerModal()"
+            class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <i class="fas fa-times mr-2"></i>Cancel
+          </button>
+          <button
+            onclick="document.getElementById('addComputerForm').reset()"
+            class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <i class="fas fa-refresh mr-2"></i>Reset
+          </button>
+          <button
+            type="submit"
+            form="addComputerForm"
+            class="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg"
+          >
+            <i class="fas fa-save mr-2"></i>Save Computer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Mobile menu toggle
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const sidebar = document.getElementById('sidebar');
+
+      mobileMenuBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('-translate-x-full');
+      });
+
+      // Close sidebar when clicking outside on mobile
+      document.addEventListener('click', (e) => {
+        if (
+          window.innerWidth < 1024 &&
+          !sidebar.contains(e.target) &&
+          !mobileMenuBtn.contains(e.target)
+        ) {
+          sidebar.classList.add('-translate-x-full');
+        }
+      });
+
+      // Modal functions
+      function openAddComputerModal() {
+        document.getElementById('addComputerModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeAddComputerModal() {
+        document.getElementById('addComputerModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+
+      function clearFilters() {
+        document.querySelectorAll('input, select').forEach((el) => {
+          if (el.type === 'text' || el.type === 'search') {
+            el.value = '';
+          } else if (el.tagName === 'SELECT') {
+            el.selectedIndex = 0;
+          }
+        });
+      }
+
+      // Close modal on background click
+      document
+        .getElementById('addComputerModal')
+        .addEventListener('click', (e) => {
+          if (e.target.id === 'addComputerModal') {
+            closeAddComputerModal();
+          }
+        });
+
+      // Form submission
+      document
+        .getElementById('addComputerForm')
+        .addEventListener('submit', (e) => {
+          e.preventDefault();
+          alert('Computer added successfully!');
+          closeAddComputerModal();
+          document.getElementById('addComputerForm').reset();
+        });
+    </script>
+  </body>
+</html>
