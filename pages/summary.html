@@ -109,14 +109,7 @@
             class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
           >
             <i class="fas fa-desktop w-5"></i>
-            <span>Computers</span>
-          </a>
-          <a
-            href="./laptops.html"
-            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
-          >
-            <i class="fas fa-laptop w-5"></i>
-            <span>Laptops</span>
+            <span class="font-medium">Computers</span>
           </a>
           <a
             href="./printers.html"
@@ -126,50 +119,138 @@
             <span>Printers</span>
           </a>
           <a
-            href="./other-devices.html"
+            href="#"
             class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
           >
-            <i class="fas fa-hdd w-5"></i>
+            <i class="fas fa-microchip w-5"></i>
             <span>Other Devices</span>
           </a>
           <a
-            href="./repairs.html"
+            href="#"
             class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
           >
             <i class="fas fa-tools w-5"></i>
             <span>Repairs</span>
           </a>
           <a
-            href="./site-offices.html"
+            href="#"
             class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
           >
-            <i class="fas fa-building w-5"></i>
-            <span>Site Offices</span>
+            <i class="fas fa-exclamation-triangle w-5"></i>
+            <span>Issues</span>
           </a>
           <a
             href="./summary.html"
-            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600"
+            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
           >
-            <i class="fas fa-chart-pie w-5"></i>
-            <span class="font-medium">Summary</span>
+            <i class="fas fa-exclamation-triangle w-5"></i>
+            <span>Summary</span>
           </a>
         </div>
+
+        <div class="mt-8 pt-8 border-t border-gray-100">
+          <p class="text-xs font-semibold text-gray-400 uppercase px-4 mb-3">
+            Administration
+          </p>
+          <div class="space-y-1">
+            <a
+              href="./site_offices.html"
+              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600"
+            >
+              <i class="fas fa-building w-5"></i>
+              <span>Site Offices</span>
+            </a>
+            <a
+              href="./sections.html"
+              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+            >
+              <i class="fas fa-sitemap w-5"></i>
+              <span>Sections</span>
+            </a>
+            <a
+              href="#"
+              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+            >
+              <i class="fas fa-users w-5"></i>
+              <span>Users</span>
+            </a>
+            <a
+              href="#"
+              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+            >
+              <i class="fas fa-tags w-5"></i>
+              <span>Categories</span>
+            </a>
+            <a
+              href="#"
+              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+            >
+              <i class="fas fa-chart-line w-5"></i>
+              <span>Reports</span>
+            </a>
+            <a
+              href="#"
+              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+            >
+              <i class="fas fa-cog w-5"></i>
+              <span>Settings</span>
+            </a>
+          </div>
+        </div>
       </nav>
+
+      <div class="p-4 border-t border-gray-100 mt-auto">
+        <a
+          href="#"
+          class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50"
+        >
+          <i class="fas fa-sign-out-alt w-5"></i>
+          <span>Logout</span>
+        </a>
+      </div>
     </aside>
 
     <!-- Main Content -->
-    <main class="lg:ml-64 p-6">
+    <main class="lg:ml-64">
       <!-- Header -->
-      <header class="mb-8">
-        <div
-          class="flex flex-col md:flex-row md:items-center md:justify-between"
-        >
-          <div>
-            <h1 class="text-3xl font-bold text-gray-800">Summary Dashboard</h1>
-            <p class="mt-1 text-gray-600">
+      <header
+        class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-30 border-b border-gray-100 mb-3"
+      >
+        <div class="px-6 py-4 flex items-center justify-between">
+          <div class="animate-fade-up">
+            <h1 class="text-2xl font-bold text-gray-800">Summary Dashboard</h1>
+            <p class="text-sm text-gray-500 mt-1">
               Comprehensive overview of device management system
             </p>
           </div>
+          <div class="flex items-center space-x-4">
+            <button
+              class="relative p-2 text-gray-600 hover:text-blue-600 transition-colors"
+            >
+              <i class="fas fa-bell text-xl"></i>
+              <span
+                class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"
+              ></span>
+            </button>
+            <div
+              class="flex items-center space-x-3 pl-4 border-l border-gray-200"
+            >
+              <div class="text-right">
+                <p class="text-sm font-medium text-gray-800">Admin User</p>
+                <p class="text-xs text-gray-500">Administrator</p>
+              </div>
+              <div
+                class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center"
+              >
+                <i class="fas fa-user text-white text-sm"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="p-6">
+        <div class="flex justify-end mb-6">
           <div class="mt-4 md:mt-0 flex gap-3">
             <button
               onclick="window.print()"
@@ -187,194 +268,185 @@
             </button>
           </div>
         </div>
-      </header>
-
-      <!-- Quick Stats Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="stat-card bg-white p-6 rounded-2xl shadow-sm">
-          <div class="flex items-center justify-between mb-4">
-            <div
-              class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center"
-            >
-              <i class="fas fa-desktop text-blue-600 text-xl"></i>
+        <!-- Quick Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div class="stat-card bg-white p-6 rounded-2xl shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center"
+              >
+                <i class="fas fa-desktop text-blue-600 text-xl"></i>
+              </div>
+              <span
+                class="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-lg"
+                >Devices</span
+              >
             </div>
-            <span
-              class="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-lg"
-              >Devices</span
-            >
-          </div>
-          <h3 class="text-2xl font-bold text-gray-800 mb-1">2,547</h3>
-          <p class="text-gray-500 text-sm">Total Devices</p>
-          <div class="mt-4 flex items-center text-green-600">
-            <i class="fas fa-arrow-up text-xs mr-1"></i>
-            <span class="text-xs">12% from last month</span>
-          </div>
-        </div>
-
-        <div class="stat-card bg-white p-6 rounded-2xl shadow-sm">
-          <div class="flex items-center justify-between mb-4">
-            <div
-              class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center"
-            >
-              <i class="fas fa-tools text-red-600 text-xl"></i>
+            <h3 class="text-2xl font-bold text-gray-800 mb-1">2,547</h3>
+            <p class="text-gray-500 text-sm">Total Devices</p>
+            <div class="mt-4 flex items-center text-green-600">
+              <i class="fas fa-arrow-up text-xs mr-1"></i>
+              <span class="text-xs">12% from last month</span>
             </div>
-            <span
-              class="text-sm font-medium text-red-600 bg-red-50 px-2 py-1 rounded-lg"
-              >Issues</span
-            >
           </div>
-          <h3 class="text-2xl font-bold text-gray-800 mb-1">48</h3>
-          <p class="text-gray-500 text-sm">Active Issues</p>
-          <div class="mt-4 flex items-center text-red-600">
-            <i class="fas fa-arrow-down text-xs mr-1"></i>
-            <span class="text-xs">8% from last week</span>
-          </div>
-        </div>
-
-        <div class="stat-card bg-white p-6 rounded-2xl shadow-sm">
-          <div class="flex items-center justify-between mb-4">
-            <div
-              class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center"
-            >
-              <i class="fas fa-check-circle text-green-600 text-xl"></i>
+          <div class="stat-card bg-white p-6 rounded-2xl shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center"
+              >
+                <i class="fas fa-tools text-red-600 text-xl"></i>
+              </div>
+              <span
+                class="text-sm font-medium text-red-600 bg-red-50 px-2 py-1 rounded-lg"
+                >Issues</span
+              >
             </div>
-            <span
-              class="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-lg"
-              >Active</span
-            >
-          </div>
-          <h3 class="text-2xl font-bold text-gray-800 mb-1">95.8%</h3>
-          <p class="text-gray-500 text-sm">Uptime Rate</p>
-          <div class="mt-4 flex items-center text-green-600">
-            <i class="fas fa-arrow-up text-xs mr-1"></i>
-            <span class="text-xs">2.3% improvement</span>
-          </div>
-        </div>
-
-        <div class="stat-card bg-white p-6 rounded-2xl shadow-sm">
-          <div class="flex items-center justify-between mb-4">
-            <div
-              class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center"
-            >
-              <i class="fas fa-users text-purple-600 text-xl"></i>
+            <h3 class="text-2xl font-bold text-gray-800 mb-1">48</h3>
+            <p class="text-gray-500 text-sm">Active Issues</p>
+            <div class="mt-4 flex items-center text-red-600">
+              <i class="fas fa-arrow-down text-xs mr-1"></i>
+              <span class="text-xs">8% from last week</span>
             </div>
-            <span
-              class="text-sm font-medium text-purple-600 bg-purple-50 px-2 py-1 rounded-lg"
-              >Users</span
+          </div>
+          <div class="stat-card bg-white p-6 rounded-2xl shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center"
+              >
+                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+              </div>
+              <span
+                class="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-lg"
+                >Active</span
+              >
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-1">95.8%</h3>
+            <p class="text-gray-500 text-sm">Uptime Rate</p>
+            <div class="mt-4 flex items-center text-green-600">
+              <i class="fas fa-arrow-up text-xs mr-1"></i>
+              <span class="text-xs">2.3% improvement</span>
+            </div>
+          </div>
+          <div class="stat-card bg-white p-6 rounded-2xl shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center"
+              >
+                <i class="fas fa-users text-purple-600 text-xl"></i>
+              </div>
+              <span
+                class="text-sm font-medium text-purple-600 bg-purple-50 px-2 py-1 rounded-lg"
+                >Users</span
+              >
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-1">342</h3>
+            <p class="text-gray-500 text-sm">Active Users</p>
+            <div class="mt-4 flex items-center text-green-600">
+              <i class="fas fa-arrow-up text-xs mr-1"></i>
+              <span class="text-xs">5% new users</span>
+            </div>
+          </div>
+        </div>
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <!-- Device Distribution Chart -->
+          <div class="chart-container bg-white p-6 rounded-2xl shadow-sm">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">
+              Device Distribution
+            </h3>
+            <div class="h-80">
+              <canvas id="deviceDistributionChart"></canvas>
+            </div>
+          </div>
+          <!-- Monthly Issues Chart -->
+          <div class="chart-container bg-white p-6 rounded-2xl shadow-sm">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">
+              Monthly Issues Trend
+            </h3>
+            <div class="h-80">
+              <canvas id="monthlyIssuesChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <!-- Device Status & Branch Distribution -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <!-- Device Status -->
+          <div class="chart-container bg-white p-6 rounded-2xl shadow-sm">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">
+              Device Status Overview
+            </h3>
+            <div class="h-80" id="deviceStatusChart"></div>
+          </div>
+          <!-- Branch Distribution -->
+          <div class="chart-container bg-white p-6 rounded-2xl shadow-sm">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">
+              Branch Distribution
+            </h3>
+            <div class="h-80" id="branchDistributionChart"></div>
+          </div>
+        </div>
+        <!-- Recent Activity Table -->
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-bold text-gray-800">Recent Activity</h3>
+            <a
+              href="#"
+              class="text-blue-600 hover:text-blue-700 text-sm font-medium"
+              >View All</a
             >
           </div>
-          <h3 class="text-2xl font-bold text-gray-800 mb-1">342</h3>
-          <p class="text-gray-500 text-sm">Active Users</p>
-          <div class="mt-4 flex items-center text-green-600">
-            <i class="fas fa-arrow-up text-xs mr-1"></i>
-            <span class="text-xs">5% new users</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Charts Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <!-- Device Distribution Chart -->
-        <div class="chart-container bg-white p-6 rounded-2xl shadow-sm">
-          <h3 class="text-lg font-bold text-gray-800 mb-4">
-            Device Distribution
-          </h3>
-          <div class="h-80">
-            <canvas id="deviceDistributionChart"></canvas>
-          </div>
-        </div>
-
-        <!-- Monthly Issues Chart -->
-        <div class="chart-container bg-white p-6 rounded-2xl shadow-sm">
-          <h3 class="text-lg font-bold text-gray-800 mb-4">
-            Monthly Issues Trend
-          </h3>
-          <div class="h-80">
-            <canvas id="monthlyIssuesChart"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <!-- Device Status & Branch Distribution -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <!-- Device Status -->
-        <div class="chart-container bg-white p-6 rounded-2xl shadow-sm">
-          <h3 class="text-lg font-bold text-gray-800 mb-4">
-            Device Status Overview
-          </h3>
-          <div class="h-80" id="deviceStatusChart"></div>
-        </div>
-
-        <!-- Branch Distribution -->
-        <div class="chart-container bg-white p-6 rounded-2xl shadow-sm">
-          <h3 class="text-lg font-bold text-gray-800 mb-4">
-            Branch Distribution
-          </h3>
-          <div class="h-80" id="branchDistributionChart"></div>
-        </div>
-      </div>
-
-      <!-- Recent Activity Table -->
-      <div class="bg-white rounded-2xl shadow-sm p-6">
-        <div class="flex justify-between items-center mb-6">
-          <h3 class="text-lg font-bold text-gray-800">Recent Activity</h3>
-          <a
-            href="#"
-            class="text-blue-600 hover:text-blue-700 text-sm font-medium"
-            >View All</a
-          >
-        </div>
-        <div class="overflow-x-auto">
-          <table class="min-w-full">
-            <thead>
-              <tr class="border-b border-gray-100">
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Date
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Activity
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Device
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  User
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Status
-                </th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-              <tr class="table-row">
-                <td class="px-6 py-4 text-sm text-gray-600">2025-10-31</td>
-                <td class="px-6 py-4 text-sm text-gray-900">
-                  Device Registration
-                </td>
-                <td class="px-6 py-4 text-sm text-gray-600">
-                  HP ProBook 450 G8
-                </td>
-                <td class="px-6 py-4 text-sm text-gray-600">John Doe</td>
-                <td class="px-6 py-4">
-                  <span
-                    class="px-2 py-1 text-xs font-medium bg-green-50 text-green-600 rounded-lg"
-                    >Completed</span
+          <div class="overflow-x-auto">
+            <table class="min-w-full">
+              <thead>
+                <tr class="border-b border-gray-100">
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                </td>
-              </tr>
-              <!-- Add more rows as needed -->
-            </tbody>
-          </table>
+                    Date
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Activity
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Device
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    User
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                <tr class="table-row">
+                  <td class="px-6 py-4 text-sm text-gray-600">2025-10-31</td>
+                  <td class="px-6 py-4 text-sm text-gray-900">
+                    Device Registration
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-600">
+                    HP ProBook 450 G8
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-600">John Doe</td>
+                  <td class="px-6 py-4">
+                    <span
+                      class="px-2 py-1 text-xs font-medium bg-green-50 text-green-600 rounded-lg"
+                      >Completed</span
+                    >
+                  </td>
+                </tr>
+                <!-- Add more rows as needed -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </main>
