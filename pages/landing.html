@@ -557,66 +557,118 @@
     </section>
 
     <div
-      class="bg-gray-800 py-16 px-6 lg:px-12 text-white flex flex-col items-center text-center space-y-12"
+      class="relative bg-gradient-to-b from-gray-900 to-cyan-900 py-20 px-6 lg:px-12 text-white overflow-hidden"
     >
-      <!-- Feature Pills -->
-      <div class="flex flex-wrap gap-4 justify-center">
-        <span
-          class="bg-white/10 backdrop-blur-md px-5 py-2 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-white/20 transition"
-        >
-          <i class="fas fa-building"></i> Bandarawela Branch
-        </span>
-        <span
-          class="bg-white/10 backdrop-blur-md px-5 py-2 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-white/20 transition"
-        >
-          <i class="fas fa-desktop"></i> Device Tracking
-        </span>
-        <span
-          class="bg-white/10 backdrop-blur-md px-5 py-2 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-white/20 transition"
-        >
-          <i class="fas fa-history"></i> Maintenance Records
-        </span>
+      <!-- Background Elements -->
+      <div class="absolute inset-0 overflow-hidden opacity-20">
+        <div
+          class="absolute top-0 -left-10 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob"
+        ></div>
+        <div
+          class="absolute top-0 -right-10 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"
+        ></div>
+        <div
+          class="absolute -bottom-10 left-1/2 transform -translate-x-1/2 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"
+        ></div>
       </div>
 
-      <!-- CTA Buttons -->
-      <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
-        <a
-          href="../index.php"
-          class="bg-white text-cyan-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-cyan-50 transition-all duration-300 shadow-lg hover:shadow-cyan-500/50 transform hover:scale-105 flex items-center gap-2"
-        >
-          Get Started Now
-          <i
-            class="fas fa-arrow-right transition-transform group-hover:translate-x-1"
-          ></i>
-        </a>
-        <a
-          href="#features"
-          class="bg-white/10 backdrop-blur-md text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/20 transition flex items-center gap-2"
-        >
-          <i class="fas fa-play-circle"></i>
-          Watch Demo
-        </a>
-      </div>
+      <div
+        class="relative z-10 flex flex-col items-center text-center space-y-16"
+      >
+        <!-- Feature Pills -->
+        <div class="flex flex-wrap gap-4 justify-center">
+          <span
+            class="bg-gradient-to-r from-cyan-500/20 to-blue-500/20 backdrop-blur-md px-6 py-3 rounded-full text-sm font-medium flex items-center gap-3 hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-300 transform hover:scale-105 shadow-lg"
+          >
+            <div
+              class="w-8 h-8 bg-cyan-500 rounded-full flex items-center justify-center"
+            >
+              <i class="fas fa-building text-white"></i>
+            </div>
+            Bandarawela Branch
+          </span>
+          <span
+            class="bg-gradient-to-r from-blue-500/20 to-indigo-500/20 backdrop-blur-md px-6 py-3 rounded-full text-sm font-medium flex items-center gap-3 hover:from-blue-500/30 hover:to-indigo-500/30 transition-all duration-300 transform hover:scale-105 shadow-lg"
+          >
+            <div
+              class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center"
+            >
+              <i class="fas fa-desktop text-white"></i>
+            </div>
+            Device Tracking
+          </span>
+          <span
+            class="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 backdrop-blur-md px-6 py-3 rounded-full text-sm font-medium flex items-center gap-3 hover:from-indigo-500/30 hover:to-purple-500/30 transition-all duration-300 transform hover:scale-105 shadow-lg"
+          >
+            <div
+              class="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center"
+            >
+              <i class="fas fa-history text-white"></i>
+            </div>
+            Maintenance Records
+          </span>
+        </div>
 
-      <!-- Stats Row -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-3xl">
-        <div class="text-center">
-          <div class="text-4xl font-bold text-white counter" data-target="500">
-            0
-          </div>
-          <div class="text-cyan-200 text-sm mt-1">Devices</div>
+        <!-- CTA Buttons -->
+        <div
+          class="flex flex-col sm:flex-row gap-6 justify-center items-center"
+        >
+          <a
+            href="../index.php"
+            class="group bg-gradient-to-r from-cyan-500 to-blue-500 px-8 py-4 rounded-full font-bold text-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-cyan-500/50 transform hover:scale-105 flex items-center gap-3"
+          >
+            Get Started Now
+            <i
+              class="fas fa-arrow-right transition-transform duration-300 group-hover:translate-x-1"
+            ></i>
+          </a>
+          <a
+            href="#features"
+            class="group bg-white/10 backdrop-blur-md px-8 py-4 rounded-full font-bold text-lg hover:bg-white/20 transition-all duration-300 flex items-center gap-3 border border-white/20 hover:border-white/40"
+          >
+            <div
+              class="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center"
+            >
+              <i class="fas fa-play text-white text-xs"></i>
+            </div>
+            Watch Demo
+          </a>
         </div>
-        <div class="text-center">
-          <div class="text-4xl font-bold text-white counter" data-target="15">
-            0
+
+        <!-- Stats Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 w-full max-w-4xl">
+          <div
+            class="bg-white/5 backdrop-blur-lg rounded-2xl p-8 transform hover:scale-105 transition-all duration-300 border border-white/10 hover:border-cyan-500/30"
+          >
+            <div
+              class="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent counter"
+              data-target="500"
+            >
+              0
+            </div>
+            <div class="text-cyan-200 font-medium mt-2">Devices Managed</div>
           </div>
-          <div class="text-cyan-200 text-sm mt-1">Branches</div>
-        </div>
-        <div class="text-center">
-          <div class="text-4xl font-bold text-white">
-            <span class="counter" data-target="99">0</span>%
+          <div
+            class="bg-white/5 backdrop-blur-lg rounded-2xl p-8 transform hover:scale-105 transition-all duration-300 border border-white/10 hover:border-blue-500/30"
+          >
+            <div
+              class="text-5xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent counter"
+              data-target="15"
+            >
+              0
+            </div>
+            <div class="text-cyan-200 font-medium mt-2">Branch Offices</div>
           </div>
-          <div class="text-cyan-200 text-sm mt-1">Uptime</div>
+          <div
+            class="bg-white/5 backdrop-blur-lg rounded-2xl p-8 transform hover:scale-105 transition-all duration-300 border border-white/10 hover:border-indigo-500/30"
+          >
+            <div
+              class="text-5xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+            >
+              <span class="counter" data-target="99">0</span>%
+            </div>
+            <div class="text-cyan-200 font-medium mt-2">System Uptime</div>
+          </div>
         </div>
       </div>
     </div>
