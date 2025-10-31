@@ -3,733 +3,1298 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            animation: {
-              'fade-in': 'fadeIn 1s ease-in-out',
-              'fade-in-up': 'fadeInUp 1s ease-in-out',
-              'fade-in-right': 'fadeInRight 1s ease-in-out',
-              'slide-up': 'slideUp 0.8s ease-out',
-              'slide-up-delay': 'slideUp 0.8s ease-out 0.2s both',
-              'slide-up-delay-2': 'slideUp 0.8s ease-out 0.4s both',
-              'fade-in-up-delay': 'fadeInUp 1s ease-in-out 0.6s both',
-              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            },
-            keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0' },
-                '100%': { opacity: '1' },
-              },
-              fadeInUp: {
-                '0%': { opacity: '0', transform: 'translateY(30px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
-              },
-              fadeInRight: {
-                '0%': { opacity: '0', transform: 'translateX(30px)' },
-                '100%': { opacity: '1', transform: 'translateX(0)' },
-              },
-              slideUp: {
-                '0%': { opacity: '0', transform: 'translateY(50px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
-              },
-            },
-          },
-        },
-      };
-    </script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="shortcut icon"
-      href="./src/assets/images/favicon.png"
-      type="image/x-icon"
-    />
-    <link rel="stylesheet" href="./src/assets/css/main.css" />
-    <title>National Water Supply and Drainage Board</title>
+    <title>NWSDB - Device Record System</title>
 
-    <!-- Loader Styles -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
     <style>
-      /* Loader Overlay */
-      #loader {
-        position: fixed;
+      :root {
+        --water-blue: #0891b2;
+        --water-dark: #0e7490;
+        --water-light: #22d3ee;
+        --water-pale: #67e8f9;
+        --water-bg: #ecfeff;
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+
+      /* Water Ripple Effect */
+      .water-ripple {
+        position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          135deg,
-          #1e40af 0%,
-          #3b82f6 50%,
-          #60a5fa 100%
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(
+          circle at center,
+          transparent 30%,
+          rgba(6, 182, 212, 0.1) 70%
         );
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        animation: ripple 15s infinite linear;
+        opacity: 0.5;
       }
 
-      #loader.fade-out {
-        opacity: 0;
-        visibility: hidden;
-      }
-
-      /* Logo Animation */
-      .loader-logo {
-        animation: logoFloat 2s ease-in-out infinite alternate;
-        margin-bottom: 2rem;
-      }
-
-      @keyframes logoFloat {
+      @keyframes ripple {
         0% {
-          transform: translateY(0px) scale(1);
-        }
-        100% {
-          transform: translateY(-10px) scale(1.05);
-        }
-      }
-
-      /* Water Drop Loader */
-      .water-loader {
-        position: relative;
-        width: 80px;
-        height: 80px;
-        margin-bottom: 2rem;
-      }
-
-      .drop {
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        background: rgba(255, 255, 255, 0.8);
-        border-radius: 50% 50% 50% 0;
-        transform: rotate(-45deg);
-        animation: dropFall 1.5s ease-in-out infinite;
-      }
-
-      .drop:nth-child(1) {
-        animation-delay: 0s;
-        left: 10px;
-      }
-      .drop:nth-child(2) {
-        animation-delay: 0.3s;
-        left: 30px;
-      }
-      .drop:nth-child(3) {
-        animation-delay: 0.6s;
-        left: 50px;
-      }
-
-      @keyframes dropFall {
-        0%,
-        100% {
-          transform: rotate(-45deg) translateY(0px);
-          opacity: 1;
+          transform: scale(1);
         }
         50% {
-          transform: rotate(-45deg) translateY(30px);
-          opacity: 0.7;
+          transform: scale(1.2);
         }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      /* Floating Animation */
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-20px) rotate(5deg);
+        }
+      }
+
+      @keyframes float-reverse {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(20px) rotate(-5deg);
+        }
+      }
+
+      .float-1 {
+        animation: float 6s ease-in-out infinite;
+      }
+      .float-2 {
+        animation: float-reverse 8s ease-in-out infinite;
+      }
+      .float-3 {
+        animation: float 10s ease-in-out infinite;
+      }
+
+      /* Gradient Glow Animation */
+      @keyframes gradientGlow {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .gradient-glow {
+        background: linear-gradient(
+          45deg,
+          var(--water-blue),
+          var(--water-light),
+          var(--water-dark)
+        );
+        background-size: 200% 200%;
+        animation: gradientGlow 15s ease infinite;
+      }
+
+      /* Ripple Effect */
+      @keyframes ripple {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1.5);
+          opacity: 0;
+        }
+      }
+
+      .ripple-circle {
+        position: absolute;
+        border: 2px solid rgba(34, 211, 238, 0.6);
+        border-radius: 50%;
+        animation: ripple 3s ease-out infinite;
+      }
+
+      /* Gradient Text */
+      .gradient-text {
+        background: linear-gradient(
+          135deg,
+          #06b6d4 0%,
+          #0891b2 50%,
+          #0e7490 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* Glass Effect */
+
+      /* Hover Effects */
+      .hover-lift {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .hover-lift:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 60px rgba(8, 145, 178, 0.3);
+      }
+
+      /* Fade In Animations */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(40px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeInLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-40px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes fadeInRight {
+        from {
+          opacity: 0;
+          transform: translateX(40px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes scaleIn {
+        from {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .fade-in-up {
+        animation: fadeInUp 0.8s ease-out forwards;
+      }
+
+      .fade-in-left {
+        animation: fadeInLeft 0.8s ease-out forwards;
+      }
+
+      .fade-in-right {
+        animation: fadeInRight 0.8s ease-out forwards;
+      }
+
+      .scale-in {
+        animation: scaleIn 0.8s ease-out forwards;
+      }
+
+      .delay-100 {
+        animation-delay: 0.1s;
+        opacity: 0;
+      }
+      .delay-200 {
+        animation-delay: 0.2s;
+        opacity: 0;
+      }
+      .delay-300 {
+        animation-delay: 0.3s;
+        opacity: 0;
+      }
+      .delay-400 {
+        animation-delay: 0.4s;
+        opacity: 0;
+      }
+      .delay-500 {
+        animation-delay: 0.5s;
+        opacity: 0;
+      }
+      .delay-600 {
+        animation-delay: 0.6s;
+        opacity: 0;
+      }
+      .delay-700 {
+        animation-delay: 0.7s;
+        opacity: 0;
       }
 
       /* Progress Bar */
-      .progress-container {
-        width: 300px;
-        height: 4px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 2px;
-        overflow: hidden;
-        margin-bottom: 1rem;
-      }
-
       .progress-bar {
-        height: 100%;
-        background: linear-gradient(90deg, #ffffff, #e0f2fe, #ffffff);
-        background-size: 200% 100%;
-        animation: progressShine 1s ease-in-out infinite;
-        width: 0%;
-        transition: width 0.1s ease-out;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #06b6d4, #0891b2, #22d3ee);
+        z-index: 9999;
+        transition: width 0.1s ease;
       }
 
-      /* Remove the automatic CSS animation, we'll control it with JavaScript */
-      @keyframes progressShine {
-        0% {
-          background-position: -200% 0;
-        }
-        100% {
-          background-position: 200% 0;
-        }
-      }
-
-      /* Progress percentage text */
-      .progress-text {
-        color: white;
-        font-family: 'Inter', sans-serif;
-        font-size: 0.9rem;
-        font-weight: 500;
-        margin-top: 0.5rem;
-        text-align: center;
-      }
-
-      /* Loading Text */
-      .loading-text {
-        color: white;
-        font-family: 'Inter', sans-serif;
-        font-size: 1.2rem;
-        font-weight: 500;
-        text-align: center;
-        animation: textPulse 2s ease-in-out infinite;
-      }
-
-      @keyframes textPulse {
+      /* Blob Animation */
+      @keyframes blob {
         0%,
         100% {
-          opacity: 1;
+          transform: translate(0, 0) scale(1);
+        }
+        25% {
+          transform: translate(20px, -50px) scale(1.1);
         }
         50% {
-          opacity: 0.7;
+          transform: translate(0, -100px) scale(0.9);
+        }
+        75% {
+          transform: translate(-20px, -50px) scale(1.05);
         }
       }
 
-      /* Hide main content initially */
-      body.loading .main-content {
-        opacity: 0;
-        pointer-events: none;
+      .blob {
+        border-radius: 50%;
+        filter: blur(60px);
+        opacity: 0.7;
+        animation: blob 15s ease-in-out infinite;
       }
 
-      body.loaded .main-content {
-        opacity: 1;
-        pointer-events: auto;
-        transition: opacity 0.5s ease-in;
+      /* Smooth Scroll */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--water-blue);
+        border-radius: 5px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--water-dark);
       }
     </style>
   </head>
-  <body
-    class="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white text-gray-800 loading"
-  >
-    <!-- LOADER -->
-    <div id="loader">
-      <!-- Logo with Animation -->
-      <div class="loader-logo">
-        <div class="flex items-center space-x-4">
-          <img
-            src="./src/assets/images/logo/nationalsign.png"
-            alt="Sri Lanka National Emblem"
-            class="h-16 w-auto"
-            onerror="this.style.display='none'"
-          />
-          <img
-            src="./src/assets/images/logo/logo.png"
-            alt="NWSDB logo"
-            class="h-12 w-auto"
-            onerror="this.style.display='none'"
-          />
-        </div>
-      </div>
+  <body class="bg-gray-50 text-gray-800">
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
 
-      <!-- Water Drop Animation -->
-      <div class="water-loader">
-        <div class="drop"></div>
-        <div class="drop"></div>
-        <div class="drop"></div>
-      </div>
-
-      <!-- Progress Bar -->
-      <div class="progress-container">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
-      <div class="progress-text" id="progressText">0%</div>
-
-      <!-- Loading Text -->
-      <div class="loading-text">
-        <div id="loadingMessage">Initializing NWSDB Portal...</div>
-        <div class="text-sm opacity-80 mt-2">
-          Customer Details Upload System
-        </div>
-      </div>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
-      <!-- NAVBAR -->
-      <header
-        class="bg-white/95 backdrop-blur-lg shadow-lg sticky top-0 z-50 border-b border-gray-200"
-      >
-        <div
-          class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 xl:px-20 h-16 sm:h-20 flex items-center justify-between"
-        >
-          <!-- Logo Section -->
+    <!-- Navigation -->
+    <nav
+      class="fixed w-full z-50 transition-all duration-300 bg-gradient-to-b from-black/50 to-transparent backdrop-blur-sm"
+      id="navbar"
+    >
+      <div class="container mx-auto px-6 py-4">
+        <div class="flex justify-between items-center max-w-7xl mx-auto">
           <a
-            href="/index.html"
-            class="flex items-center space-x-3 sm:space-x-4 group"
+            href="#"
+            class="text-2xl font-bold text-white flex items-center gap-2 transition-all duration-300 hover:scale-105"
           >
-            <img
-              src="./src/assets/images/logo/nationalsign.png"
-              alt="Sri Lanka National Emblem"
-              class="h-10 sm:h-16 w-auto transition-all duration-300"
-            />
-            <img
-              src="./src/assets/images/logo/logo.png"
-              alt="NWSDB logo"
-              class="h-8 sm:h-12 w-auto transition-all duration-300"
-            />
+            <div class="bg-white bg-opacity-20 p-2 rounded-lg backdrop-blur-sm">
+              <i class="fa-solid fa-droplet text-cyan-300"></i>
+            </div>
+            <span>NWSDB Bandarawela</span>
           </a>
-
-          <!-- Desktop Navigation -->
-          <nav class="hidden sm:flex items-center space-x-1">
-            <span
-              class="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 text-sm font-medium"
-            >
-              SignIn From Here
-            </span>
-            <a
-              href="./src/pages/Auth/login.html"
-              class="ml-4 px-6 py-2.5 text-sm font-semibold rounded-full text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 active:scale-95 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/25"
-            >
-              <i class="fas fa-sign-in-alt mr-2"></i>Login
-            </a>
-          </nav>
-        </div>
-      </header>
-
-      <!-- HERO SECTION -->
-      <main class="flex-grow">
-        <section
-          class="relative min-h-screen sm:min-h-[600px] bg-cover bg-center bg-no-repeat overflow-hidden"
-          style="
-            background-image: linear-gradient(
-                rgba(0, 0, 0, 0.5),
-                rgba(0, 0, 0, 0.3)
-              ),
-              url('./src/assets/images/backgrounds/hero_background_landing.jpg');
-          "
-        >
-          <!-- Animated background elements -->
-          <div class="absolute inset-0">
-            <div
-              class="absolute top-10 left-10 w-2 h-2 bg-blue-400 rounded-full animate-pulse"
-            ></div>
-            <div
-              class="absolute top-20 right-20 w-3 h-3 bg-white/30 rounded-full animate-bounce"
-            ></div>
-            <div
-              class="absolute bottom-20 left-20 w-2 h-2 bg-blue-300 rounded-full animate-ping"
-            ></div>
-            <div
-              class="absolute bottom-10 right-10 w-4 h-4 bg-white/20 rounded-full animate-pulse"
-            ></div>
-          </div>
-
-          <div
-            class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 xl:px-20 2xl:px-32 py-16 sm:py-20 lg:py-24 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 xl:gap-20 items-center h-full relative z-10"
+          <ul
+            class="hidden md:flex items-center space-x-8 text-white font-medium"
           >
-            <!-- TEXT -->
-            <div class="text-center lg:text-left space-y-6 animate-fade-in-up">
-              <div
-                class="inline-block px-4 py-2 bg-blue-500/20 border border-blue-400/30 rounded-full text-blue-200 text-sm font-medium mb-4 backdrop-blur-sm animate-fade-in"
+            <li>
+              <a href="#hero" class="hover:text-cyan-300 transition">Home</a>
+            </li>
+            <li>
+              <a href="#features" class="hover:text-cyan-300 transition"
+                >Features</a
               >
-                <i class="fas fa-star mr-2"></i>Official NWSDB Portal
-              </div>
+            </li>
+            <li>
+              <a href="#about" class="hover:text-cyan-300 transition">Help</a>
+            </li>
+          </ul>
+          <div class="flex items-center gap-4">
+            <a
+              href="./pages/register.html"
+              class="text-white hover:text-cyan-300 transition-all duration-300"
+            >
+              <i class="fas fa-user-plus mr-1"></i> Staff Register
+            </a>
+            <a
+              href="./pages/login.html"
+              class="bg-white text-cyan-600 px-6 py-2.5 rounded-full font-semibold hover:bg-cyan-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              Staff Login <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
 
-              <h1
-                class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-white leading-tight drop-shadow-lg animate-slide-up"
+    <!-- Hero Section -->
+    <section
+      id="hero"
+      class="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-900 pt-10"
+    >
+      <!-- Animated Background Elements -->
+      <div class="absolute inset-0 overflow-hidden">
+        <div class="water-ripple"></div>
+        <!-- Floating Circles -->
+        <div
+          class="absolute top-20 left-20 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl float-1"
+        ></div>
+        <div
+          class="absolute bottom-20 right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-2xl float-2"
+        ></div>
+        <div
+          class="absolute top-1/2 left-1/3 w-24 h-24 bg-cyan-400/10 rounded-full blur-2xl float-3"
+        ></div>
+      </div>
+
+      <!-- Content Container -->
+      <div class="container mx-auto px-6 py-12 md:py-16 relative z-10">
+        <div
+          class="flex flex-col lg:flex-row items-center gap-12 max-w-7xl mx-auto"
+        >
+          <!-- Left Content -->
+          <div class="flex-1 text-white text-center lg:text-left space-y-8">
+            <!-- Badge -->
+            <div
+              class="inline-flex items-center gap-2 bg-white bg-opacity-20 backdrop-blur-md px-4 py-2 rounded-full mb-6 fade-in-up"
+            >
+              <span
+                class="w-2 h-2 bg-green-400 rounded-full animate-pulse"
+              ></span>
+              <span class="text-sm font-medium"
+                >Internal Staff System - Bandarawela Branch</span
               >
-                <span class="block">Customer Details</span>
+            </div>
+
+            <!-- Main Heading -->
+            <h1
+              class="text-5xl lg:text-7xl font-bold mb-6 leading-tight fade-in-up delay-100"
+            >
+              NWSDB Device
+              <span class="gradient-text block">Management Portal</span>
+            </h1>
+
+            <!-- Subheading -->
+            <p
+              class="text-xl lg:text-2xl text-cyan-100 mb-6 leading-relaxed fade-in-up delay-200"
+            >
+              Internal IT asset management system for NWSDB Bandarawela branch
+              staff
+            </p>
+
+            <!-- Access Notice -->
+            <div
+              class="bg-white/10 backdrop-blur-md rounded-lg p-4 mb-6 inline-block fade-in-up delay-200"
+            >
+              <p class="text-cyan-100 flex items-center gap-2">
+                <i class="fas fa-info-circle text-cyan-300"></i>
                 <span
-                  class="block bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent"
-                  >Upload System</span
-                >
-              </h1>
-
-              <p
-                class="text-base sm:text-lg lg:text-xl text-gray-100 max-w-lg mx-auto lg:mx-0 drop-shadow-md leading-relaxed animate-slide-up-delay"
-              >
-                A secure and efficient platform to upload and manage customer
-                data for the
-                <span class="font-semibold text-blue-300"
-                  >National Water Supply and Drainage Board — Bandarawela
-                  Center.</span
+                  >Restricted access: Only authorized NWSDB Bandarawela staff
+                  members can register and access this system</span
                 >
               </p>
-
-              <div
-                class="flex flex-col sm:flex-row gap-4 animate-slide-up-delay-2"
-              >
-                <a
-                  href="./src/pages/Auth/login.html"
-                  class="group inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full font-semibold shadow-lg hover:from-blue-600 hover:to-blue-700 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/25 transition-all duration-300 transform"
-                >
-                  <i class="fas fa-rocket mr-2 group-hover:animate-bounce"></i>
-                  Get Started
-                  <i
-                    class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform duration-300"
-                  ></i>
-                </a>
-
-                <span
-                  class="inline-flex items-center justify-center px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-full font-medium hover:bg-white/20 hover:scale-105 transition-all duration-300 transform"
-                >
-                  <i class="fas fa-info-circle mr-2"></i>
-                  Protected By NWSDB
-                </span>
-              </div>
-
-              <!-- Stats -->
-              <div class="grid grid-cols-3 gap-4 pt-8 animate-fade-in-up-delay">
-                <div class="text-center">
-                  <div class="text-2xl sm:text-3xl font-bold text-white">
-                    1000+
-                  </div>
-                  <div class="text-xs sm:text-sm text-blue-200">Customers</div>
-                </div>
-                <div class="text-center">
-                  <div class="text-2xl sm:text-3xl font-bold text-white">
-                    99.9%
-                  </div>
-                  <div class="text-xs sm:text-sm text-blue-200">Uptime</div>
-                </div>
-                <div class="text-center">
-                  <div class="text-2xl sm:text-3xl font-bold text-white">
-                    24/7
-                  </div>
-                  <div class="text-xs sm:text-sm text-blue-200">Support</div>
-                </div>
-              </div>
             </div>
 
-            <!-- MODERN VISUAL ELEMENT -->
-            <div
-              class="flex justify-center lg:justify-end animate-fade-in-right"
-            >
-              <div class="relative">
-                <!-- Main card with glassmorphism effect -->
-                <div
-                  class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-6 sm:p-8 shadow-2xl transform hover:scale-105 transition-all duration-500 hover:rotate-1"
-                >
-                  <!-- Floating elements -->
-                  <div class="relative">
-                    <!-- Central icon -->
-                    <div
-                      class="w-24 h-24 sm:w-32 sm:h-32 mx-auto bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg animate-pulse-slow"
-                    >
-                      <i
-                        class="fas fa-database text-2xl sm:text-4xl text-white"
-                      ></i>
-                    </div>
-
-                    <!-- Orbiting elements -->
-                    <div
-                      class="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-full flex items-center justify-center animate-bounce"
-                    >
-                      <i
-                        class="fas fa-upload text-white text-sm sm:text-xl"
-                      ></i>
-                    </div>
-
-                    <div
-                      class="absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-full flex items-center justify-center animate-pulse"
-                    >
-                      <i
-                        class="fas fa-shield-alt text-white text-sm sm:text-xl"
-                      ></i>
-                    </div>
-
-                    <div
-                      class="absolute top-1/2 -left-4 sm:-left-8 w-10 h-10 sm:w-12 sm:h-12 bg-white/15 rounded-full flex items-center justify-center animate-ping"
-                    >
-                      <i
-                        class="fas fa-search text-white text-xs sm:text-base"
-                      ></i>
-                    </div>
-                  </div>
-
-                  <!-- Card content -->
-                  <div class="mt-6 text-center">
-                    <h3 class="text-lg sm:text-xl font-bold text-white mb-2">
-                      Secure & Efficient
-                    </h3>
-                    <p class="text-white/80 text-xs sm:text-sm">
-                      Customer Data Management
-                    </p>
-                  </div>
-                </div>
-              </div>
+            <!-- Typed Text -->
+            <div class="text-lg text-cyan-200 mb-8 h-16 fade-in-up delay-300">
+              <i class="fas fa-circle-notch fa-spin mr-2"></i>
+              <span id="typed-text"></span>
             </div>
           </div>
 
-          <!-- Scroll indicator -->
-          <div
-            class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce"
-          >
-            <div
-              class="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center"
-            >
+          <!-- Right Content - 3D Illustration -->
+          <div class="flex-1 relative fade-in-right delay-400">
+            <div class="relative">
+              <!-- Main Device Illustration -->
+              <div class="glass-card p-8 rounded-3xl float-1">
+                <div
+                  class="bg-gradient-to-br from-cyan-400 to-blue-600 rounded-2xl p-8 shadow-2xl"
+                >
+                  <div class="space-y-4">
+                    <!-- Dashboard Preview -->
+                    <div
+                      class="bg-white bg-opacity-20 backdrop-blur-md rounded-xl p-4"
+                    >
+                      <div class="flex items-center gap-3 mb-3">
+                        <div
+                          class="w-12 h-12 bg-white bg-opacity-30 rounded-lg flex items-center justify-center"
+                        >
+                          <i class="fas fa-server text-white text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                          <div
+                            class="h-2 bg-white bg-opacity-40 rounded-full w-3/4 mb-2"
+                          ></div>
+                          <div
+                            class="h-2 bg-white bg-opacity-30 rounded-full w-1/2"
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                      <div
+                        class="bg-white bg-opacity-20 backdrop-blur-md rounded-xl p-3 text-center"
+                      >
+                        <i class="fas fa-laptop text-white text-2xl mb-2"></i>
+                        <div
+                          class="h-2 bg-white bg-opacity-40 rounded-full"
+                        ></div>
+                      </div>
+                      <div
+                        class="bg-white bg-opacity-20 backdrop-blur-md rounded-xl p-3 text-center"
+                      >
+                        <i
+                          class="fas fa-mobile-alt text-white text-2xl mb-2"
+                        ></i>
+                        <div
+                          class="h-2 bg-white bg-opacity-40 rounded-full"
+                        ></div>
+                      </div>
+                    </div>
+
+                    <div
+                      class="bg-white bg-opacity-20 backdrop-blur-md rounded-xl p-4"
+                    >
+                      <div class="flex justify-between items-center mb-2">
+                        <div
+                          class="h-2 bg-white bg-opacity-40 rounded-full w-1/3"
+                        ></div>
+                        <div class="text-white text-xs">85%</div>
+                      </div>
+                      <div
+                        class="h-3 bg-white bg-opacity-20 rounded-full overflow-hidden"
+                      >
+                        <div
+                          class="h-full bg-gradient-to-r from-cyan-300 to-blue-300 rounded-full"
+                          style="width: 85%"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Floating Cards -->
               <div
-                class="w-1 h-3 bg-white/60 rounded-full mt-2 animate-pulse"
+                class="absolute -top-6 -left-6 glass-card p-4 rounded-2xl shadow-xl float-2"
+              >
+                <i class="fas fa-check-circle text-green-400 text-3xl"></i>
+              </div>
+
+              <div
+                class="absolute -bottom-6 -right-6 glass-card p-4 rounded-2xl shadow-xl float-3"
+              >
+                <i class="fas fa-chart-line text-cyan-300 text-3xl"></i>
+              </div>
+
+              <!-- Ripple Effects -->
+              <div
+                class="ripple-circle"
+                style="width: 100px; height: 100px; top: 20%; right: -20px"
+              ></div>
+              <div
+                class="ripple-circle"
+                style="
+                  width: 150px;
+                  height: 150px;
+                  bottom: 10%;
+                  left: -30px;
+                  animation-delay: 1s;
+                "
               ></div>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </div>
 
-      <!-- FOOTER -->
-      <footer
-        class="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-t border-gray-200"
-      >
-        <div
-          class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 xl:px-20 2xl:px-32 py-12"
+      <!-- Wave Divider -->
+      <div class="wave">
+        <svg
+          data-name="Layer 1"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1200 120"
+          preserveAspectRatio="none"
         >
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- About Section -->
-            <div class="footer-section">
-              <h3 class="text-lg font-semibold mb-4 text-blue-600">
-                NWSDB Bandarawela
-              </h3>
-              <p class="text-gray-600 text-sm leading-relaxed">
-                National Water Supply and Drainage Board, Bandarawela Center is
-                committed to providing reliable water services and maintaining
-                quality customer records.
-              </p>
-              <div class="mt-4 flex space-x-4">
-                <a
-                  href="#"
-                  class="text-gray-400 hover:text-blue-600 transition-colors duration-300"
-                >
-                  <i class="fab fa-facebook-f text-xl"></i>
-                </a>
-                <a
-                  href="#"
-                  class="text-gray-400 hover:text-blue-600 transition-colors duration-300"
-                >
-                  <i class="fab fa-twitter text-xl"></i>
-                </a>
-                <a
-                  href="#"
-                  class="text-gray-400 hover:text-blue-600 transition-colors duration-300"
-                >
-                  <i class="fab fa-linkedin-in text-xl"></i>
-                </a>
-              </div>
-            </div>
+          <path
+            d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
+            class="shape-fill"
+          ></path>
+        </svg>
+      </div>
+    </section>
 
-            <!-- Contact Information -->
-            <div class="footer-section">
-              <h3 class="text-lg font-semibold mb-4 text-blue-600">
-                Contact Information
-              </h3>
-              <div class="space-y-3 text-gray-600 text-sm">
-                <div
-                  class="flex items-start space-x-3 hover:text-gray-800 transition-colors duration-300"
-                >
-                  <i
-                    class="fas fa-map-marker-alt text-blue-500 mt-1 flex-shrink-0"
-                  ></i>
-                  <span>No. 15, Bandarawela Road, Bandarawela 90100</span>
-                </div>
-                <div
-                  class="flex items-center space-x-3 hover:text-gray-800 transition-colors duration-300"
-                >
-                  <i class="fas fa-phone text-blue-500 flex-shrink-0"></i>
-                  <a href="tel:+94572223456" class="hover:underline"
-                    >+94 57 222 3456</a
-                  >
-                </div>
-                <div
-                  class="flex items-center space-x-3 hover:text-gray-800 transition-colors duration-300"
-                >
-                  <i class="fas fa-envelope text-blue-500 flex-shrink-0"></i>
-                  <a
-                    href="mailto:info.bandarawela@nwsdb.lk"
-                    class="hover:underline"
-                    >info.bandarawela@nwsdb.lk</a
-                  >
-                </div>
-                <div
-                  class="flex items-center space-x-3 hover:text-gray-800 transition-colors duration-300"
-                >
-                  <i class="fas fa-clock text-blue-500 flex-shrink-0"></i>
-                  <span>Mon - Fri: 8:00 AM - 4:30 PM</span>
-                </div>
-              </div>
-            </div>
+    <div
+      class="relative bg-gradient-to-b from-gray-900 to-cyan-900 py-20 px-6 lg:px-12 text-white overflow-hidden"
+    >
+      <!-- Background Elements -->
+      <div class="absolute inset-0 overflow-hidden opacity-20">
+        <div
+          class="absolute top-0 -left-10 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob"
+        ></div>
+        <div
+          class="absolute top-0 -right-10 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"
+        ></div>
+        <div
+          class="absolute -bottom-10 left-1/2 transform -translate-x-1/2 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"
+        ></div>
+      </div>
 
-            <!-- Quick Links -->
+      <div
+        class="relative z-10 flex flex-col items-center text-center space-y-16"
+      >
+        <!-- Feature Pills -->
+        <div class="flex flex-wrap gap-4 justify-center">
+          <span
+            class="bg-gradient-to-r from-cyan-500/20 to-blue-500/20 backdrop-blur-md px-6 py-3 rounded-full text-sm font-medium flex items-center gap-3 hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-300 transform hover:scale-105 shadow-lg"
+          >
             <div
-              class="footer-section hidden md:block sm:col-span-2 lg:col-span-1"
+              class="w-8 h-8 bg-cyan-500 rounded-full flex items-center justify-center"
             >
-              <img
-                src="./src/assets/images/logo/footer_logo.png"
-                alt=""
-                class="h-48 w-auto"
-              />
+              <i class="fas fa-building text-white"></i>
             </div>
+            Bandarawela Branch
+          </span>
+          <span
+            class="bg-gradient-to-r from-blue-500/20 to-indigo-500/20 backdrop-blur-md px-6 py-3 rounded-full text-sm font-medium flex items-center gap-3 hover:from-blue-500/30 hover:to-indigo-500/30 transition-all duration-300 transform hover:scale-105 shadow-lg"
+          >
+            <div
+              class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center"
+            >
+              <i class="fas fa-desktop text-white"></i>
+            </div>
+            Device Tracking
+          </span>
+          <span
+            class="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 backdrop-blur-md px-6 py-3 rounded-full text-sm font-medium flex items-center gap-3 hover:from-indigo-500/30 hover:to-purple-500/30 transition-all duration-300 transform hover:scale-105 shadow-lg"
+          >
+            <div
+              class="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center"
+            >
+              <i class="fas fa-history text-white"></i>
+            </div>
+            Maintenance Records
+          </span>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div
+          class="flex flex-col sm:flex-row gap-6 justify-center items-center"
+        >
+          <a
+            href="../index.php"
+            class="group bg-gradient-to-r from-cyan-500 to-blue-500 px-8 py-4 rounded-full font-bold text-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-cyan-500/50 transform hover:scale-105 flex items-center gap-3"
+          >
+            Get Started Now
+            <i
+              class="fas fa-arrow-right transition-transform duration-300 group-hover:translate-x-1"
+            ></i>
+          </a>
+          <a
+            href="#features"
+            class="group bg-white/10 backdrop-blur-md px-8 py-4 rounded-full font-bold text-lg hover:bg-white/20 transition-all duration-300 flex items-center gap-3 border border-white/20 hover:border-white/40"
+          >
+            <div
+              class="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center"
+            >
+              <i class="fas fa-play text-white text-xs"></i>
+            </div>
+            Watch Demo
+          </a>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 w-full max-w-4xl">
+          <div
+            class="bg-white/5 backdrop-blur-lg rounded-2xl p-8 transform hover:scale-105 transition-all duration-300 border border-white/10 hover:border-cyan-500/30"
+          >
+            <div
+              class="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent counter"
+              data-target="500"
+            >
+              0
+            </div>
+            <div class="text-cyan-200 font-medium mt-2">Devices Managed</div>
+          </div>
+          <div
+            class="bg-white/5 backdrop-blur-lg rounded-2xl p-8 transform hover:scale-105 transition-all duration-300 border border-white/10 hover:border-blue-500/30"
+          >
+            <div
+              class="text-5xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent counter"
+              data-target="15"
+            >
+              0
+            </div>
+            <div class="text-cyan-200 font-medium mt-2">Branch Offices</div>
+          </div>
+          <div
+            class="bg-white/5 backdrop-blur-lg rounded-2xl p-8 transform hover:scale-105 transition-all duration-300 border border-white/10 hover:border-indigo-500/30"
+          >
+            <div
+              class="text-5xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+            >
+              <span class="counter" data-target="99">0</span>%
+            </div>
+            <div class="text-cyan-200 font-medium mt-2">System Uptime</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <section class="py-24 bg-gradient-to-br from-cyan-50 to-blue-50">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+            Simple, Streamlined <span class="text-cyan-600">Workflow</span>
+          </h2>
+          <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            Get started in minutes with our intuitive three-step process
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div class="text-center">
+            <div class="relative mb-6">
+              <div
+                class="w-32 h-32 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full mx-auto flex items-center justify-center text-white text-5xl font-bold shadow-2xl transform hover:scale-110 transition-transform duration-300"
+              >
+                1
+              </div>
+              <div
+                class="absolute top-0 right-0 w-8 h-8 bg-green-400 rounded-full flex items-center justify-center animate-pulse"
+              >
+                <i class="fas fa-check text-white text-sm"></i>
+              </div>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-3">
+              Sign In Securely
+            </h3>
+            <p class="text-gray-600">
+              Access the platform using your NWSDB credentials with
+              enterprise-grade security and encryption.
+            </p>
           </div>
 
-          <!-- Bottom Bar -->
-          <div
-            class="border-t border-gray-300 mt-8 pt-6 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500 space-y-4 sm:space-y-0"
-          >
-            <p class="text-center sm:text-left">
-              © <span id="year"></span> National Water Supply and Drainage Board
-              — Bandarawela Center. All rights reserved.
+          <div class="text-center">
+            <div class="relative mb-6">
+              <div
+                class="w-32 h-32 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full mx-auto flex items-center justify-center text-white text-5xl font-bold shadow-2xl transform hover:scale-110 transition-transform duration-300"
+              >
+                2
+              </div>
+              <div
+                class="absolute top-0 right-0 w-8 h-8 bg-green-400 rounded-full flex items-center justify-center animate-pulse"
+              >
+                <i class="fas fa-check text-white text-sm"></i>
+              </div>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-3">
+              Add Your Devices
+            </h3>
+            <p class="text-gray-600">
+              Register devices with our smart form featuring auto-complete,
+              validation, and bulk import capabilities.
             </p>
-            <p class="text-center sm:text-right">
-              Made with <span class="text-red-500 animate-pulse">♥</span> —
-              Oshadi Perera
+          </div>
+
+          <div class="text-center">
+            <div class="relative mb-6">
+              <div
+                class="w-32 h-32 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full mx-auto flex items-center justify-center text-white text-5xl font-bold shadow-2xl transform hover:scale-110 transition-transform duration-300"
+              >
+                3
+              </div>
+              <div
+                class="absolute top-0 right-0 w-8 h-8 bg-green-400 rounded-full flex items-center justify-center animate-pulse"
+              >
+                <i class="fas fa-check text-white text-sm"></i>
+              </div>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-3">
+              Track & Analyze
+            </h3>
+            <p class="text-gray-600">
+              Monitor your entire inventory in real-time and generate powerful
+              insights with advanced analytics.
             </p>
           </div>
         </div>
-      </footer>
-    </div>
-    <!-- End main-content -->
+      </div>
+    </section>
 
+    <!-- About Section -->
+    <section class="py-24 bg-white" id="about">
+      <div class="container mx-auto px-6">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <div class="order-2 lg:order-1">
+            <div class="relative">
+              <img
+                src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop"
+                alt="Modern Office"
+                class="rounded-3xl shadow-2xl"
+              />
+              <div
+                class="absolute -bottom-6 -right-6 bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-6 rounded-2xl shadow-2xl"
+              >
+                <div class="text-4xl font-bold counter" data-target="500">
+                  0
+                </div>
+                <div class="text-cyan-100">Devices Managed</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="order-1 lg:order-2">
+            <div
+              class="inline-block bg-cyan-100 text-cyan-600 px-4 py-2 rounded-full text-sm font-semibold mb-4"
+            >
+              <i class="fas fa-info-circle mr-2"></i>About the Project
+            </div>
+            <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+              Transforming Water Board
+              <span class="text-cyan-600">IT Management</span>
+            </h2>
+            <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+              The NWSDB Device Record System represents a pivotal digital
+              transformation initiative for the
+              <strong>National Water Supply and Drainage Board</strong>. We're
+              replacing outdated manual processes with an intelligent,
+              cloud-based platform that brings clarity and control to IT asset
+              management.
+            </p>
+            <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+              Starting with the Bandarawela branch, our mission is to create a
+              comprehensive, accurate inventory of all IT assets across the
+              organization, ensuring accountability, optimizing resource
+              allocation, and enabling data-driven decision making.
+            </p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+              <div
+                class="bg-gradient-to-br from-cyan-50 to-blue-50 p-5 rounded-xl"
+              >
+                <div class="flex items-center gap-3 mb-2">
+                  <div
+                    class="w-10 h-10 bg-cyan-500 rounded-lg flex items-center justify-center"
+                  >
+                    <i class="fas fa-shield-alt text-white"></i>
+                  </div>
+                  <h4 class="font-bold text-gray-900">Secure</h4>
+                </div>
+                <p class="text-sm text-gray-600">Enterprise encryption</p>
+              </div>
+
+              <div
+                class="bg-gradient-to-br from-teal-50 to-cyan-50 p-5 rounded-xl"
+              >
+                <div class="flex items-center gap-3 mb-2">
+                  <div
+                    class="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center"
+                  >
+                    <i class="fas fa-bolt text-white"></i>
+                  </div>
+                  <h4 class="font-bold text-gray-900">Fast</h4>
+                </div>
+                <p class="text-sm text-gray-600">Instant searches</p>
+              </div>
+
+              <div
+                class="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl"
+              >
+                <div class="flex items-center gap-3 mb-2">
+                  <div
+                    class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center"
+                  >
+                    <i class="fas fa-mobile-alt text-white"></i>
+                  </div>
+                  <h4 class="font-bold text-gray-900">Responsive</h4>
+                </div>
+                <p class="text-sm text-gray-600">Any device, anywhere</p>
+              </div>
+
+              <div
+                class="bg-gradient-to-br from-emerald-50 to-teal-50 p-5 rounded-xl"
+              >
+                <div class="flex items-center gap-3 mb-2">
+                  <div
+                    class="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center"
+                  >
+                    <i class="fas fa-headset text-white"></i>
+                  </div>
+                  <h4 class="font-bold text-gray-900">Support</h4>
+                </div>
+                <p class="text-sm text-gray-600">24/7 assistance</p>
+              </div>
+            </div>
+
+            <a
+              href="../index.php"
+              class="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-8 py-4 rounded-full font-semibold hover:shadow-2xl hover:shadow-cyan-500/50 transition-all duration-300 transform hover:scale-105"
+            >
+              Start Managing Assets
+              <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section
+      class="py-24 bg-gradient-to-br from-blue-50 to-cyan-50"
+      id="benefits"
+    >
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+            Why Choose <span class="text-cyan-600">NWSDB Registry</span>
+          </h2>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Experience the transformative benefits of modern asset management
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="bg-white p-8 rounded-2xl shadow-lg hover-lift">
+            <div
+              class="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
+            >
+              <i class="fas fa-check-double text-white text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">
+              Complete Accountability
+            </h3>
+            <p class="text-gray-600">
+              Track every device's location, status, and assignment history with
+              full transparency and audit trails.
+            </p>
+          </div>
+
+          <div class="bg-white p-8 rounded-2xl shadow-lg hover-lift">
+            <div
+              class="w-16 h-16 bg-gradient-to-br from-red-400 to-rose-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
+            >
+              <i class="fas fa-ban text-white text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">
+              Zero Manual Errors
+            </h3>
+            <p class="text-gray-600">
+              Eliminate data entry mistakes and lost records with automated
+              validation and digital workflows.
+            </p>
+          </div>
+
+          <div class="bg-white p-8 rounded-2xl shadow-lg hover-lift">
+            <div
+              class="w-16 h-16 bg-gradient-to-br from-purple-400 to-violet-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
+            >
+              <i class="fas fa-brain text-white text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Smart Insights</h3>
+            <p class="text-gray-600">
+              Make informed decisions with predictive analytics and
+              comprehensive reporting capabilities.
+            </p>
+          </div>
+
+          <div class="bg-white p-8 rounded-2xl shadow-lg hover-lift">
+            <div
+              class="w-16 h-16 bg-gradient-to-br from-orange-400 to-amber-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
+            >
+              <i class="fas fa-rocket text-white text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">
+              Lightning Speed
+            </h3>
+            <p class="text-gray-600">
+              Find any device in seconds with powerful search filters and
+              real-time synchronization.
+            </p>
+          </div>
+
+          <div class="bg-white p-8 rounded-2xl shadow-lg hover-lift">
+            <div
+              class="w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
+            >
+              <i class="fas fa-coins text-white text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Cost Savings</h3>
+            <p class="text-gray-600">
+              Reduce operational costs through better asset utilization and
+              optimized procurement planning.
+            </p>
+          </div>
+
+          <div class="bg-white p-8 rounded-2xl shadow-lg hover-lift">
+            <div
+              class="w-16 h-16 bg-gradient-to-br from-indigo-400 to-blue-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
+            >
+              <i class="fas fa-sync text-white text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Auto Sync</h3>
+            <p class="text-gray-600">
+              All data syncs automatically across branches in real-time,
+              ensuring everyone has the latest information.
+            </p>
+          </div>
+
+          <div class="bg-white p-8 rounded-2xl shadow-lg hover-lift">
+            <div
+              class="w-16 h-16 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
+            >
+              <i class="fas fa-chart-pie text-white text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Visual Reports</h3>
+            <p class="text-gray-600">
+              Generate beautiful, interactive charts and graphs that make data
+              interpretation effortless.
+            </p>
+          </div>
+
+          <div class="bg-white p-8 rounded-2xl shadow-lg hover-lift">
+            <div
+              class="w-16 h-16 bg-gradient-to-br from-pink-400 to-rose-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
+            >
+              <i class="fas fa-graduation-cap text-white text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Easy to Learn</h3>
+            <p class="text-gray-600">
+              Intuitive interface requires minimal training, with built-in
+              tutorials and helpful tooltips.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section
+      class="py-24 bg-gradient-to-br from-cyan-600 to-blue-700 text-white relative overflow-hidden"
+    >
+      <div class="absolute inset-0 opacity-10">
+        <div
+          class="absolute top-0 left-0 w-96 h-96 bg-white rounded-full -ml-48 -mt-48"
+        ></div>
+        <div
+          class="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full -mr-48 -mb-48"
+        ></div>
+      </div>
+
+      <div class="container mx-auto px-6 text-center relative z-10">
+        <h2 class="text-4xl lg:text-5xl font-bold mb-6">
+          Ready to Transform Your Asset Management?
+        </h2>
+        <p class="text-xl text-cyan-100 mb-10 max-w-2xl mx-auto">
+          Join the digital revolution. Start tracking, managing, and optimizing
+          your device inventory today with NWSDB Registry.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="../index.php"
+            class="bg-white text-cyan-600 px-10 py-5 rounded-full font-bold text-lg hover:bg-cyan-50 transition-all duration-300 shadow-2xl transform hover:scale-105 inline-flex items-center justify-center gap-2"
+          >
+            <i class="fas fa-sign-in-alt"></i>
+            Access the System
+          </a>
+          <a
+            href="#features"
+            class="border-2 border-white text-white px-10 py-5 rounded-full font-bold text-lg hover:bg-white hover:text-cyan-600 transition-all duration-300 inline-flex items-center justify-center gap-2"
+          >
+            <i class="fas fa-info-circle"></i>
+            Learn More
+          </a>
+        </div>
+
+        <div
+          class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 max-w-4xl mx-auto"
+        >
+          <div>
+            <div class="text-5xl font-bold mb-2">
+              <span class="counter" data-target="99">0</span>%
+            </div>
+            <div class="text-cyan-200">Accuracy Rate</div>
+          </div>
+          <div>
+            <div class="text-5xl font-bold mb-2">
+              <span class="counter" data-target="24">0</span>/7
+            </div>
+            <div class="text-cyan-200">Support Available</div>
+          </div>
+          <div>
+            <div class="text-5xl font-bold mb-2">
+              <span class="counter" data-target="15">0</span>+
+            </div>
+            <div class="text-cyan-200">Branch Offices</div>
+          </div>
+          <div>
+            <div class="text-5xl font-bold mb-2">
+              &lt;<span class="counter" data-target="1">0</span>s
+            </div>
+            <div class="text-cyan-200">Search Speed</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+      <div class="container mx-auto px-6">
+        <div class="grid md:grid-cols-4 gap-12 mb-12">
+          <div class="md:col-span-2">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="bg-cyan-500 p-2 rounded-lg">
+                <i class="fa-solid fa-droplet text-white text-xl"></i>
+              </div>
+              <span class="text-2xl font-bold">NWSDB Registry</span>
+            </div>
+            <p class="text-gray-400 mb-6 leading-relaxed">
+              National Water Supply and Drainage Board's comprehensive device
+              management system. Streamlining IT asset tracking across all
+              branches.
+            </p>
+            <div class="flex gap-4">
+              <a
+                href="#"
+                class="w-10 h-10 bg-gray-800 hover:bg-cyan-500 rounded-full flex items-center justify-center transition-all duration-300"
+              >
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 bg-gray-800 hover:bg-cyan-500 rounded-full flex items-center justify-center transition-all duration-300"
+              >
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 bg-gray-800 hover:bg-cyan-500 rounded-full flex items-center justify-center transition-all duration-300"
+              >
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+              <a
+                href="#"
+                class="w-10 h-10 bg-gray-800 hover:bg-cyan-500 rounded-full flex items-center justify-center transition-all duration-300"
+              >
+                <i class="fab fa-youtube"></i>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-lg mb-4 text-cyan-400">Quick Links</h4>
+            <ul class="space-y-3 text-gray-400">
+              <li>
+                <a href="#hero" class="hover:text-cyan-400 transition">Home</a>
+              </li>
+              <li>
+                <a href="#features" class="hover:text-cyan-400 transition"
+                  >Features</a
+                >
+              </li>
+              <li>
+                <a href="#about" class="hover:text-cyan-400 transition"
+                  >About Us</a
+                >
+              </li>
+              <li>
+                <a href="#benefits" class="hover:text-cyan-400 transition"
+                  >Benefits</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-lg mb-4 text-cyan-400">Support</h4>
+            <ul class="space-y-3 text-gray-400">
+              <li>
+                <a href="#" class="hover:text-cyan-400 transition"
+                  >Help Center</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-cyan-400 transition"
+                  >Documentation</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-cyan-400 transition"
+                  >Contact Us</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-cyan-400 transition"
+                  >Report Issue</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-800 pt-8 text-center text-gray-400">
+          <p>
+            &copy; 2025 National Water Supply and Drainage Board. All Rights
+            Reserved.
+          </p>
+          <p class="mt-2">
+            Developed for NWSDB Bandarawela Branch |
+            <span class="text-cyan-400">Version 1.0</span>
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
     <script>
-      // Loader Management with Progress Control
-      let progress = 0;
-      let progressInterval;
+      // Typed.js Animation
+      new Typed('#typed-text', {
+        strings: [
+          'Real-time device tracking across all branches',
+          'Comprehensive analytics and reporting',
+          'Automated maintenance reminders',
+          'Secure cloud-based infrastructure',
+          'Mobile-friendly responsive design',
+        ],
+        typeSpeed: 50,
+        backSpeed: 30,
+        backDelay: 2000,
+        loop: true,
+        smartBackspace: true,
+      });
 
-      const progressBar = document.getElementById('progressBar');
-      const progressText = document.getElementById('progressText');
-      const loadingMessage = document.getElementById('loadingMessage');
-
-      // Loading messages for different stages
-      const loadingStages = [
-        { percent: 0, message: 'Initializing NWSDB Portal...' },
-        { percent: 25, message: 'Loading Security Protocols...' },
-        { percent: 50, message: 'Connecting to Database...' },
-        { percent: 75, message: 'Preparing User Interface...' },
-        { percent: 90, message: 'Finalizing Setup...' },
-        { percent: 100, message: 'Ready! Loading Complete.' },
-      ];
-
-      function updateProgress() {
-        // Increase progress gradually
-        progress += Math.random() * 3 + 1; // Random increment between 1-4
-
-        if (progress > 100) {
-          progress = 100;
-        }
-
-        // Update progress bar width
-        progressBar.style.width = progress + '%';
-        progressText.textContent = Math.floor(progress) + '%';
-
-        // Update loading message based on progress
-        const currentStage = loadingStages.find(
-          (stage) => progress >= stage.percent
-        );
-        if (
-          currentStage &&
-          loadingMessage.textContent !== currentStage.message
-        ) {
-          loadingMessage.textContent = currentStage.message;
-        }
-
-        // When progress reaches 100%, wait a moment then hide loader
-        if (progress >= 100) {
-          clearInterval(progressInterval);
-          progressText.textContent = '100%';
-          loadingMessage.textContent = 'Ready! Loading Complete.';
-
-          // Wait 800ms after completion before hiding loader
-          setTimeout(() => {
-            hideLoader();
-          }, 800);
-        }
-      }
-
-      function hideLoader() {
-        const loader = document.getElementById('loader');
-        const body = document.body;
-
-        // Add fade-out class to loader
-        loader.classList.add('fade-out');
-
-        // Remove loading class from body and add loaded class
-        body.classList.remove('loading');
-        body.classList.add('loaded');
-
-        // Remove loader from DOM after animation completes
-        setTimeout(() => {
-          loader.style.display = 'none';
-        }, 500);
-      }
-
-      // Start progress animation when page loads
-      function startLoader() {
-        // Start the progress bar animation
-        progressInterval = setInterval(updateProgress, 100); // Update every 100ms
-
-        // Fallback: If something goes wrong, hide loader after 8 seconds maximum
-        setTimeout(() => {
-          if (document.body.classList.contains('loading')) {
-            clearInterval(progressInterval);
-            progress = 100;
-            updateProgress();
-          }
-        }, 8000);
-      }
-
-      // Initialize loader when DOM is ready
-      document.addEventListener('DOMContentLoaded', startLoader);
-
-      // Also start if already loaded
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', startLoader);
-      } else {
-        startLoader();
-      }
-
-      // Set current year in footer
-      document.getElementById('year').textContent = new Date().getFullYear();
-
-      // Add scroll effect to navbar
+      // Scroll Progress Bar
       window.addEventListener('scroll', () => {
-        const header = document.querySelector('header');
-        if (window.scrollY > 100) {
-          header.classList.add('backdrop-blur-xl', 'bg-white/98', 'shadow-xl');
+        const winScroll =
+          document.body.scrollTop || document.documentElement.scrollTop;
+        const height =
+          document.documentElement.scrollHeight -
+          document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        document.getElementById('progressBar').style.width = scrolled + '%';
+      });
+
+      // Navbar Background on Scroll
+      const navbar = document.getElementById('navbar');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+          navbar.classList.add(
+            'bg-gray-900',
+            'bg-opacity-95',
+            'backdrop-blur-lg',
+            'shadow-lg'
+          );
         } else {
-          header.classList.remove(
-            'backdrop-blur-xl',
-            'bg-white/98',
-            'shadow-xl'
+          navbar.classList.remove(
+            'bg-gray-900',
+            'bg-opacity-95',
+            'backdrop-blur-lg',
+            'shadow-lg'
           );
         }
       });
 
-      // Intersection Observer for animations
+      // Counter Animation
+      const counters = document.querySelectorAll('.counter');
       const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px',
+        threshold: 0.5,
+        rootMargin: '0px',
       };
 
-      const observer = new IntersectionObserver((entries) => {
+      const counterObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-fade-in-up');
+          if (
+            entry.isIntersecting &&
+            !entry.target.classList.contains('counted')
+          ) {
+            const target = +entry.target.getAttribute('data-target');
+            const duration = 2000;
+            const increment = target / (duration / 16);
+            let current = 0;
+
+            const updateCounter = () => {
+              current += increment;
+              if (current < target) {
+                entry.target.textContent = Math.ceil(current);
+                requestAnimationFrame(updateCounter);
+              } else {
+                entry.target.textContent = target;
+              }
+            };
+
+            updateCounter();
+            entry.target.classList.add('counted');
           }
         });
       }, observerOptions);
 
-      // Observe elements for animations
-      document
-        .querySelectorAll('.footer-section')
-        .forEach((el) => observer.observe(el));
-
-      // Add loading animation
-      window.addEventListener('load', () => {
-        document.body.classList.add('loaded');
+      counters.forEach((counter) => {
+        counterObserver.observe(counter);
       });
+
+      // Smooth Scroll for Anchor Links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+          }
+        });
+      });
+
+      // Intersection Observer for Fade Animations
+      const fadeElements = document.querySelectorAll(
+        '.fade-in-up, .fade-in-left, .fade-in-right, .scale-in'
+      );
+      const fadeObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.opacity = '1';
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
+
+      fadeElements.forEach((el) => fadeObserver.observe(el));
     </script>
   </body>
 </html>
