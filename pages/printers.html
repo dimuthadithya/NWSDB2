@@ -239,12 +239,26 @@
           </div>
         </div>
 
+        <!-- Quick Actions -->
         <div class="flex flex-wrap gap-3">
           <button
-            onclick="openAddPrinterModal()"
-            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg"
+            onclick="openAddComputerModal()"
+            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all"
           >
-            <i class="fas fa-plus mr-2"></i> Add New Printer
+            <i class="fas fa-plus mr-2"></i>
+            Add New Computer
+          </button>
+          <button
+            class="inline-flex items-center px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm border border-gray-200 transition-all"
+          >
+            <i class="fas fa-file-excel mr-2 text-green-600"></i>
+            Export to Excel
+          </button>
+          <button
+            class="inline-flex items-center px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm border border-gray-200 transition-all"
+          >
+            <i class="fas fa-file-pdf mr-2 text-red-600"></i>
+            Export to PDF
           </button>
         </div>
 
