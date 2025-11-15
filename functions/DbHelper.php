@@ -33,8 +33,8 @@ class DbHelper
         $email,
         $gender,
         $password,
-        $role = 'user',
-        $mobile
+        $mobile,
+        $role = 'user'
     ) {
         self::init();
 
@@ -134,7 +134,7 @@ class DbHelper
 
         $computers = self::$db->select('devices', ['*'], ['category_id' => $computerId]);
 
-        return $computers ? $computers : false;
+        return $computers ? $computers : 0;
     }
 
     public static function getAllLaptops()
@@ -145,7 +145,7 @@ class DbHelper
 
         $laptops = self::$db->select('devices', ['*'], ['category_id' => $laptopId]);
 
-        return $laptops ? $laptops : false;
+        return $laptops ? $laptops : 0;
     }
 
     public static function getAllPrinters()
@@ -156,7 +156,7 @@ class DbHelper
 
         $printers = self::$db->select('devices', ['*'], ['category_id' => $printerId]);
 
-        return $printers ? $printers : false;
+        return $printers ? $printers : 0;
     }
 
     public static function createBranch($branch_name, $branch_location)
@@ -293,6 +293,24 @@ class DbHelper
 
         $where = ['device_id' => $device_id];
         return self::$db->delete('devices', $where);
+    }
+
+    public static function getRowCount($tableName)
+    {
+        self::init();
+
+        $result = self::$db->count($tableName);
+
+        return $result ? $result : 0;
+    }
+
+    public static function getRowCountWithCondition($tableName, $conditions)
+    {
+        self::init();
+
+        $result = self::$db->count($tableName, $conditions);
+
+        return $result ? $result : 0;
     }
 
     public static function getComputerCount()

@@ -1,9 +1,22 @@
 <?php
 require_once __DIR__ . '/../middleware/auth.php';
+require_once __DIR__ . '/../functions/DbHelper.php';
+
 requireLogin();
 
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
+
+// get device count 
+$totalDevices = DbHelper::getRowCount('devices');
+$activeDevices = DbHelper::getRowCountWithCondition('devices', ['status' => 'active']);
+$repairDevices = DbHelper::getRowCountWithCondition('devices', ['status' => 'under_repair']);
+$laptopsCount = DbHelper::getAllLaptops();
+$printersCount = DbHelper::getAllPrinters();
+$computersCount = DbHelper::getAllComputers();
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -123,7 +136,9 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Total</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">90</h3>
+          <h3 class="text-3xl font-bold mb-1">
+            <?php echo $totalDevices; ?>
+          </h3>
           <p class="text-blue-100 text-sm">Total Devices</p>
           <div class="mt-4 flex items-center text-sm">
             <i class="fas fa-arrow-up mr-1"></i>
@@ -142,7 +157,9 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Active</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">85</h3>
+          <h3 class="text-3xl font-bold mb-1">
+            <?php echo $activeDevices; ?>
+          </h3>
           <p class="text-green-100 text-sm">Active Devices</p>
           <div class="mt-4 flex items-center text-sm">
             <i class="fas fa-check mr-1"></i>
@@ -162,31 +179,13 @@ $name = $_SESSION['user']['name'];
             <span
               class="text-sm bg-white/20 px-3 py-1 rounded-full status-badge">Repairs</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">5</h3>
+          <h3 class="text-3xl font-bold mb-1">
+            <?php echo $repairDevices; ?>
+          </h3>
           <p class="text-orange-100 text-sm">Under Repair</p>
           <div class="mt-4 flex items-center text-sm">
             <i class="fas fa-tools mr-1"></i>
             <span>2 pending completion</span>
-          </div>
-        </div>
-
-        <!-- Open Issues -->
-        <div
-          class="stat-card bg-gradient-to-br from-red-500 to-red-600 rounded-2xl p-6 text-white shadow-lg animate-fade-up"
-          style="animation-delay: 0.4s">
-          <div class="flex items-center justify-between mb-4">
-            <div
-              class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-              <i class="fas fa-exclamation-triangle text-2xl"></i>
-            </div>
-            <span
-              class="text-sm bg-white/20 px-3 py-1 rounded-full status-badge">Issues</span>
-          </div>
-          <h3 class="text-3xl font-bold mb-1">8</h3>
-          <p class="text-red-100 text-sm">Open Issues</p>
-          <div class="mt-4 flex items-center text-sm">
-            <i class="fas fa-fire mr-1"></i>
-            <span>3 high priority</span>
           </div>
         </div>
       </div>
@@ -203,7 +202,9 @@ $name = $_SESSION['user']['name'];
             </div>
             <div>
               <p class="text-gray-500 text-sm">Desktop Computers</p>
-              <h3 class="text-2xl font-bold text-gray-800">42</h3>
+              <h3 class="text-2xl font-bold text-gray-800">
+                <?php echo $computersCount; ?>
+              </h3>
             </div>
           </div>
         </div>
@@ -218,7 +219,9 @@ $name = $_SESSION['user']['name'];
             </div>
             <div>
               <p class="text-gray-500 text-sm">Laptops</p>
-              <h3 class="text-2xl font-bold text-gray-800">28</h3>
+              <h3 class="text-2xl font-bold text-gray-800">
+                <?php echo $laptopsCount; ?>
+              </h3>
             </div>
           </div>
         </div>
@@ -233,7 +236,9 @@ $name = $_SESSION['user']['name'];
             </div>
             <div>
               <p class="text-gray-500 text-sm">Printers</p>
-              <h3 class="text-2xl font-bold text-gray-800">15</h3>
+              <h3 class="text-2xl font-bold text-gray-800">
+                <?php echo $printersCount; ?>
+              </h3>
             </div>
           </div>
         </div>
