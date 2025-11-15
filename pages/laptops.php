@@ -1,3 +1,8 @@
+<!-- TODO:
+Delete when the deployment  
+-->
+
+
 <?php
 include '../components/sessions.php';
 require_once '../functions/DbHelper.php';
