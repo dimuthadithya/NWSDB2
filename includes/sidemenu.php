@@ -49,19 +49,19 @@
                   <span>RVPN Connections</span>
               </a>
               <a
-                  href="#"
+                  href="<?php echo $pathUpdate2 ? '../finger-device.php' : './finger-device.php' ?>"
                   class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
                   <i class="fas fa-fingerprint w-5"></i>
                   <span>Finger Devices</span>
               </a>
               <a
-                  href="#"
+                  href="<?php echo $pathUpdate2 ? '../other-devices.php' : './other-devices.php' ?>"
                   class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
                   <i class="fas fa-microchip w-5"></i>
                   <span>Other Devices</span>
               </a>
               <a
-                  href="#"
+                  href="<?php echo $pathUpdate2 ? '../repairs.php' : './repairs.php' ?>"
                   class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
                   <i class="fas fa-tools w-5"></i>
                   <span>Repairs</span>
@@ -81,30 +81,29 @@
 
           <?php if ($role == 'admin')
                 echo '
-
-    <div class="mt-8 pt-8 border-t border-gray-100">
-          <p class="text-xs font-semibold text-gray-400 uppercase px-4 mb-3">
-            Water Supply Management
-          </p>
-          <div class="space-y-1">
-              <a href="' . ($pathUpdate ? './admin/regions.php' : './regions.php') . '" 
-              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
-            >
-              <i class="fas fa-globe-asia w-5"></i>
-              <span>Regions</span>
-            </a>
-              <a href="' . ($pathUpdate ? './admin/areas.php' : './areas.php') . '" 
-              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
-            >
-              <i class="fas fa-map-marked-alt w-5"></i>
-              <span class="font-medium">Areas</span>
-            </a>
-              <a href="' . ($pathUpdate ? './admin/water-schemes.php' : './water-schemes.php') . '" 
-              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
-            >
-              <i class="fas fa-tint w-5"></i>
-              <span>Water Supply Schemes</span>
-            </a>
+        <div class="mt-8 pt-8 border-t border-gray-100">
+            <p class="text-xs font-semibold text-gray-400 uppercase px-4 mb-3">
+                Water Supply Management
+            </p>
+            <div class="space-y-1">
+                <a href="' . ($pathUpdate ? './admin/regions.php' : './regions.php') . '" 
+                class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+                >
+                <i class="fas fa-globe-asia w-5"></i>
+                <span>Regions</span>
+                </a>
+                <a href="' . ($pathUpdate ? './admin/areas.php' : './areas.php') . '" 
+                class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+                >
+                <i class="fas fa-map-marked-alt w-5"></i>
+                <span class="font-medium">Areas</span>
+                </a>
+                <a href="' . ($pathUpdate ? './admin/water-schemes.php' : './water-schemes.php') . '" 
+                class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+                >
+                <i class="fas fa-tint w-5"></i>
+                <span>Water Supply Schemes</span>
+                </a>
           </div>
         </div>
 
@@ -146,9 +145,7 @@
                   </a>
               </div>
           </div>'
-
             ?>
-
       </nav>
 
       <div class="p-4 border-t border-gray-100 mt-auto">
