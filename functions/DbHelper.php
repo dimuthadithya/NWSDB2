@@ -33,7 +33,8 @@ class DbHelper
         $email,
         $gender,
         $password,
-        $role = 'user'
+        $role = 'user',
+        $mobile
     ) {
         self::init();
 
@@ -46,7 +47,8 @@ class DbHelper
             'gender' => $gender,
             'password' => $hashedPassword,
             'role' => $role,
-            'status' => 'active'
+            'status' => 'active',
+            'mobile_number' => $mobile
         ];
 
         return self::$db->insert('users', $userData);

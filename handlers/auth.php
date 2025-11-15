@@ -9,10 +9,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $last_name = trim($_POST['last_name']);
         $email = trim($_POST['email']);
         $gender = trim($_POST['gender']);
+        $mobile = trim($_POST['mobile']);
         $password = $_POST['password'];
         $role = 'user';
 
-        $userId = DbHelper::createUser($first_name, $last_name, $email, $gender, $password, $role);
+        $userId = DbHelper::createUser($first_name, $last_name, $email, $gender, $password, $role, $mobile);
 
         if ($userId) {
             header('Location: ../index.php?registration=success');
