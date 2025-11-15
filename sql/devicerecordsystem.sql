@@ -84,7 +84,6 @@ CREATE TABLE devices (
   device_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   device_name VARCHAR(150) NOT NULL,        -- Device type/name
   model VARCHAR(100) NULL,                  -- Device model
-  made_in VARCHAR(100) NULL,                -- Country/manufacturer origin
   category_id INT UNSIGNED NOT NULL,        -- Device category reference
   section_id INT UNSIGNED NULL,             -- Optional section assignment
   assigned_to INT UNSIGNED NULL,            -- User assigned to this device
@@ -99,7 +98,8 @@ CREATE TABLE devices (
   virus_guard VARCHAR(100) NULL,
   ip_address VARCHAR(45) NULL,
   monitor_info VARCHAR(100) NULL,
-  cpu_serial VARCHAR(100) NULL,
+  system_unit_serial VARCHAR(100) NULL,
+  ups_serial VARCHAR(100) NULL,
   purchase_date DATE NULL,
   status ENUM('active','under_repair','retired','lost') DEFAULT 'active',
   notes TEXT NULL,
