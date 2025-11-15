@@ -119,7 +119,7 @@
         <div class="text-center pt-4 border-t border-white/10">
           <p class="text-sm text-gray-400">
             Don't have an account?
-            <a href="register.php" class="text-cyan-400 hover:underline">Register here</a>
+            <a href="./register.php" class="text-cyan-400 hover:underline">Register here</a>
           </p>
         </div>
       </form>

@@ -33,18 +33,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = DbHelper::loginUser($email, $password);
         if ($user) {
             session_start();
-            $_SESSION['user_id'] = $user['user_id'];
-            $_SESSION['user_role'] = $user['role'];
-            header('Location: ../pages/index.php?login=true');
+
+            // Example: fetched from DB after login check
+            $user = [
+                'id'    => $user['user_id'],
+                'name'  => $user['first_name'] . ' ' . $user['last_name'],
+                'email' => $user['email'],
+                'role'  =>    $user['role']
+            ];
+
+            // Store user data in session
+            $_SESSION['user'] = [
+                'id'    => $user['id'],
+                'name'  => $user['name'],
+                'email' => $user['email'],
+                'role'  => $user['role']
+            ];
+
+            header('Location: ../pages/dashboard.php');
             exit();
         } else {
-            header('Location: ../index.php?login=failed');
+            header('Location: ../pages/login.php?login=failed');
             exit();
         }
     }
 
-    // If neither register nor login found
-    header('Location: ../index.php?invalid=request');
+    // If neither register or login found
+    header('Location: ../index.php');
     exit();
 } else {
     header('Location: ../index.php');
