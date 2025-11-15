@@ -177,3 +177,60 @@ CREATE TABLE device_issues (
   CONSTRAINT fk_issues_user FOREIGN KEY (reported_by) REFERENCES users(user_id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ===============================================================
+-- 9. Regions Table
+-- Stores regional information for NWSDB operations
+-- ===============================================================
+CREATE TABLE IF NOT EXISTS regions (
+  region_id INT(11) NOT NULL AUTO_INCREMENT,
+  region_code VARCHAR(20) NOT NULL,
+  region_name VARCHAR(100) NOT NULL,
+  status ENUM('active','inactive') DEFAULT 'active',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (region_id),
+  UNIQUE KEY region_code (region_code),
+  KEY idx_region_code (region_code),
+  KEY idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ===============================================================
+-- 10. Areas Table
+-- Stores area information under regions
+-- ===============================================================
+CREATE TABLE IF NOT EXISTS areas (
+  area_id INT(11) NOT NULL AUTO_INCREMENT,
+  region_id INT(11) NOT NULL,
+  area_code VARCHAR(20) NOT NULL,
+  area_name VARCHAR(100) NOT NULL,
+  status ENUM('active','inactive') DEFAULT 'active',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (area_id),
+  UNIQUE KEY area_code (area_code),
+  KEY idx_region_id (region_id),
+  KEY idx_area_code (area_code),
+  KEY idx_status (status),
+  CONSTRAINT areas_ibfk_1 FOREIGN KEY (region_id) REFERENCES regions(region_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ===============================================================
+-- 11. Water Supply Schemes Table
+-- Stores water supply scheme information
+-- ===============================================================
+CREATE TABLE IF NOT EXISTS water_supply_schemes (
+  wss_id INT(11) NOT NULL AUTO_INCREMENT,
+  area_id INT(11) NOT NULL,
+  wss_code VARCHAR(20) NOT NULL,
+  wss_name VARCHAR(100) NOT NULL,
+  status ENUM('active','inactive','maintenance') DEFAULT 'active',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (wss_id),
+  UNIQUE KEY wss_code (wss_code),
+  KEY idx_area_id (area_id),
+  KEY idx_wss_code (wss_code),
+  KEY idx_status (status),
+  CONSTRAINT water_supply_schemes_ibfk_1 FOREIGN KEY (area_id) REFERENCES areas(area_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
