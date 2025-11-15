@@ -25,31 +25,31 @@
       <nav class="p-4">
           <div class="space-y-1">
               <a
-                  href="./dashboard.html"
+                  href="<?php echo $pathUpdate2 ? '../dashboard.php' : './dashboard.php' ?>"
                   class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600">
                   <i class="fas fa-home w-5"></i>
                   <span class="font-medium">Dashboard</span>
               </a>
               <a
-                  href="./computers.html"
+                  href="<?php echo $pathUpdate2 ? '../computers.php' : './computers.php' ?>"
                   class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
                   <i class="fas fa-desktop w-5"></i>
                   <span>Computers</span>
               </a>
               <a
-                  href="./printers.html"
+                  href="<?php echo $pathUpdate2 ? '../laptops.php' : './laptops.php' ?>"
                   class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
                   <i class="fas fa-print w-5"></i>
                   <span>Printers</span>
               </a>
               <a
-                  href="./rvpn-connections.html"
+                  href="<?php echo $pathUpdate2 ? '../site-offices.php' : './site-offices.php' ?>"
                   class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
                   <i class="fas fa-network-wired w-5"></i>
                   <span>RVPN Connections</span>
               </a>
               <a
-                  href="./finger-device.html"
+                  href="#"
                   class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
                   <i class="fas fa-fingerprint w-5"></i>
                   <span>Finger Devices</span>
@@ -73,7 +73,7 @@
                   <span>Issues</span>
               </a>
               <a
-                  href="./summary.html"
+                  href="<?php echo $pathUpdate2 ? '../summary.php' : './summary.php' ?>"
                   class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
                   <i class="fas fa-chart-pie w-5"></i> <span>Summary</span>
               </a>
