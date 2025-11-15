@@ -131,11 +131,6 @@
                   Administration
               </p>
               <div class="space-y-1">
-                     <a href="' . ($pathUpdate ? './admin/site_offices.php' : './site_offices.php') . '" 
-                      class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl ' . isActive('site_offices.php') . '">
-                      <i class="fas fa-building w-5"></i>
-                      <span class="' . isFontWeight('site_offices.php') . '">Site Offices</span>
-                  </a>
                      <a href="' . ($pathUpdate ? './admin/sections.php' : './sections.php') . '" 
                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl ' . isActive('sections.php') . '">
                       <i class="fas fa-sitemap w-5"></i>
