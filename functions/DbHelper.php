@@ -169,6 +169,28 @@ class DbHelper
         return $printers ? $printers : false;
     }
 
+    public static function getAllRVPNConnections()
+    {
+        self::init();
+
+        $rvpnId = self::$db->getId('device_categories', 'category_name', 'RVPN Connection', 'category_id');
+
+        $rvpnConnections = self::$db->select('devices', ['*'], ['category_id' => $rvpnId]);
+
+        return $rvpnConnections ? $rvpnConnections : false;
+    }
+
+    public static function getAllFingerDevices()
+    {
+        self::init();
+
+        $fingerId = self::$db->getId('device_categories', 'category_name', 'Fingerprint Device', 'category_id');
+
+        $fingerDevices = self::$db->select('devices', ['*'], ['category_id' => $fingerId]);
+
+        return $fingerDevices ? $fingerDevices : false;
+    }
+
     public static function createBranch($branch_name, $branch_location)
     {
         self::init();

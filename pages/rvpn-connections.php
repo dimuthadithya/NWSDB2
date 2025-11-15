@@ -7,6 +7,20 @@ requireLogin();
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
+// Fetch RVPN connections from database
+$rvpnConnections = DbHelper::getAllRVPNConnections();
+if (!$rvpnConnections) {
+  $rvpnConnections = [];
+}
+
+// Calculate statistics
+$totalConnections = count($rvpnConnections);
+$activeConnections = count(array_filter($rvpnConnections, function ($conn) {
+  return $conn['status'] === 'active';
+}));
+$inactiveConnections = $totalConnections - $activeConnections;
+$totalUsers = $totalConnections; // Each connection represents a user
+
 ?>
 
 <!DOCTYPE html>
@@ -94,7 +108,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Total</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">156</h3>
+          <h3 class="text-3xl font-bold mb-1"><?= $totalConnections ?></h3>
           <p class="text-blue-100 text-sm">Total Connections</p>
         </div>
 
@@ -108,7 +122,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Active</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">142</h3>
+          <h3 class="text-3xl font-bold mb-1"><?= $activeConnections ?></h3>
           <p class="text-green-100 text-sm">Active Connections</p>
         </div>
 
@@ -122,7 +136,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Inactive</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">14</h3>
+          <h3 class="text-3xl font-bold mb-1"><?= $inactiveConnections ?></h3>
           <p class="text-orange-100 text-sm">Inactive Connections</p>
         </div>
 
@@ -136,7 +150,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Users</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">156</h3>
+          <h3 class="text-3xl font-bold mb-1"><?= $totalUsers ?></h3>
           <p class="text-purple-100 text-sm">Total Users</p>
         </div>
       </div>
@@ -243,53 +257,65 @@ $name = $_SESSION['user']['name'];
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr class="table-row">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  001
-                </td>
-                <td
-                  class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  John Doe
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  EMP001
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  Manager
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  Main Office
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  CC001
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  SN123456
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  jdoe
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  1234
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Required</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button
-                    class="text-blue-600 hover:text-blue-900 mr-3"
-                    title="Edit">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button
-                    class="text-red-600 hover:text-red-900"
-                    title="Delete">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
-              <!-- Add more sample rows as needed -->
+              <?php if (empty($rvpnConnections)): ?>
+                <tr>
+                  <td colspan="11" class="px-6 py-12 text-center">
+                    <div class="flex flex-col items-center justify-center text-gray-500">
+                      <i class="fas fa-network-wired text-5xl mb-3 text-gray-300"></i>
+                      <p class="text-lg font-medium">No RVPN connections found</p>
+                      <p class="text-sm">Click "Add New RVPN Connection" to add your first connection</p>
+                    </div>
+                  </td>
+                </tr>
+              <?php else: ?>
+                <?php foreach ($rvpnConnections as $index => $conn): ?>
+                  <tr class="table-row">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <?= str_pad($index + 1, 3, '0', STR_PAD_LEFT) ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <?= htmlspecialchars($conn['device_name'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($conn['employee_number'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($conn['designation'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($conn['working_location'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($conn['cost_code'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($conn['rvpn_serial_number'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($conn['rvpn_username'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($conn['pin_number'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <?php
+                      $required = $conn['connection_required'] ?? 'not_required';
+                      $badgeClass = $required === 'required' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
+                      $badgeText = ucfirst(str_replace('_', ' ', $required));
+                      ?>
+                      <span class="px-2 py-1 text-xs font-medium <?= $badgeClass ?> rounded-full"><?= $badgeText ?></span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button class="text-blue-600 hover:text-blue-900 mr-3" title="Edit">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="text-red-600 hover:text-red-900" title="Delete">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>

@@ -7,6 +7,24 @@ requireLogin();
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
+// Fetch finger devices from database
+$fingerDevices = DbHelper::getAllFingerDevices();
+if (!$fingerDevices) {
+  $fingerDevices = [];
+}
+
+// Calculate statistics
+$totalDevices = count($fingerDevices);
+$activeDevices = count(array_filter($fingerDevices, function ($device) {
+  return $device['status'] === 'active';
+}));
+$approvedDevices = count(array_filter($fingerDevices, function ($device) {
+  return $device['approval_status'] === 'approved';
+}));
+// Get unique locations
+$locations = array_unique(array_column($fingerDevices, 'location_name'));
+$totalLocations = count(array_filter($locations));
+
 ?>
 
 
@@ -94,7 +112,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Total</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">67</h3>
+          <h3 class="text-3xl font-bold mb-1"><?= $totalDevices ?></h3>
           <p class="text-blue-100 text-sm">Total Devices</p>
         </div>
 
@@ -108,7 +126,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Active</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">62</h3>
+          <h3 class="text-3xl font-bold mb-1"><?= $activeDevices ?></h3>
           <p class="text-green-100 text-sm">Active Devices</p>
         </div>
 
@@ -122,7 +140,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Locations</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">24</h3>
+          <h3 class="text-3xl font-bold mb-1"><?= $totalLocations ?></h3>
           <p class="text-orange-100 text-sm">Locations</p>
         </div>
 
@@ -134,9 +152,9 @@ $name = $_SESSION['user']['name'];
               class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <i class="fas fa-shield-alt text-2xl"></i>
             </div>
-            <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Warranty</span>
+            <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Approved</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">45</h3>
+          <h3 class="text-3xl font-bold mb-1"><?= $approvedDevices ?></h3>
           <p class="text-purple-100 text-sm">Under Warranty</p>
         </div>
       </div>
@@ -263,68 +281,85 @@ $name = $_SESSION['user']['name'];
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr class="table-row">
-                <td
-                  class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  Main Office
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  Reception
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  ZKTeco
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  F18
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  Finger
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  DEV001
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  ZK123456
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  192.168.1.100
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  2023-01-15
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  ZKTeco Inc
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  $250
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  2 yrs
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  4370
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  IT Dept
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Approved</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button
-                    class="text-blue-600 hover:text-blue-900 mr-3"
-                    title="Edit">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button
-                    class="text-red-600 hover:text-red-900"
-                    title="Delete">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
-              <!-- Add more sample rows as needed -->
+              <?php if (empty($fingerDevices)): ?>
+                <tr>
+                  <td colspan="16" class="px-6 py-12 text-center">
+                    <div class="flex flex-col items-center justify-center text-gray-500">
+                      <i class="fas fa-fingerprint text-5xl mb-3 text-gray-300"></i>
+                      <p class="text-lg font-medium">No finger devices found</p>
+                      <p class="text-sm">Click "Add New Finger Device" to add your first device</p>
+                    </div>
+                  </td>
+                </tr>
+              <?php else: ?>
+                <?php foreach ($fingerDevices as $device): ?>
+                  <tr class="table-row">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <?= htmlspecialchars($device['location_name'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($device['sub_location'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($device['make'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($device['model'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($device['device_type'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($device['device_number'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($device['identification_code'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($device['ip_address_adsl'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= $device['installed_date'] ? date('Y-m-d', strtotime($device['installed_date'])) : 'N/A' ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($device['company_name'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= $device['device_cost'] ? '$' . number_format($device['device_cost'], 2) : 'N/A' ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($device['warranty_period'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($device['port_number'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?= htmlspecialchars($device['managed_by'] ?? 'N/A') ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <?php
+                      $approvalStatus = $device['approval_status'] ?? 'pending';
+                      $statusColors = [
+                        'approved' => 'bg-green-100 text-green-800',
+                        'pending' => 'bg-yellow-100 text-yellow-800',
+                        'rejected' => 'bg-red-100 text-red-800'
+                      ];
+                      $statusClass = $statusColors[$approvalStatus] ?? 'bg-gray-100 text-gray-800';
+                      $statusText = ucfirst($approvalStatus);
+                      ?>
+                      <span class="px-2 py-1 text-xs font-medium <?= $statusClass ?> rounded-full"><?= $statusText ?></span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button class="text-blue-600 hover:text-blue-900 mr-3" title="Edit">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="text-red-600 hover:text-red-900" title="Delete">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>
