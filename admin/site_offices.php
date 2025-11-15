@@ -1,5 +1,15 @@
+<!-- /**
+ TODO: 
+* ! delete this page when deloyments
+*/ -->
+
+
 <?php
 include '../components/sessions.php';
+require_once '../functions/DbHelper.php';
+
+$branches = DbHelper::getAllBranches();
+
 ?>
 
 <!DOCTYPE html>
@@ -32,7 +42,7 @@ include '../components/sessions.php';
                     <p class="mt-1 text-sm text-gray-600">Manage and track all site offices in the system</p>
                 </div>
                 <div class="mt-4 md:mt-0 flex flex-col sm:flex-row gap-3">
-                    <button class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button command="show-modal" commandfor="dialog" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <i class="fas fa-plus mr-2"></i>
                         Add New Office
                     </button>
@@ -42,6 +52,41 @@ include '../components/sessions.php';
                     </button>
                 </div>
             </div>
+
+            <!-- Modal -->
+            <el-dialog>
+                <dialog id="dialog" aria-labelledby="dialog-title" class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent">
+                    <el-dialog-backdrop class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in" onclick="document.getElementById('dialog').close()"></el-dialog-backdrop>
+
+                    <div tabindex="0" class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0" onclick="if(event.target === this) document.getElementById('dialog').close()">
+                        <el-dialog-panel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95">
+                            <form id="addBranchForm" action="./handlers/addHandler.php" method="post">
+                                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                    <div class="sm:flex sm:items-start">
+                                        <div class="w-full">
+                                            <h3 id="dialog-title" class="text-lg font-semibold text-gray-900 mb-5">Add New Branch Office</h3>
+                                            <div class="space-y-4">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-1">Branch Name</label>
+                                                    <input type="text" name="branch_name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                                    <input type="text" name="location" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="Enter branch location">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                    <button type="submit" name="save_branch" class="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto">Save Branch</button>
+                                    <button type="button" command="close" commandfor="dialog" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
+                                </div>
+                            </form>
+                        </el-dialog-panel>
+                    </div>
+                </dialog>
+            </el-dialog>
 
             <!-- Filters -->
             <div class="mb-6 bg-white rounded-lg shadow p-4">
@@ -81,7 +126,7 @@ include '../components/sessions.php';
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Office ID</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">#</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Branch Name</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Location</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Status</th>
@@ -91,115 +136,50 @@ include '../components/sessions.php';
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <!-- Sample Row 1 -->
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    SO-001
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center">
-                                        <div class="text-sm font-medium text-gray-900">Bandarawela Main Office</div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900">123 Main Street, Bandarawela</div>
-                                    <div class="text-xs text-gray-500">Central Region</div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        Active
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    2023-10-25 14:30
-                                </td>
-                                <td class="px-6 py-4 text-right text-sm font-medium">
-                                    <div class="flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-900">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-900">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        <button class="text-gray-600 hover:text-gray-900">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                            <?php
+                            foreach ($branches as $key => $branch) {
+                            ?>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        <?php echo $key + 1; ?>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="text-sm font-medium text-gray-900"><?php echo $branch['branch_name'] ?></div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-gray-900"><?php echo $branch['location'] ?></div>
+                                        <div class="text-xs text-gray-500">if need</div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            Active
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <?php echo $branch['updated_at']; ?>
+                                    </td>
+                                    <td class="px-6 py-4 text-right text-sm font-medium">
+                                        <div class="flex justify-end space-x-2">
+                                            <button class="text-indigo-600 hover:text-indigo-900">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-red-600 hover:text-red-900 cousor-pointer">
+                                                <a href="./handlers/deleteHandler.php?branch_id=<?php echo $branch['branch_id']; ?>&&action=delete_branch">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </button>
+                                            <button class="text-gray-600 hover:text-gray-900">
+                                                <i class="fas fa-info-circle"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php
+                            }
 
-                            <!-- Sample Row 2 -->
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    SO-002
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center">
-                                        <div class="text-sm font-medium text-gray-900">Badulla Branch</div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900">45 Station Road, Badulla</div>
-                                    <div class="text-xs text-gray-500">Central Region</div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        Active
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    2023-10-24 09:15
-                                </td>
-                                <td class="px-6 py-4 text-right text-sm font-medium">
-                                    <div class="flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-900">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-900">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        <button class="text-gray-600 hover:text-gray-900">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Sample Row 3 -->
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    SO-003
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center">
-                                        <div class="text-sm font-medium text-gray-900">Welimada Office</div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900">78 Hill Street, Welimada</div>
-                                    <div class="text-xs text-gray-500">Central Region</div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                        Maintenance
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    2023-10-23 16:45
-                                </td>
-                                <td class="px-6 py-4 text-right text-sm font-medium">
-                                    <div class="flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-900">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-900">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        <button class="text-gray-600 hover:text-gray-900">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                            ?>
                         </tbody>
                     </table>
                 </div>

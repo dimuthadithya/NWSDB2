@@ -1,5 +1,18 @@
 <?php
-include '../components/sessions.php';
+require_once __DIR__ . '/../middleware/auth.php';
+require_once __DIR__ . '/../functions/DbHelper.php';
+
+requireLogin();
+
+$role = $_SESSION['user']['role'];
+$name = $_SESSION['user']['name'];
+
+// Fetch printers data
+$printers = DbHelper::getAllPrinters();
+$totalPrinters = $printers ? count($printers) : 0;
+$activePrinters = $printers ? count(array_filter($printers, fn($p) => $p['status'] === 'active')) : 0;
+$repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status'] === 'under_repair')) : 0;
+
 ?>
 
 <!DOCTYPE html>
@@ -8,333 +21,409 @@ include '../components/sessions.php';
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NWSDB - Printers</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="shortcut icon" href="../assets/images/favicon.png" type="image/x-icon" />
+  <title>NWSDB - Printer Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fade-up {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+  </style>
 </head>
 
-<body class="min-h-screen bg-gray-50">
-  <?php include '../components/sidemenu.php'; ?>
+<body
+  class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
+  <!-- Side Menu   -->
+  <?php
+  $pathUpdate = true;
+  $pathUpdate2 = false;
+  include_once __DIR__ . '/../includes/sidemenu.php';
+  ?>
 
-  <div class="lg:pl-64 min-h-screen flex flex-col">
-    <?php include '../components/header.php'; ?>
+  <!-- Main Content -->
+  <main class="lg:ml-64 min-h-screen">
+    <!-- Header -->
+    <?php include_once __DIR__ . '/../includes/header.php'; ?>
 
-    <!-- Main Content -->
-    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Page Header -->
-      <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900">Printer Devices</h1>
-          <p class="mt-1 text-sm text-gray-600">Manage and track all printer devices in the system</p>
+
+    <div class="p-6 space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div
+          class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg animate-fade-up">
+          <i class="fas fa-print text-2xl"></i>
+          <h3 class="text-3xl font-bold mt-4 mb-1"><?php echo $totalPrinters; ?></h3>
+          <p class="text-blue-100 text-sm">Total Printers</p>
         </div>
-        <div class="mt-4 md:mt-0 flex flex-col sm:flex-row gap-3">
-          <button class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <i class="fas fa-plus mr-2"></i>
-            Add New Printer
-          </button>
-          <button class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-            <i class="fas fa-file-excel mr-2"></i>
-            Export to Excel
-          </button>
+        <div
+          class="stat-card bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-lg animate-fade-up"
+          style="animation-delay: 0.1s">
+          <i class="fas fa-check-circle text-2xl"></i>
+          <h3 class="text-3xl font-bold mt-4 mb-1"><?php echo $activePrinters; ?></h3>
+          <p class="text-green-100 text-sm">Active Devices</p>
+        </div>
+        <div
+          class="stat-card bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 text-white shadow-lg animate-fade-up"
+          style="animation-delay: 0.2s">
+          <i class="fas fa-wrench text-2xl"></i>
+          <h3 class="text-3xl font-bold mt-4 mb-1"><?php echo $repairPrinters; ?></h3>
+          <p class="text-orange-100 text-sm">Under Repair</p>
+        </div>
+        <div
+          class="stat-card bg-gradient-to-br from-red-500 to-red-600 rounded-2xl p-6 text-white shadow-lg animate-fade-up"
+          style="animation-delay: 0.3s">
+          <i class="fas fa-exclamation-triangle text-2xl"></i>
+          <h3 class="text-3xl font-bold mt-4 mb-1">1</h3>
+          <p class="text-red-100 text-sm">Low Toner</p>
         </div>
       </div>
 
-      <!-- Enhanced Filters -->
-      <div class="mb-6 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <!-- Quick Actions -->
+      <div class="flex flex-wrap gap-3">
+        <button
+          onclick="openAddComputerModal()"
+          class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all">
+          <i class="fas fa-plus mr-2"></i>
+          Add New Printer
+        </button>
+        <button
+          class="inline-flex items-center px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm border border-gray-200 transition-all">
+          <i class="fas fa-file-excel mr-2 text-green-600"></i>
+          Export to Excel
+        </button>
+        <button
+          class="inline-flex items-center px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm border border-gray-200 transition-all">
+          <i class="fas fa-file-pdf mr-2 text-red-600"></i>
+          Export to PDF
+        </button>
+      </div>
+
+      <!-- Filter Section -->
+
+      <div
+        class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up">
+        <div
+          class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div
+                class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                 <i class="fas fa-filter text-white"></i>
               </div>
+
               <div>
-                <h3 class="text-lg font-semibold text-gray-900">Filter Printers</h3>
-                <p class="text-sm text-gray-600">Refine your search results</p>
+                <h3 class="text-lg font-semibold text-gray-900">
+                  Filter Printers
+                </h3>
+
+                <p class="text-sm text-gray-600">
+                  Refine your search results
+                </p>
               </div>
             </div>
-            <button onclick="clearFilters()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-              <i class="fas fa-times mr-2"></i>Clear All
+          </div>
+        </div>
+
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"><i class="fas fa-print text-blue-600 mr-2"></i>Printer
+                Type</label>
+
+              <select
+                class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white">
+                <option value="">All Types</option>
+
+                <option value="laser">Laser</option>
+
+                <option value="inkjet">Inkjet</option>
+
+                <option value="dot-matrix">Dot Matrix</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"><i class="fas fa-circle-dot text-blue-600 mr-2"></i>Status</label>
+
+              <select
+                class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white">
+                <option value="">All Status</option>
+
+                <option value="active">Active</option>
+
+                <option value="under_repair">Under Repair</option>
+
+                <option value="retired">Retired</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"><i class="fas fa-building text-blue-600 mr-2"></i>Section</label>
+
+              <select
+                class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white">
+                <option value="">All Sections</option>
+
+                <option value="it">IT Department</option>
+
+                <option value="hr">HR Department</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"><i class="fas fa-network-wired text-blue-600 mr-2"></i>Connectivity</label>
+
+              <select
+                class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white">
+                <option value="">All</option>
+
+                <option value="usb">USB</option>
+
+                <option value="network">Network</option>
+
+                <option value="wifi">Wi-Fi</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mt-4 flex justify-end gap-3">
+            <button
+              class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">
+              Reset
+            </button>
+
+            <button
+              class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+              Apply Filters
             </button>
           </div>
         </div>
-
-        <!-- Filter Content -->
-        <div class="p-6">
-          <!-- Search Bar - Prominent Position -->
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Quick Search</label>
-            <div class="relative">
-              <input
-                type="text"
-                placeholder="Search by printer name, model, or serial number..."
-                class="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200">
-              <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-            </div>
-          </div>
-
-          <!-- Filter Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <!-- Status Filter -->
-            <div class="space-y-2">
-              <label class="block text-sm font-medium text-gray-700">
-                <i class="fas fa-circle-dot text-blue-600 mr-2"></i>Status
-              </label>
-              <select class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white">
-                <option value="">All Status</option>
-                <option value="active">✓ Active</option>
-                <option value="under_repair">⚠ Under Repair</option>
-                <option value="retired">✕ Retired</option>
-                <option value="maintenance">🔧 Under Maintenance</option>
-              </select>
-            </div>
-
-            <!-- Type Filter -->
-            <div class="space-y-2">
-              <label class="block text-sm font-medium text-gray-700">
-                <i class="fas fa-print text-blue-600 mr-2"></i>Type
-              </label>
-              <select class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white">
-                <option value="">All Types</option>
-                <option value="laser">Laser Printer</option>
-                <option value="inkjet">Inkjet Printer</option>
-                <option value="dotmatrix">Dot Matrix Printer</option>
-                <option value="multifunction">Multifunction Printer</option>
-              </select>
-            </div>
-
-            <!-- Department Filter -->
-            <div class="space-y-2">
-              <label class="block text-sm font-medium text-gray-700">
-                <i class="fas fa-building text-blue-600 mr-2"></i>Department
-              </label>
-              <select class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white">
-                <option value="">All Departments</option>
-                <option value="it">IT Department</option>
-                <option value="hr">HR Department</option>
-                <option value="finance">Finance Department</option>
-                <option value="operations">Operations</option>
-              </select>
-            </div>
-
-            <!-- Location Filter -->
-            <div class="space-y-2">
-              <label class="block text-sm font-medium text-gray-700">
-                <i class="fas fa-map-marker-alt text-blue-600 mr-2"></i>Location
-              </label>
-              <select class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white">
-                <option value="">All Locations</option>
-                <option value="head_office">Head Office</option>
-                <option value="branch_office">Branch Office</option>
-                <option value="site_office">Site Office</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Location Type Checkboxes -->
-          <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <label class="block text-sm font-medium text-gray-700 mb-3">
-              <i class="fas fa-location-dot text-blue-600 mr-2"></i>Location Type
-            </label>
-            <div class="flex flex-wrap gap-4">
-              <label class="inline-flex items-center cursor-pointer group">
-                <input
-                  type="checkbox"
-                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                  name="location_type[]"
-                  value="bandarawela">
-                <span class="ml-2 text-sm text-gray-700 group-hover:text-gray-900">Bandarawela</span>
-              </label>
-              <label class="inline-flex items-center cursor-pointer group">
-                <input
-                  type="checkbox"
-                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                  name="location_type[]"
-                  value="non_bandarawela">
-                <span class="ml-2 text-sm text-gray-700 group-hover:text-gray-900">Non Bandarawela</span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Footer with Apply Button -->
-        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
-          <button onclick="resetFilters()" class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-            <i class="fas fa-rotate-right mr-2"></i>Reset
-          </button>
-          <button onclick="applyFilters()" class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm">
-            <i class="fas fa-check mr-2"></i>Apply Filters
-          </button>
-        </div>
       </div>
 
-      <!-- Printers Table -->
-      <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div
+        class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+            <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
               <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Basic Info</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Hardware Specs</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Additional Features</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Connectivity</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Assignment & Status</th>
-                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Actions</th>
+                <th
+                  class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Basic Info
+                </th>
+                <th
+                  class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Specifications
+                </th>
+                <th
+                  class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Status
+                </th>
+                <th
+                  class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Assignment
+                </th>
+                <th
+                  class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <!-- Sample Row -->
-              <tr class="hover:bg-gray-50">
-                <td class="px-6 py-4">
-                  <div class="flex items-center">
-                    <i class="fas fa-print text-gray-400 mr-3"></i>
-                    <div>
-                      <div class="text-sm font-medium text-gray-900">HP LaserJet Pro</div>
-                      <div class="text-sm text-gray-500">ID: PR001</div>
-                      <div class="text-sm text-gray-500">Model: M404dn</div>
-                      <div class="text-sm text-gray-500">Purchase: 2023-05-20</div>
+              <?php if (empty($printers)): ?>
+                <tr>
+                  <td colspan="5" class="px-6 py-12 text-center">
+                    <div class="flex flex-col items-center justify-center text-gray-500">
+                      <i class="fas fa-print text-5xl mb-3 text-gray-300"></i>
+                      <p class="text-lg font-medium">No printers found</p>
+                      <p class="text-sm">Click "Add New Printer" to add your first device</p>
                     </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm text-gray-900">
-                    <div>Type: Laser Printer</div>
-                    <div>Print Speed: 38 ppm</div>
-                    <div>Resolution: 1200 x 1200 dpi</div>
-                    <div>Paper Size: A4, Letter, Legal</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm text-gray-900">
-                    <div>Duplex Printing: Yes</div>
-                    <div>Color Printing: No</div>
-                    <div>Paper Capacity: 250 sheets</div>
-                    <div>Monthly Duty: 80,000 pages</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm text-gray-900">
-                    <div>Network: Ethernet</div>
-                    <div>Wi-Fi: Yes</div>
-                    <div>USB: Yes</div>
-                    <div>IP: 192.168.1.101</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm text-gray-900">
-                    <div>Section: IT Department</div>
-                    <div>Location: 2nd Floor</div>
-                    <div>
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Active
+                  </td>
+                </tr>
+              <?php else: ?>
+                <?php foreach ($printers as $printer): ?>
+                  <tr class="table-row">
+                    <td class="px-6 py-4">
+                      <div class="flex items-start">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                          <i class="fas fa-print text-blue-600"></i>
+                        </div>
+                        <div>
+                          <div class="text-sm font-semibold text-gray-900">
+                            <?= htmlspecialchars($printer['device_name'] ?? 'N/A') ?>
+                          </div>
+                          <div class="text-xs text-gray-500"><?= htmlspecialchars($printer['model'] ?? 'N/A') ?></div>
+                          <div class="text-xs text-gray-500 mt-1">
+                            ID: <?= htmlspecialchars($printer['device_id'] ?? 'N/A') ?>
+                          </div>
+                          <div class="text-xs text-gray-400">
+                            Created: <?= date('M d, Y', strtotime($printer['created_at'])) ?>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="text-sm space-y-1">
+                        <div class="flex items-center">
+                          <i class="fas fa-tag text-gray-400 text-xs mr-2 w-4"></i>
+                          <span class="text-gray-700">Type: <?= htmlspecialchars($printer['printer_type'] ?? 'N/A') ?></span>
+                        </div>
+                        <div class="flex items-center">
+                          <i class="fas fa-palette text-gray-400 text-xs mr-2 w-4"></i>
+                          <span class="text-gray-700">Color: <?= htmlspecialchars($printer['color_capability'] ?? 'N/A') ?></span>
+                        </div>
+                        <div class="flex items-center">
+                          <i class="fas fa-file-alt text-gray-400 text-xs mr-2 w-4"></i>
+                          <span class="text-gray-700">Paper: <?= htmlspecialchars($printer['paper_size'] ?? 'N/A') ?></span>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4">
+                      <?php
+                      $statusClass = '';
+                      $statusText = ucfirst(str_replace('_', ' ', $printer['status'] ?? 'unknown'));
+                      switch ($printer['status']) {
+                        case 'active':
+                          $statusClass = 'bg-green-100 text-green-800';
+                          break;
+                        case 'under_repair':
+                          $statusClass = 'bg-yellow-100 text-yellow-800';
+                          break;
+                        case 'retired':
+                          $statusClass = 'bg-gray-100 text-gray-800';
+                          break;
+                        default:
+                          $statusClass = 'bg-gray-100 text-gray-800';
+                      }
+                      ?>
+                      <div class="flex items-center">
+                        <span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full <?= $statusClass ?>"><?= $statusText ?></span>
+                      </div>
+                      <div class="text-sm text-gray-600 mt-1">Speed: <?= htmlspecialchars($printer['print_speed'] ?? 'N/A') ?></div>
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="text-sm mb-2">
+                        <div class="font-medium text-gray-900"><?= htmlspecialchars($printer['section_id'] ?? 'Unassigned') ?></div>
+                        <div class="text-gray-600 text-xs"><?= htmlspecialchars($printer['assigned_to'] ?? 'Not assigned') ?></div>
+                      </div>
+                      <span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full <?= $statusClass ?>">
+                        <i class="fas fa-circle text-xs mr-1"></i><?= $statusText ?>
                       </span>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 text-right text-sm font-medium">
-                  <div class="flex justify-end space-x-2">
-                    <button class="text-indigo-600 hover:text-indigo-900">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="text-red-600 hover:text-red-900">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                    <button class="text-gray-600 hover:text-gray-900">
-                      <i class="fas fa-history"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                      <div class="flex items-center justify-end space-x-2">
+                        <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="View Details">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Edit">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Delete">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>
       </div>
+    </div>
+  </main>
 
-      <!-- Pagination -->
-      <div class="mt-4 flex items-center justify-between">
-        <div class="flex-1 flex justify-between sm:hidden">
-          <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-            Previous
-          </button>
-          <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-            Next
-          </button>
-        </div>
-        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-          <div>
-            <p class="text-sm text-gray-700">
-              Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium">20</span> results
-            </p>
-          </div>
-          <div>
-            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-              <button class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                <span class="sr-only">Previous</span>
-                <i class="fas fa-chevron-left"></i>
-              </button>
-              <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-                1
-              </button>
-              <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-                2
-              </button>
-              <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-                3
-              </button>
-              <button class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                <span class="sr-only">Next</span>
-                <i class="fas fa-chevron-right"></i>
-              </button>
-            </nav>
-          </div>
-        </div>
+  <div
+    id="addPrinterModal"
+    class="hidden fixed inset-0 z-50 backdrop-blur-sm bg-black/30 flex items-center justify-center p-4">
+    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl">
+      <div class="flex items-center justify-between p-6 border-b">
+        <h3 class="text-xl font-bold text-gray-900">Add New Printer</h3>
+        <button
+          onclick="closeAddPrinterModal()"
+          class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-times text-2xl"></i>
+        </button>
       </div>
-    </main>
+      <div class="p-6">
+        <form id="addPrinterForm" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              type="text"
+              placeholder="Printer Model"
+              class="w-full px-4 py-2.5 rounded-lg border" />
+            <input
+              type="text"
+              placeholder="Serial Number"
+              class="w-full px-4 py-2.5 rounded-lg border" />
+            <select class="w-full px-4 py-2.5 rounded-lg border">
+              <option>Select Type</option>
+              <option>Laser</option>
+              <option>Inkjet</option>
+              <option>Dot Matrix</option>
+            </select>
+            <select class="w-full px-4 py-2.5 rounded-lg border">
+              <option>Select Status</option>
+              <option>Active</option>
+              <option>Under Repair</option>
+              <option>Retired</option>
+            </select>
+          </div>
+          <textarea
+            placeholder="Notes..."
+            rows="3"
+            class="w-full px-4 py-2.5 rounded-lg border"></textarea>
+        </form>
+      </div>
+      <div
+        class="flex items-center justify-end gap-3 p-6 border-t bg-gray-50">
+        <button
+          onclick="closeAddPrinterModal()"
+          class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border rounded-lg">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          form="addPrinterForm"
+          class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg">
+          Save Printer
+        </button>
+      </div>
+    </div>
   </div>
-</body>
 
-</html>
-<p class="text-sm text-gray-700">
-  Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium">20</span> results
-</p>
-</div>
-<div>
-  <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-    <a href="#" class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
-      <span class="sr-only">Previous</span>
-      <i class="fas fa-chevron-left h-5 w-5"></i>
-    </a>
-    <a href="#" aria-current="page" class="relative z-10 inline-flex items-center bg-blue-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">1</a>
-    <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">2</a>
-    <a href="#" class="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex">3</a>
-    <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">...</span>
-    <a href="#" class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
-      <span class="sr-only">Next</span>
-      <i class="fas fa-chevron-right h-5 w-5"></i>
-    </a>
-  </nav>
-</div>
-</div>
-</div>
-</div>
-</main>
-</div>
+  <script>
+    document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+      document
+        .getElementById('sidebar')
+        .classList.toggle('-translate-x-full');
+    });
 
-<script>
-  // Filter functionality
-  document.getElementById('search').addEventListener('keyup', function() {
-    // Add search filter logic here
-  });
+    function openAddPrinterModal() {
+      document.getElementById('addPrinterModal').classList.remove('hidden');
+    }
 
-  document.getElementById('status').addEventListener('change', function() {
-    // Add status filter logic here
-  });
-
-  document.getElementById('type').addEventListener('change', function() {
-    // Add type filter logic here
-  });
-</script>
+    function closeAddPrinterModal() {
+      document.getElementById('addPrinterModal').classList.add('hidden');
+    }
+  </script>
 </body>
 
 </html>

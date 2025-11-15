@@ -66,10 +66,14 @@ class Database
             $placeholders = implode(", ", array_fill(0, count($data), "?"));
             $query = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
 
+            error_log("Insert Query: " . $query);
+            error_log("Insert Data: " . print_r($data, true));
+
             $stmt = $this->executeQuery($query, array_values($data));
             return $stmt ? $this->conn->lastInsertId() : false;
         } catch (PDOException $e) {
             error_log("Insert failed: " . $e->getMessage());
+            error_log("Query was: INSERT INTO {$table} (" . implode(", ", array_keys($data)) . ")");
             return false;
         }
     }
@@ -253,5 +257,58 @@ class Database
     {
         $error = $this->conn->errorInfo();
         return $error[2];
+    }
+
+    public function getSectionsByDeviceCount()
+    {
+        try {
+            $query = "
+            SELECT 
+                s.section_id,
+                s.section_name,
+                COUNT(d.device_id) AS total_devices
+            FROM 
+                sections s
+            LEFT JOIN 
+                devices d ON s.section_id = d.section_id
+            GROUP BY 
+                s.section_id, s.section_name
+            ORDER BY 
+                total_devices DESC
+        ";
+
+            $stmt = $this->executeQuery($query);
+            return $stmt ? $stmt->fetchAll() : false;
+        } catch (PDOException $e) {
+            error_log('getSectionsByDeviceCount failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get the ID of a record by matching a specific column and value.
+     * Example: getId('users', 'email', 'user@example.com', 'user_id')
+     *
+     * @param string $table Table name
+     * @param string $searchColumn Column name to search
+     * @param mixed $searchValue Value to match
+     * @param string $idColumn Column name of the ID (default: 'id')
+     * @return int|false Returns the ID if found, or false if not
+     */
+    public function getId($table, $searchColumn, $searchValue, $idColumn = 'id')
+    {
+        try {
+            $query = "SELECT {$idColumn} FROM {$table} WHERE {$searchColumn} = ? LIMIT 1";
+            $stmt = $this->executeQuery($query, [$searchValue]);
+
+            if ($stmt) {
+                $result = $stmt->fetch();
+                return $result ? (int)$result[$idColumn] : false;
+            }
+            return false;
+        } catch (PDOException $e) {
+            error_log("getId failed: " . $e->getMessage());
+            return false;
+        }
     }
 }

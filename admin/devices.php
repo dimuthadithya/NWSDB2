@@ -1,6 +1,11 @@
 <?php
 include '../components/sessions.php';
-require_once '../functions/Database.php';
+require_once '../functions/DbHelper.php';
+
+$allCategories = DbHelper::getAllDeviceCategories();
+$deviceIcons = ['fas fa-desktop', 'fas fa-print', 'fa-solid fa-expand', 'fa-solid fa-wifi', 'fas fa-laptop']
+
+
 ?>
 
 <!DOCTYPE html>
@@ -34,9 +39,9 @@ require_once '../functions/Database.php';
                     <p class="mt-1 text-sm text-gray-600">Manage and track all device categories in the system</p>
                 </div>
                 <div class="mt-4 md:mt-0 flex flex-col sm:flex-row gap-3">
-                    <button class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button command="show-modal" commandfor="dialog" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <i class="fas fa-plus mr-2"></i>
-                        Add New Category
+                        Add New Device Type
                     </button>
                     <button class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
                         <i class="fas fa-file-excel mr-2"></i>
@@ -44,6 +49,41 @@ require_once '../functions/Database.php';
                     </button>
                 </div>
             </div>
+
+            <!-- Modal -->
+            <el-dialog>
+                <dialog id="dialog" aria-labelledby="dialog-title" class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent">
+                    <el-dialog-backdrop class="fixed inset-0 bg-gray-900/50 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in" onclick="document.getElementById('dialog').close()"></el-dialog-backdrop>
+
+                    <div tabindex="0" class="flex min-h-full items-end justify-center p-4 text-center focus:outline-none sm:items-center sm:p-0" onclick="if(event.target === this) document.getElementById('dialog').close()">
+                        <el-dialog-panel class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95">
+                            <form id="addDeviceCategoryForm" action="./handlers/addHandler.php" method="post">
+                                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                    <div class="sm:flex sm:items-start">
+                                        <div class="w-full">
+                                            <h3 id="dialog-title" class="text-lg font-semibold text-gray-900 mb-5">Add New Device Category</h3>
+                                            <div class="space-y-4">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-1">Category Name</label>
+                                                    <input type="text" name="category_name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="Enter category name">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                                    <textarea name="description" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="Enter category description"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                                    <button type="submit" name="save_device_category" class="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto">Save Category</button>
+                                    <button type="button" command="close" commandfor="dialog" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
+                                </div>
+                            </form>
+                        </el-dialog-panel>
+                    </div>
+                </dialog>
+            </el-dialog>
 
             <!-- Filters -->
             <div class="mb-6 bg-white rounded-lg shadow p-4">
@@ -93,172 +133,53 @@ require_once '../functions/Database.php';
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <!-- Sample Row 1 -->
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    #001
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10">
-                                            <span class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                                                <i class="fas fa-desktop"></i>
-                                            </span>
+                            <?php
+                            foreach ($allCategories as $key => $category) { ?>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        #00<?php echo $category['category_id'] ?>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <span class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                                    <i class="<?php echo $deviceIcons[$key] ?>"></i>
+                                                </span>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900"><?php echo $category['category_name'] ?></div>
+                                            </div>
                                         </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">Computer</div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-gray-900">
+                                            <?php echo $category['description'] ?>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900">Desktop computers and workstations</div>
-                                    <div class="text-xs text-gray-500">All types of desktop computing devices</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    2023-10-25 14:30
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    2023-10-26 09:15
-                                </td>
-                                <td class="px-6 py-4 text-right text-sm font-medium">
-                                    <div class="flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-900" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-900" title="Delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        <button class="text-gray-600 hover:text-gray-900" title="View Details">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Sample Row 2 -->
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    #002
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10">
-                                            <span class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                                                <i class="fas fa-print"></i>
-                                            </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <?php echo $category['created_at'] ?>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <?php echo $category['updated_at'] ?>
+                                    </td>
+                                    <td class="px-6 py-4 text-right text-sm font-medium">
+                                        <div class="flex justify-end space-x-2">
+                                            <button class="text-indigo-600 hover:text-indigo-900" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-red-600 hover:text-red-900 cousor-pointer" title="Delete">
+                                                <a href="./handlers/deleteHandler.php?action=delete_device_category&category_id=<?php echo $category['category_id']; ?>">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </button>
+                                            <button class="text-gray-600 hover:text-gray-900" title="View Details">
+                                                <i class="fas fa-info-circle"></i>
+                                            </button>
                                         </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">Printer</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900">Inkjet and laser printers</div>
-                                    <div class="text-xs text-gray-500">Various printing devices and multifunction printers</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    2023-10-24 11:20
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    2023-10-25 16:45
-                                </td>
-                                <td class="px-6 py-4 text-right text-sm font-medium">
-                                    <div class="flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-900" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-900" title="Delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        <button class="text-gray-600 hover:text-gray-900" title="View Details">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Sample Row 3 -->
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    #003
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10">
-                                            <span class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
-                                                <i class="fas fa-laptop"></i>
-                                            </span>
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">Laptop</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900">Portable laptop computers</div>
-                                    <div class="text-xs text-gray-500">Business and personal laptop devices</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    2023-10-23 08:45
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    2023-10-24 12:30
-                                </td>
-                                <td class="px-6 py-4 text-right text-sm font-medium">
-                                    <div class="flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-900" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-900" title="Delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        <button class="text-gray-600 hover:text-gray-900" title="View Details">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Sample Row 4 -->
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    #004
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10">
-                                            <span class="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600">
-                                                <i class="fas fa-scanner"></i>
-                                            </span>
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">Scanner</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900">Document and photo scanners</div>
-                                    <div class="text-xs text-gray-500">Flatbed and sheet-fed document scanners</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    2023-10-22 15:10
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    2023-10-23 10:20
-                                </td>
-                                <td class="px-6 py-4 text-right text-sm font-medium">
-                                    <div class="flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-900" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-900" title="Delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        <button class="text-gray-600 hover:text-gray-900" title="View Details">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            <?php }
+                            ?>
                         </tbody>
                     </table>
                     <!-- Pagination -->

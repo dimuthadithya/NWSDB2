@@ -8,17 +8,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $first_name = trim($_POST['first_name']);
         $last_name = trim($_POST['last_name']);
         $email = trim($_POST['email']);
-        $gender = trim($_POST['gender']);
+        $gender = isset($_POST['gender']) ? trim($_POST['gender']) : 'Male'; // Default to Male if not provided
+        $mobile = trim($_POST['mobile']);
         $password = $_POST['password'];
         $role = 'user';
 
-        $userId = DbHelper::createUser($first_name, $last_name, $email, $gender, $password, $role);
+        $userId = DbHelper::createUser($first_name, $last_name, $email, $gender, $password,  $mobile, $role);
 
         if ($userId) {
-            header('Location: ../index.php?registration=success');
+            header('Location: ../pages/login.php?registration=success');
             exit();
         } else {
-            header('Location: ../register.php?registration=failed');
+            error_log("Registration failed for email: " . $email);
+            header('Location: ../pages/register.php?registration=failed');
             exit();
         }
     }
@@ -31,18 +33,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = DbHelper::loginUser($email, $password);
         if ($user) {
             session_start();
-            $_SESSION['user_id'] = $user['user_id'];
-            $_SESSION['user_role'] = $user['role'];
-            header('Location: ../pages/index.php?login=true');
+
+            // Example: fetched from DB after login check
+            $user = [
+                'id'    => $user['user_id'],
+                'name'  => $user['first_name'] . ' ' . $user['last_name'],
+                'email' => $user['email'],
+                'role'  =>    $user['role']
+            ];
+
+            // Store user data in session
+            $_SESSION['user'] = [
+                'id'    => $user['id'],
+                'name'  => $user['name'],
+                'email' => $user['email'],
+                'role'  => $user['role']
+            ];
+
+            header('Location: ../pages/dashboard.php');
             exit();
         } else {
-            header('Location: ../index.php?login=failed');
+            header('Location: ../pages/login.php?login=failed');
             exit();
         }
     }
 
-    // If neither register nor login found
-    header('Location: ../index.php?invalid=request');
+    // If neither register or login found
+    header('Location: ../index.php');
     exit();
 } else {
     header('Location: ../index.php');

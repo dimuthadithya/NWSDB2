@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS users (
   username VARCHAR(50) UNIQUE,
   email VARCHAR(150) NOT NULL UNIQUE,
   mobile_number VARCHAR(15) UNIQUE,
-  gender ENUM('Male', 'Female') NOT NULL,
+  gender VARCHAR(10),
   password VARCHAR(255) NOT NULL,
   site_office VARCHAR(100),
   role ENUM('admin', 'user') NOT NULL DEFAULT 'user',
@@ -78,16 +78,17 @@ CREATE TABLE sections (
 
 -- ===============================================================
 -- 6. Devices Table
--- Stores details of each device in the system
+-- Stores details of each device in the system including computers, printers, RVPN connections, and finger devices
 -- ===============================================================
 CREATE TABLE devices (
   device_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   device_name VARCHAR(150) NOT NULL,        -- Device type/name
   model VARCHAR(100) NULL,                  -- Device model
-  made_in VARCHAR(100) NULL,                -- Country/manufacturer origin
   category_id INT UNSIGNED NOT NULL,        -- Device category reference
   section_id INT UNSIGNED NULL,             -- Optional section assignment
   assigned_to INT UNSIGNED NULL,            -- User assigned to this device
+  
+  -- Common fields for all devices
   operating_system VARCHAR(100) NULL,
   processor VARCHAR(100) NULL,
   ram VARCHAR(50) NULL,
@@ -99,10 +100,39 @@ CREATE TABLE devices (
   virus_guard VARCHAR(100) NULL,
   ip_address VARCHAR(45) NULL,
   monitor_info VARCHAR(100) NULL,
-  cpu_serial VARCHAR(100) NULL,
+  system_unit_serial VARCHAR(100) NULL,
+  ups_serial VARCHAR(100) NULL,
   purchase_date DATE NULL,
   status ENUM('active','under_repair','retired','lost') DEFAULT 'active',
   notes TEXT NULL,
+  
+  -- RVPN Connection specific fields
+  employee_number VARCHAR(50) NULL,         -- Employee number for RVPN user
+  designation VARCHAR(100) NULL,            -- Designation of RVPN user
+  working_location VARCHAR(150) NULL,       -- Working location of RVPN user
+  cost_code VARCHAR(50) NULL,               -- Cost code for RVPN connection
+  rvpn_serial_number VARCHAR(100) NULL,     -- Serial number of RVPN connection
+  rvpn_username VARCHAR(100) NULL,          -- Username of RVPN connection
+  pin_number VARCHAR(50) NULL,              -- Pin number for RVPN
+  connection_required ENUM('required','not_required') NULL, -- Whether connection is required
+  
+  -- Finger Device specific fields
+  location_name VARCHAR(150) NULL,          -- Location name for finger device
+  sub_location VARCHAR(150) NULL,           -- Sub location for finger device
+  make VARCHAR(100) NULL,                   -- Manufacturer/Make
+  device_type VARCHAR(100) NULL,            -- Device type: Finger/Finger,Palm/Finger,Face
+  device_number VARCHAR(50) NULL,           -- Device number
+  identification_code VARCHAR(100) NULL,    -- Identification code/Serial number
+  ip_address_adsl VARCHAR(100) NULL,        -- IP Address or ADSL for finger device
+  installed_date DATE NULL,                 -- Installation date for finger device
+  company_name VARCHAR(150) NULL,           -- Company name/vendor
+  device_cost DECIMAL(10,2) NULL,           -- Device cost
+  warranty_period VARCHAR(50) NULL,         -- Warranty period in years
+  port_number VARCHAR(20) NULL,             -- Port number
+  managed_by VARCHAR(100) NULL,             -- Department/person managing the device
+  approval_status ENUM('approved','pending','rejected') NULL, -- Approval status
+  remark TEXT NULL,                         -- Additional remarks
+  
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (device_id),
@@ -148,8 +178,59 @@ CREATE TABLE device_issues (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ===============================================================
--- 9. Default Admin User
+-- 9. Regions Table
+-- Stores regional information for NWSDB operations
 -- ===============================================================
-INSERT INTO users (first_name, last_name, username, email, mobile_number, gender, password, site_office, role)
-VALUES ('Admin', 'User', 'admin', 'admin@gmail.com', '0000000000', 'Male', SHA2('admin123', 256), 'Head Office', 'admin')
-ON DUPLICATE KEY UPDATE user_id=user_id;  -- Prevent duplicate insertion
+CREATE TABLE IF NOT EXISTS regions (
+  region_id INT(11) NOT NULL AUTO_INCREMENT,
+  region_code VARCHAR(20) NOT NULL,
+  region_name VARCHAR(100) NOT NULL,
+  status ENUM('active','inactive') DEFAULT 'active',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (region_id),
+  UNIQUE KEY region_code (region_code),
+  KEY idx_region_code (region_code),
+  KEY idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ===============================================================
+-- 10. Areas Table
+-- Stores area information under regions
+-- ===============================================================
+CREATE TABLE IF NOT EXISTS areas (
+  area_id INT(11) NOT NULL AUTO_INCREMENT,
+  region_id INT(11) NOT NULL,
+  area_code VARCHAR(20) NOT NULL,
+  area_name VARCHAR(100) NOT NULL,
+  status ENUM('active','inactive') DEFAULT 'active',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (area_id),
+  UNIQUE KEY area_code (area_code),
+  KEY idx_region_id (region_id),
+  KEY idx_area_code (area_code),
+  KEY idx_status (status),
+  CONSTRAINT areas_ibfk_1 FOREIGN KEY (region_id) REFERENCES regions(region_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ===============================================================
+-- 11. Water Supply Schemes Table
+-- Stores water supply scheme information
+-- ===============================================================
+CREATE TABLE IF NOT EXISTS water_supply_schemes (
+  wss_id INT(11) NOT NULL AUTO_INCREMENT,
+  area_id INT(11) NOT NULL,
+  wss_code VARCHAR(20) NOT NULL,
+  wss_name VARCHAR(100) NOT NULL,
+  status ENUM('active','inactive','maintenance') DEFAULT 'active',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (wss_id),
+  UNIQUE KEY wss_code (wss_code),
+  KEY idx_area_id (area_id),
+  KEY idx_wss_code (wss_code),
+  KEY idx_status (status),
+  CONSTRAINT water_supply_schemes_ibfk_1 FOREIGN KEY (area_id) REFERENCES areas(area_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
