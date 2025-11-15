@@ -1,3 +1,9 @@
+<?php
+require_once __DIR__ . '/../middleware/auth.php';
+guestOnly();
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
