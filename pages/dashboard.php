@@ -126,6 +126,7 @@ $otherDevicesCount = $totalDevices - ($laptopsCount + $printersCount + $computer
 
 <body
   class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
+  <!-- Side Menu   -->
   <?php
   $pathUpdate = true;
   $pathUpdate2 = false;

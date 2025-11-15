@@ -37,13 +37,13 @@
                   <span>Computers</span>
               </a>
               <a
-                  href="<?php echo $pathUpdate2 ? '../laptops.php' : './laptops.php' ?>"
+                  href="<?php echo $pathUpdate2 ? '../printers.php' : './printers.php' ?>"
                   class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
                   <i class="fas fa-print w-5"></i>
                   <span>Printers</span>
               </a>
               <a
-                  href="<?php echo $pathUpdate2 ? '../site-offices.php' : './site-offices.php' ?>"
+                  href="<?php echo $pathUpdate2 ? '../rvpn-connections.php' : './rvpn-connections.php' ?>"
                   class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
                   <i class="fas fa-network-wired w-5"></i>
                   <span>RVPN Connections</span>
