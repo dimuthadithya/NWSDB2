@@ -7,6 +7,11 @@ requireLogin();
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
+// Fetch sections data
+$sections = DbHelper::getAllSections();
+$totalSections = count($sections);
+$waterSchemes = DbHelper::getAllWaterSupplySchemes(); // For dropdown
+
 ?>
 
 <!DOCTYPE html>
@@ -79,13 +84,13 @@ $name = $_SESSION['user']['name'];
         <div
           class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
           <i class="fas fa-sitemap text-2xl"></i>
-          <h3 class="text-3xl font-bold mt-4 mb-1">8</h3>
+          <h3 class="text-3xl font-bold mt-4 mb-1"><?php echo $totalSections; ?></h3>
           <p class="text-blue-100 text-sm">Total Sections</p>
         </div>
         <div
           class="stat-card bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-lg">
           <i class="fas fa-users text-2xl"></i>
-          <h3 class="text-3xl font-bold mt-4 mb-1">45</h3>
+          <h3 class="text-3xl font-bold mt-4 mb-1"><?php echo count(DbHelper::getAllUsers()); ?></h3>
           <p class="text-green-100 text-sm">Total Users</p>
         </div>
         <div
@@ -128,15 +133,11 @@ $name = $_SESSION['user']['name'];
                 </th>
                 <th
                   class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                  Head of Section
+                  WSS ID
                 </th>
                 <th
                   class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                  Device Count
-                </th>
-                <th
-                  class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                  User Count
+                  Created Date
                 </th>
                 <th
                   class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase">
@@ -145,36 +146,40 @@ $name = $_SESSION['user']['name'];
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr>
-                <td class="px-6 py-4 font-semibold text-gray-900">
-                  IT Department
-                </td>
-                <td class="px-6 py-4">Mr. P. Kumar</td>
-                <td class="px-6 py-4">35</td>
-                <td class="px-6 py-4">10</td>
-                <td class="px-6 py-4 text-right">
-                  <button class="p-2 text-blue-600">
-                    <i class="fas fa-eye"></i></button><button class="p-2 text-green-600">
-                    <i class="fas fa-edit"></i></button><button class="p-2 text-red-600">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 font-semibold text-gray-900">
-                  Human Resources
-                </td>
-                <td class="px-6 py-4">Mrs. A. Silva</td>
-                <td class="px-6 py-4">15</td>
-                <td class="px-6 py-4">8</td>
-                <td class="px-6 py-4 text-right">
-                  <button class="p-2 text-blue-600">
-                    <i class="fas fa-eye"></i></button><button class="p-2 text-green-600">
-                    <i class="fas fa-edit"></i></button><button class="p-2 text-red-600">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
+              <?php if (!empty($sections)): ?>
+                <?php foreach ($sections as $section): ?>
+                  <tr class="table-row">
+                    <td class="px-6 py-4 font-semibold text-gray-900">
+                      <?php echo htmlspecialchars($section['section_name']); ?>
+                    </td>
+                    <td class="px-6 py-4 text-gray-600">
+                      <?php echo htmlspecialchars($section['wss_id']); ?>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                      <?php echo date('M d, Y', strtotime($section['created_at'])); ?>
+                    </td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                      <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="View">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Edit">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Delete">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                    <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                    <p class="text-lg font-medium">No sections found</p>
+                    <p class="text-sm">Click "Add New Computer" to create your first section</p>
+                  </td>
+                </tr>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>

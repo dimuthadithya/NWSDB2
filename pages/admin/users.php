@@ -7,6 +7,13 @@ requireLogin();
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
+// Fetch users data
+$users = DbHelper::getAllUsers();
+$totalUsers = count($users);
+$activeUsers = count(array_filter($users, fn($u) => $u['status'] === 'active'));
+$adminUsers = count(array_filter($users, fn($u) => $u['role'] === 'admin'));
+$inactiveUsers = count(array_filter($users, fn($u) => $u['status'] === 'inactive'));
+
 ?>
 
 <!DOCTYPE html>
@@ -88,7 +95,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Total</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">342</h3>
+          <h3 class="text-3xl font-bold mb-1"><?php echo $totalUsers; ?></h3>
           <p class="text-blue-100 text-sm">Total Users</p>
         </div>
 
@@ -102,7 +109,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Active</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">298</h3>
+          <h3 class="text-3xl font-bold mb-1"><?php echo $activeUsers; ?></h3>
           <p class="text-green-100 text-sm">Active Users</p>
         </div>
 
@@ -116,7 +123,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Admin</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">12</h3>
+          <h3 class="text-3xl font-bold mb-1"><?php echo $adminUsers; ?></h3>
           <p class="text-orange-100 text-sm">Administrators</p>
         </div>
 
@@ -130,7 +137,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Inactive</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">44</h3>
+          <h3 class="text-3xl font-bold mb-1"><?php echo $inactiveUsers; ?></h3>
           <p class="text-purple-100 text-sm">Inactive Users</p>
         </div>
       </div>
@@ -229,47 +236,59 @@ $name = $_SESSION['user']['name'];
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr class="table-row">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  001
-                </td>
-                <td
-                  class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  John Doe
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  jdoe
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  john.doe@nwsdb.lk
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  077-1234567
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    class="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">Admin</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Active</span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  2025-11-15 09:30
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button
-                    class="text-blue-600 hover:text-blue-900 mr-3"
-                    title="Edit">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button
-                    class="text-red-600 hover:text-red-900"
-                    title="Delete">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
+              <?php if (!empty($users)): ?>
+                <?php foreach ($users as $user): ?>
+                  <tr class="table-row">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <?php echo htmlspecialchars($user['user_id']); ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?php echo htmlspecialchars($user['username'] ?? 'N/A'); ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?php echo htmlspecialchars($user['email']); ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?php echo htmlspecialchars($user['mobile_number'] ?? 'N/A'); ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="px-2 py-1 text-xs font-medium <?php echo $user['role'] === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'; ?> rounded-full">
+                        <?php echo ucfirst($user['role']); ?>
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <?php if ($user['status'] === 'active'): ?>
+                        <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Active</span>
+                      <?php elseif ($user['status'] === 'inactive'): ?>
+                        <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">Inactive</span>
+                      <?php else: ?>
+                        <span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Suspended</span>
+                      <?php endif; ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?php echo $user['last_login'] ? date('Y-m-d H:i', strtotime($user['last_login'])) : 'Never'; ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button class="text-blue-600 hover:text-blue-900 mr-3" title="Edit">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="text-red-600 hover:text-red-900" title="Delete">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="9" class="px-6 py-8 text-center text-gray-500">
+                    <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                    <p class="text-lg font-medium">No users found</p>
+                  </td>
+                </tr>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>
@@ -279,8 +298,8 @@ $name = $_SESSION['user']['name'];
           <div class="flex items-center justify-between">
             <div class="text-sm text-gray-700">
               Showing <span class="font-medium">1</span> to
-              <span class="font-medium">10</span> of
-              <span class="font-medium">342</span> results
+              <span class="font-medium"><?php echo min($totalUsers, 10); ?></span> of
+              <span class="font-medium"><?php echo $totalUsers; ?></span> results
             </div>
             <div class="flex gap-2">
               <button

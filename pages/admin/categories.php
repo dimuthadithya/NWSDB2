@@ -7,6 +7,10 @@ requireLogin();
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
+// Fetch categories data
+$categories = DbHelper::getAllDeviceCategories();
+$totalCategories = count($categories);
+
 ?>
 
 <!DOCTYPE html>
@@ -97,7 +101,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Total</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">8</h3>
+          <h3 class="text-3xl font-bold mb-1"><?php echo $totalCategories; ?></h3>
           <p class="text-blue-100 text-sm">Total Categories</p>
         </div>
 
@@ -167,219 +171,66 @@ $name = $_SESSION['user']['name'];
       <!-- Category Cards Grid -->
       <div
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <!-- Computer Category -->
-        <div
-          class="category-card bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-          <div class="flex items-start justify-between mb-4">
-            <div
-              class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-              <i class="fas fa-desktop text-white text-2xl"></i>
+        <?php if (!empty($categories)): ?>
+          <?php
+          $icons = [
+            'Computer' => 'fa-desktop',
+            'Printer' => 'fa-print',
+            'Laptop' => 'fa-laptop',
+            'RVPN Connection' => 'fa-network-wired',
+            'Finger Device' => 'fa-fingerprint',
+            'Scanner' => 'fa-scanner',
+            'UPS' => 'fa-battery-full',
+            'Other' => 'fa-microchip'
+          ];
+          $colors = [
+            'Computer' => 'blue',
+            'Printer' => 'green',
+            'Laptop' => 'purple',
+            'RVPN Connection' => 'cyan',
+            'Finger Device' => 'orange',
+            'Scanner' => 'pink',
+            'UPS' => 'yellow',
+            'Other' => 'gray'
+          ];
+          ?>
+          <?php foreach ($categories as $category): ?>
+            <?php
+            $categoryName = $category['category_name'];
+            $icon = $icons[$categoryName] ?? 'fa-tag';
+            $color = $colors[$categoryName] ?? 'indigo';
+            ?>
+            <div class="category-card bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <div class="flex items-start justify-between mb-4">
+                <div class="w-14 h-14 bg-gradient-to-br from-<?php echo $color; ?>-500 to-<?php echo $color; ?>-600 rounded-xl flex items-center justify-center">
+                  <i class="fas <?php echo $icon; ?> text-white text-2xl"></i>
+                </div>
+                <div class="flex gap-2">
+                  <button class="text-blue-600 hover:text-blue-800" title="Edit">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="text-red-600 hover:text-red-800" title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+              <h3 class="text-lg font-bold text-gray-900 mb-2"><?php echo htmlspecialchars($categoryName); ?></h3>
+              <p class="text-sm text-gray-600 mb-4"><?php echo htmlspecialchars($category['description'] ?? 'No description'); ?></p>
+              <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                <span class="text-xs text-gray-500">Created</span>
+                <span class="text-sm font-semibold text-<?php echo $color; ?>-600">
+                  <?php echo date('M d, Y', strtotime($category['created_at'])); ?>
+                </span>
+              </div>
             </div>
-            <div class="flex gap-2">
-              <button class="text-blue-600 hover:text-blue-800" title="Edit">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="text-red-600 hover:text-red-800" title="Delete">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <div class="col-span-full text-center py-12">
+            <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+            <p class="text-lg font-medium text-gray-500">No categories found</p>
+            <p class="text-sm text-gray-400">Click "Add New Category" to create your first category</p>
           </div>
-          <h3 class="text-lg font-bold text-gray-900 mb-2">Computer</h3>
-          <p class="text-sm text-gray-600 mb-4">
-            Desktop and workstation computers
-          </p>
-          <div
-            class="flex items-center justify-between pt-4 border-t border-gray-100">
-            <span class="text-xs text-gray-500">Devices</span>
-            <span class="text-lg font-bold text-blue-600">1,245</span>
-          </div>
-        </div>
-
-        <!-- Printer Category -->
-        <div
-          class="category-card bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-          <div class="flex items-start justify-between mb-4">
-            <div
-              class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
-              <i class="fas fa-print text-white text-2xl"></i>
-            </div>
-            <div class="flex gap-2">
-              <button class="text-blue-600 hover:text-blue-800" title="Edit">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="text-red-600 hover:text-red-800" title="Delete">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </div>
-          <h3 class="text-lg font-bold text-gray-900 mb-2">Printer</h3>
-          <p class="text-sm text-gray-600 mb-4">Laser and inkjet printers</p>
-          <div
-            class="flex items-center justify-between pt-4 border-t border-gray-100">
-            <span class="text-xs text-gray-500">Devices</span>
-            <span class="text-lg font-bold text-green-600">487</span>
-          </div>
-        </div>
-
-        <!-- Laptop Category -->
-        <div
-          class="category-card bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-          <div class="flex items-start justify-between mb-4">
-            <div
-              class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
-              <i class="fas fa-laptop text-white text-2xl"></i>
-            </div>
-            <div class="flex gap-2">
-              <button class="text-blue-600 hover:text-blue-800" title="Edit">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="text-red-600 hover:text-red-800" title="Delete">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </div>
-          <h3 class="text-lg font-bold text-gray-900 mb-2">Laptop</h3>
-          <p class="text-sm text-gray-600 mb-4">Portable laptop computers</p>
-          <div
-            class="flex items-center justify-between pt-4 border-t border-gray-100">
-            <span class="text-xs text-gray-500">Devices</span>
-            <span class="text-lg font-bold text-purple-600">356</span>
-          </div>
-        </div>
-
-        <!-- RVPN Connection Category -->
-        <div
-          class="category-card bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-          <div class="flex items-start justify-between mb-4">
-            <div
-              class="w-14 h-14 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center">
-              <i class="fas fa-network-wired text-white text-2xl"></i>
-            </div>
-            <div class="flex gap-2">
-              <button class="text-blue-600 hover:text-blue-800" title="Edit">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="text-red-600 hover:text-red-800" title="Delete">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </div>
-          <h3 class="text-lg font-bold text-gray-900 mb-2">
-            RVPN Connection
-          </h3>
-          <p class="text-sm text-gray-600 mb-4">Remote VPN connections</p>
-          <div
-            class="flex items-center justify-between pt-4 border-t border-gray-100">
-            <span class="text-xs text-gray-500">Devices</span>
-            <span class="text-lg font-bold text-cyan-600">156</span>
-          </div>
-        </div>
-
-        <!-- Finger Device Category -->
-        <div
-          class="category-card bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-          <div class="flex items-start justify-between mb-4">
-            <div
-              class="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
-              <i class="fas fa-fingerprint text-white text-2xl"></i>
-            </div>
-            <div class="flex gap-2">
-              <button class="text-blue-600 hover:text-blue-800" title="Edit">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="text-red-600 hover:text-red-800" title="Delete">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </div>
-          <h3 class="text-lg font-bold text-gray-900 mb-2">Finger Device</h3>
-          <p class="text-sm text-gray-600 mb-4">Biometric finger scanners</p>
-          <div
-            class="flex items-center justify-between pt-4 border-t border-gray-100">
-            <span class="text-xs text-gray-500">Devices</span>
-            <span class="text-lg font-bold text-orange-600">67</span>
-          </div>
-        </div>
-
-        <!-- Scanner Category -->
-        <div
-          class="category-card bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-          <div class="flex items-start justify-between mb-4">
-            <div
-              class="w-14 h-14 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl flex items-center justify-center">
-              <i class="fas fa-scanner text-white text-2xl"></i>
-            </div>
-            <div class="flex gap-2">
-              <button class="text-blue-600 hover:text-blue-800" title="Edit">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="text-red-600 hover:text-red-800" title="Delete">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </div>
-          <h3 class="text-lg font-bold text-gray-900 mb-2">Scanner</h3>
-          <p class="text-sm text-gray-600 mb-4">Document scanners</p>
-          <div
-            class="flex items-center justify-between pt-4 border-t border-gray-100">
-            <span class="text-xs text-gray-500">Devices</span>
-            <span class="text-lg font-bold text-pink-600">89</span>
-          </div>
-        </div>
-
-        <!-- UPS Category -->
-        <div
-          class="category-card bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-          <div class="flex items-start justify-between mb-4">
-            <div
-              class="w-14 h-14 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center">
-              <i class="fas fa-battery-full text-white text-2xl"></i>
-            </div>
-            <div class="flex gap-2">
-              <button class="text-blue-600 hover:text-blue-800" title="Edit">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="text-red-600 hover:text-red-800" title="Delete">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </div>
-          <h3 class="text-lg font-bold text-gray-900 mb-2">UPS</h3>
-          <p class="text-sm text-gray-600 mb-4">
-            Uninterruptible power supply
-          </p>
-          <div
-            class="flex items-center justify-between pt-4 border-t border-gray-100">
-            <span class="text-xs text-gray-500">Devices</span>
-            <span class="text-lg font-bold text-yellow-600">123</span>
-          </div>
-        </div>
-
-        <!-- Other Category -->
-        <div
-          class="category-card bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-          <div class="flex items-start justify-between mb-4">
-            <div
-              class="w-14 h-14 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl flex items-center justify-center">
-              <i class="fas fa-microchip text-white text-2xl"></i>
-            </div>
-            <div class="flex gap-2">
-              <button class="text-blue-600 hover:text-blue-800" title="Edit">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="text-red-600 hover:text-red-800" title="Delete">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </div>
-          <h3 class="text-lg font-bold text-gray-900 mb-2">Other</h3>
-          <p class="text-sm text-gray-600 mb-4">Miscellaneous devices</p>
-          <div
-            class="flex items-center justify-between pt-4 border-t border-gray-100">
-            <span class="text-xs text-gray-500">Devices</span>
-            <span class="text-lg font-bold text-gray-600">24</span>
-          </div>
-        </div>
+        <?php endif; ?>
       </div>
     </div>
   </main>
