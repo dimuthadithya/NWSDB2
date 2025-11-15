@@ -7,6 +7,13 @@ requireLogin();
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
+// Fetch computers data
+$computers = DbHelper::getAllComputers();
+$totalComputers = $computers ? count($computers) : 0;
+$activeComputers = $computers ? count(array_filter($computers, fn($c) => $c['status'] === 'active')) : 0;
+$repairComputers = $computers ? count(array_filter($computers, fn($c) => $c['status'] === 'under_repair')) : 0;
+$retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['status'] === 'retired')) : 0;
+
 ?>
 
 <!DOCTYPE html>
@@ -93,7 +100,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Total</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">42</h3>
+          <h3 class="text-3xl font-bold mb-1"><?php echo $totalComputers; ?></h3>
           <p class="text-blue-100 text-sm">Total Computers</p>
         </div>
 
@@ -107,7 +114,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Active</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">38</h3>
+          <h3 class="text-3xl font-bold mb-1"><?php echo $activeComputers; ?></h3>
           <p class="text-green-100 text-sm">Active Devices</p>
         </div>
 
@@ -121,7 +128,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Repair</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">3</h3>
+          <h3 class="text-3xl font-bold mb-1"><?php echo $repairComputers; ?></h3>
           <p class="text-orange-100 text-sm">Under Repair</p>
         </div>
 
@@ -131,12 +138,12 @@ $name = $_SESSION['user']['name'];
           <div class="flex items-center justify-between mb-4">
             <div
               class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-              <i class="fas fa-exclamation-triangle text-2xl"></i>
+              <i class="fas fa-ban text-2xl"></i>
             </div>
-            <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Issues</span>
+            <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Retired</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">2</h3>
-          <p class="text-purple-100 text-sm">Open Issues</p>
+          <h3 class="text-3xl font-bold mb-1"><?php echo $retiredComputers; ?></h3>
+          <p class="text-purple-100 text-sm">Retired Devices</p>
         </div>
       </div>
 
@@ -320,385 +327,125 @@ $name = $_SESSION['user']['name'];
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <!-- Computer Row 1 -->
-              <tr class="table-row">
-                <td class="px-6 py-4">
-                  <div class="flex items-start">
-                    <div
-                      class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                      <i class="fas fa-desktop text-blue-600"></i>
+              <?php if (empty($computers)): ?>
+                <tr>
+                  <td colspan="6" class="px-6 py-12 text-center">
+                    <div class="flex flex-col items-center justify-center text-gray-500">
+                      <i class="fas fa-desktop text-5xl mb-3 text-gray-300"></i>
+                      <p class="text-lg font-medium">No computers found</p>
+                      <p class="text-sm">Click "Add New Computer" to add your first device</p>
                     </div>
-                    <div>
-                      <div class="text-sm font-semibold text-gray-900">
-                        Desktop PC #001
+                  </td>
+                </tr>
+              <?php else: ?>
+                <?php foreach ($computers as $computer): ?>
+                  <tr class="table-row">
+                    <td class="px-6 py-4">
+                      <div class="flex items-start">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                          <i class="fas fa-desktop text-blue-600"></i>
+                        </div>
+                        <div>
+                          <div class="text-sm font-semibold text-gray-900">
+                            <?= htmlspecialchars($computer['device_name'] ?? 'N/A') ?>
+                          </div>
+                          <div class="text-xs text-gray-500">
+                            <?= htmlspecialchars($computer['model'] ?? 'N/A') ?>
+                          </div>
+                          <div class="text-xs text-gray-500 mt-1">
+                            ID: <?= htmlspecialchars($computer['device_id'] ?? 'N/A') ?>
+                          </div>
+                          <div class="text-xs text-gray-400">
+                            Created: <?= date('M d, Y', strtotime($computer['created_at'])) ?>
+                          </div>
+                        </div>
                       </div>
-                      <div class="text-xs text-gray-500">
-                        Dell OptiPlex 7090
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="text-sm space-y-1">
+                        <div class="flex items-center">
+                          <i class="fas fa-microchip text-gray-400 text-xs mr-2 w-4"></i>
+                          <span class="text-gray-700"><?= htmlspecialchars($computer['processor'] ?? 'N/A') ?></span>
+                        </div>
+                        <div class="flex items-center">
+                          <i class="fas fa-memory text-gray-400 text-xs mr-2 w-4"></i>
+                          <span class="text-gray-700"><?= htmlspecialchars($computer['ram'] ?? 'N/A') ?></span>
+                        </div>
+                        <div class="flex items-center">
+                          <i class="fas fa-hdd text-gray-400 text-xs mr-2 w-4"></i>
+                          <span class="text-gray-700"><?= htmlspecialchars($computer['storage'] ?? 'N/A') ?></span>
+                        </div>
                       </div>
-                      <div class="text-xs text-gray-500 mt-1">
-                        ID: DT-2024-001
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="text-sm space-y-1">
+                        <div class="text-gray-700"><?= htmlspecialchars($computer['operating_system'] ?? 'N/A') ?></div>
+                        <div class="text-gray-600 text-xs">Monitor: <?= htmlspecialchars($computer['monitor_type'] ?? 'N/A') ?></div>
+                        <div class="text-gray-600 text-xs">KB: <?= htmlspecialchars($computer['keyboard'] ?? 'N/A') ?></div>
+                        <div class="text-gray-600 text-xs">Mouse: <?= htmlspecialchars($computer['mouse'] ?? 'N/A') ?></div>
                       </div>
-                      <div class="text-xs text-gray-400">
-                        Purchased: Jan 15, 2024
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="text-sm space-y-1">
+                        <div class="flex items-center">
+                          <i class="fas fa-network-wired text-gray-400 text-xs mr-2"></i>
+                          <span class="text-gray-700"><?= htmlspecialchars($computer['ip_address'] ?? 'N/A') ?></span>
+                        </div>
+                        <div class="text-gray-600 text-xs"><?= htmlspecialchars($computer['network_type'] ?? 'N/A') ?></div>
+                        <div class="text-gray-600 text-xs"><?= htmlspecialchars($computer['antivirus'] ?? 'N/A') ?></div>
                       </div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm space-y-1">
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-microchip text-gray-400 text-xs mr-2 w-4"></i>
-                      <span class="text-gray-700">Intel i7-12700</span>
-                    </div>
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-memory text-gray-400 text-xs mr-2 w-4"></i>
-                      <span class="text-gray-700">16GB DDR4</span>
-                    </div>
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-hdd text-gray-400 text-xs mr-2 w-4"></i>
-                      <span class="text-gray-700">512GB SSD</span>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm space-y-1">
-                    <div class="text-gray-700">Windows 11 Pro</div>
-                    <div class="text-gray-600 text-xs">Monitor: 24" LED</div>
-                    <div class="text-gray-600 text-xs">KB: Dell KB216</div>
-                    <div class="text-gray-600 text-xs">Mouse: Dell MS116</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm space-y-1">
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-network-wired text-gray-400 text-xs mr-2"></i>
-                      <span class="text-gray-700">192.168.1.101</span>
-                    </div>
-                    <div class="text-gray-600 text-xs">Ethernet</div>
-                    <div class="text-gray-600 text-xs">Windows Defender</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm mb-2">
-                    <div class="font-medium text-gray-900">IT Department</div>
-                    <div class="text-gray-600 text-xs">John Smith</div>
-                  </div>
-                  <span
-                    class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                    <i class="fas fa-circle text-xs mr-1"></i>Active
-                  </span>
-                </td>
-                <td class="px-6 py-4 text-right">
-                  <div class="flex items-center justify-end space-x-2">
-                    <button
-                      class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      title="View Details">
-                      <i class="fas fa-eye"></i>
-                    </button>
-                    <button
-                      class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                      title="Edit">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button
-                      class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Delete">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-
-              <!-- Computer Row 2 -->
-              <tr class="table-row">
-                <td class="px-6 py-4">
-                  <div class="flex items-start">
-                    <div
-                      class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                      <i class="fas fa-desktop text-blue-600"></i>
-                    </div>
-                    <div>
-                      <div class="text-sm font-semibold text-gray-900">
-                        Workstation #002
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="text-sm mb-2">
+                        <div class="font-medium text-gray-900"><?= htmlspecialchars($computer['section_id'] ?? 'Unassigned') ?></div>
+                        <div class="text-gray-600 text-xs"><?= htmlspecialchars($computer['assigned_to'] ?? 'Not assigned') ?></div>
                       </div>
-                      <div class="text-xs text-gray-500">
-                        HP EliteDesk 800 G8
+                      <?php
+                      $statusClass = '';
+                      $statusText = ucfirst(str_replace('_', ' ', $computer['status'] ?? 'unknown'));
+                      switch ($computer['status']) {
+                        case 'active':
+                          $statusClass = 'bg-green-100 text-green-800';
+                          break;
+                        case 'under_repair':
+                          $statusClass = 'bg-yellow-100 text-yellow-800';
+                          break;
+                        case 'retired':
+                          $statusClass = 'bg-gray-100 text-gray-800';
+                          break;
+                        case 'lost':
+                          $statusClass = 'bg-red-100 text-red-800';
+                          break;
+                        default:
+                          $statusClass = 'bg-gray-100 text-gray-800';
+                      }
+                      ?>
+                      <span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full <?= $statusClass ?>">
+                        <i class="fas fa-circle text-xs mr-1"></i><?= $statusText ?>
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                      <div class="flex items-center justify-end space-x-2">
+                        <button
+                          class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="View Details">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button
+                          class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                          title="Edit">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button
+                          class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Delete">
+                          <i class="fas fa-trash"></i>
+                        </button>
                       </div>
-                      <div class="text-xs text-gray-500 mt-1">
-                        ID: DT-2024-002
-                      </div>
-                      <div class="text-xs text-gray-400">
-                        Purchased: Feb 20, 2024
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm space-y-1">
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-microchip text-gray-400 text-xs mr-2 w-4"></i>
-                      <span class="text-gray-700">Intel i5-11500</span>
-                    </div>
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-memory text-gray-400 text-xs mr-2 w-4"></i>
-                      <span class="text-gray-700">8GB DDR4</span>
-                    </div>
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-hdd text-gray-400 text-xs mr-2 w-4"></i>
-                      <span class="text-gray-700">256GB SSD</span>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm space-y-1">
-                    <div class="text-gray-700">Windows 10 Pro</div>
-                    <div class="text-gray-600 text-xs">Monitor: 22" LED</div>
-                    <div class="text-gray-600 text-xs">KB: HP Standard</div>
-                    <div class="text-gray-600 text-xs">
-                      Mouse: HP Wireless
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm space-y-1">
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-network-wired text-gray-400 text-xs mr-2"></i>
-                      <span class="text-gray-700">192.168.1.102</span>
-                    </div>
-                    <div class="text-gray-600 text-xs">WiFi + Ethernet</div>
-                    <div class="text-gray-600 text-xs">Norton Antivirus</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm mb-2">
-                    <div class="font-medium text-gray-900">HR Department</div>
-                    <div class="text-gray-600 text-xs">Jane Doe</div>
-                  </div>
-                  <span
-                    class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                    <i class="fas fa-circle text-xs mr-1"></i>Active
-                  </span>
-                </td>
-                <td class="px-6 py-4 text-right">
-                  <div class="flex items-center justify-end space-x-2">
-                    <button
-                      class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      title="View Details">
-                      <i class="fas fa-eye"></i>
-                    </button>
-                    <button
-                      class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                      title="Edit">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button
-                      class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Delete">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-
-              <!-- Computer Row 3 -->
-              <tr class="table-row">
-                <td class="px-6 py-4">
-                  <div class="flex items-start">
-                    <div
-                      class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                      <i class="fas fa-desktop text-orange-600"></i>
-                    </div>
-                    <div>
-                      <div class="text-sm font-semibold text-gray-900">
-                        Desktop PC #003
-                      </div>
-                      <div class="text-xs text-gray-500">
-                        Lenovo ThinkCentre M90
-                      </div>
-                      <div class="text-xs text-gray-500 mt-1">
-                        ID: DT-2023-015
-                      </div>
-                      <div class="text-xs text-gray-400">
-                        Purchased: Nov 10, 2023
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm space-y-1">
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-microchip text-gray-400 text-xs mr-2 w-4"></i>
-                      <span class="text-gray-700">AMD Ryzen 5 5600</span>
-                    </div>
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-memory text-gray-400 text-xs mr-2 w-4"></i>
-                      <span class="text-gray-700">16GB DDR4</span>
-                    </div>
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-hdd text-gray-400 text-xs mr-2 w-4"></i>
-                      <span class="text-gray-700">1TB HDD</span>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm space-y-1">
-                    <div class="text-gray-700">Windows 11 Pro</div>
-                    <div class="text-gray-600 text-xs">Monitor: 27" LED</div>
-                    <div class="text-gray-600 text-xs">KB: Logitech K120</div>
-                    <div class="text-gray-600 text-xs">
-                      Mouse: Logitech B100
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm space-y-1">
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-network-wired text-gray-400 text-xs mr-2"></i>
-                      <span class="text-gray-700">192.168.1.105</span>
-                    </div>
-                    <div class="text-gray-600 text-xs">Ethernet</div>
-                    <div class="text-gray-600 text-xs">McAfee Security</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm mb-2">
-                    <div class="font-medium text-gray-900">Finance</div>
-                    <div class="text-gray-600 text-xs">Michael Johnson</div>
-                  </div>
-                  <span
-                    class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-orange-100 text-orange-800">
-                    <i class="fas fa-wrench text-xs mr-1"></i>Under Repair
-                  </span>
-                </td>
-                <td class="px-6 py-4 text-right">
-                  <div class="flex items-center justify-end space-x-2">
-                    <button
-                      class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      title="View Details">
-                      <i class="fas fa-eye"></i>
-                    </button>
-                    <button
-                      class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                      title="Edit">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button
-                      class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Delete">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-
-              <!-- Computer Row 4 -->
-              <tr class="table-row">
-                <td class="px-6 py-4">
-                  <div class="flex items-start">
-                    <div
-                      class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                      <i class="fas fa-desktop text-blue-600"></i>
-                    </div>
-                    <div>
-                      <div class="text-sm font-semibold text-gray-900">
-                        Desktop PC #004
-                      </div>
-                      <div class="text-xs text-gray-500">
-                        Acer Veriton M480G
-                      </div>
-                      <div class="text-xs text-gray-500 mt-1">
-                        ID: DT-2024-004
-                      </div>
-                      <div class="text-xs text-gray-400">
-                        Purchased: Mar 5, 2024
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm space-y-1">
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-microchip text-gray-400 text-xs mr-2 w-4"></i>
-                      <span class="text-gray-700">Intel i3-10100</span>
-                    </div>
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-memory text-gray-400 text-xs mr-2 w-4"></i>
-                      <span class="text-gray-700">8GB DDR4</span>
-                    </div>
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-hdd text-gray-400 text-xs mr-2 w-4"></i>
-                      <span class="text-gray-700">500GB HDD</span>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm space-y-1">
-                    <div class="text-gray-700">Windows 10 Pro</div>
-                    <div class="text-gray-600 text-xs">
-                      Monitor: 21.5" LED
-                    </div>
-                    <div class="text-gray-600 text-xs">KB: Generic USB</div>
-                    <div class="text-gray-600 text-xs">
-                      Mouse: Generic USB
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm space-y-1">
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-network-wired text-gray-400 text-xs mr-2"></i>
-                      <span class="text-gray-700">192.168.1.108</span>
-                    </div>
-                    <div class="text-gray-600 text-xs">WiFi</div>
-                    <div class="text-gray-600 text-xs">Windows Defender</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm mb-2">
-                    <div class="font-medium text-gray-900">Operations</div>
-                    <div class="text-gray-600 text-xs">Sarah Wilson</div>
-                  </div>
-                  <span
-                    class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                    <i class="fas fa-circle text-xs mr-1"></i>Active
-                  </span>
-                </td>
-                <td class="px-6 py-4 text-right">
-                  <div class="flex items-center justify-end space-x-2">
-                    <button
-                      class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      title="View Details">
-                      <i class="fas fa-eye"></i>
-                    </button>
-                    <button
-                      class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                      title="Edit">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button
-                      class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Delete">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>

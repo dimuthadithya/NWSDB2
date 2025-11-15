@@ -130,7 +130,7 @@ class DbHelper
     {
         self::init();
 
-        $computerId = self::$db->getId('device_categories', 'category_name', 'Computer', 'category_id');
+        $computerId = self::$db->getId('device_categories', 'category_name', 'Desktop Computer', 'category_id');
 
         $computers = self::$db->select('devices', ['*'], ['category_id' => $computerId]);
 

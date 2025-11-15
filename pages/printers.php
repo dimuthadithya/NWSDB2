@@ -7,6 +7,12 @@ requireLogin();
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
+// Fetch printers data
+$printers = DbHelper::getAllPrinters();
+$totalPrinters = $printers ? count($printers) : 0;
+$activePrinters = $printers ? count(array_filter($printers, fn($p) => $p['status'] === 'active')) : 0;
+$repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status'] === 'under_repair')) : 0;
+
 ?>
 
 <!DOCTYPE html>
@@ -64,21 +70,21 @@ $name = $_SESSION['user']['name'];
         <div
           class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg animate-fade-up">
           <i class="fas fa-print text-2xl"></i>
-          <h3 class="text-3xl font-bold mt-4 mb-1">25</h3>
+          <h3 class="text-3xl font-bold mt-4 mb-1"><?php echo $totalPrinters; ?></h3>
           <p class="text-blue-100 text-sm">Total Printers</p>
         </div>
         <div
           class="stat-card bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-lg animate-fade-up"
           style="animation-delay: 0.1s">
           <i class="fas fa-check-circle text-2xl"></i>
-          <h3 class="text-3xl font-bold mt-4 mb-1">22</h3>
+          <h3 class="text-3xl font-bold mt-4 mb-1"><?php echo $activePrinters; ?></h3>
           <p class="text-green-100 text-sm">Active Devices</p>
         </div>
         <div
           class="stat-card bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 text-white shadow-lg animate-fade-up"
           style="animation-delay: 0.2s">
           <i class="fas fa-wrench text-2xl"></i>
-          <h3 class="text-3xl font-bold mt-4 mb-1">2</h3>
+          <h3 class="text-3xl font-bold mt-4 mb-1"><?php echo $repairPrinters; ?></h3>
           <p class="text-orange-100 text-sm">Under Repair</p>
         </div>
         <div
@@ -241,75 +247,102 @@ $name = $_SESSION['user']['name'];
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <!-- Printer Row 1 -->
-              <tr class="table-row">
-                <td class="px-6 py-4">
-                  <div class="flex items-start">
-                    <div
-                      class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
-                      <i class="fas fa-print text-blue-600"></i>
+              <?php if (empty($printers)): ?>
+                <tr>
+                  <td colspan="5" class="px-6 py-12 text-center">
+                    <div class="flex flex-col items-center justify-center text-gray-500">
+                      <i class="fas fa-print text-5xl mb-3 text-gray-300"></i>
+                      <p class="text-lg font-medium">No printers found</p>
+                      <p class="text-sm">Click "Add New Printer" to add your first device</p>
                     </div>
-                    <div>
-                      <div class="text-sm font-semibold text-gray-900">
-                        HP LaserJet Pro M404dn
+                  </td>
+                </tr>
+              <?php else: ?>
+                <?php foreach ($printers as $printer): ?>
+                  <tr class="table-row">
+                    <td class="px-6 py-4">
+                      <div class="flex items-start">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
+                          <i class="fas fa-print text-blue-600"></i>
+                        </div>
+                        <div>
+                          <div class="text-sm font-semibold text-gray-900">
+                            <?= htmlspecialchars($printer['device_name'] ?? 'N/A') ?>
+                          </div>
+                          <div class="text-xs text-gray-500"><?= htmlspecialchars($printer['model'] ?? 'N/A') ?></div>
+                          <div class="text-xs text-gray-500 mt-1">
+                            ID: <?= htmlspecialchars($printer['device_id'] ?? 'N/A') ?>
+                          </div>
+                          <div class="text-xs text-gray-400">
+                            Created: <?= date('M d, Y', strtotime($printer['created_at'])) ?>
+                          </div>
+                        </div>
                       </div>
-                      <div class="text-xs text-gray-500">ID: PR-2024-001</div>
-                      <div class="text-xs text-gray-400 mt-1">
-                        Purchased: Mar 10, 2024
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="text-sm space-y-1">
+                        <div class="flex items-center">
+                          <i class="fas fa-tag text-gray-400 text-xs mr-2 w-4"></i>
+                          <span class="text-gray-700">Type: <?= htmlspecialchars($printer['printer_type'] ?? 'N/A') ?></span>
+                        </div>
+                        <div class="flex items-center">
+                          <i class="fas fa-palette text-gray-400 text-xs mr-2 w-4"></i>
+                          <span class="text-gray-700">Color: <?= htmlspecialchars($printer['color_capability'] ?? 'N/A') ?></span>
+                        </div>
+                        <div class="flex items-center">
+                          <i class="fas fa-file-alt text-gray-400 text-xs mr-2 w-4"></i>
+                          <span class="text-gray-700">Paper: <?= htmlspecialchars($printer['paper_size'] ?? 'N/A') ?></span>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm space-y-1">
-                    <div class="flex items-center">
-                      <i class="fas fa-tag text-gray-400 text-xs mr-2 w-4"></i><span class="text-gray-700">Type: Laser</span>
-                    </div>
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-palette text-gray-400 text-xs mr-2 w-4"></i><span class="text-gray-700">Color: Monochrome</span>
-                    </div>
-                    <div class="flex items-center">
-                      <i
-                        class="fas fa-file-alt text-gray-400 text-xs mr-2 w-4"></i><span class="text-gray-700">Paper: A4, Letter</span>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="flex items-center">
-                    <span
-                      class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
-                  </div>
-                  <div class="text-sm text-gray-600 mt-1">Toner: 85%</div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm mb-2">
-                    <div class="font-medium text-gray-900">IT Department</div>
-                    <div class="text-gray-600 text-xs">John Smith</div>
-                  </div>
-                  <span
-                    class="px-3 py-1 inline-flex text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                    <i class="fas fa-circle text-xs mr-1"></i>Active
-                  </span>
-                </td>
-                <td class="px-6 py-4 text-right">
-                  <div class="flex items-center justify-end space-x-2">
-                    <button
-                      class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
-                      <i class="fas fa-eye"></i>
-                    </button>
-                    <button
-                      class="p-2 text-green-600 hover:bg-green-50 rounded-lg">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button
-                      class="p-2 text-red-600 hover:bg-red-50 rounded-lg">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <!-- Add more printer rows as needed -->
+                    </td>
+                    <td class="px-6 py-4">
+                      <?php
+                      $statusClass = '';
+                      $statusText = ucfirst(str_replace('_', ' ', $printer['status'] ?? 'unknown'));
+                      switch ($printer['status']) {
+                        case 'active':
+                          $statusClass = 'bg-green-100 text-green-800';
+                          break;
+                        case 'under_repair':
+                          $statusClass = 'bg-yellow-100 text-yellow-800';
+                          break;
+                        case 'retired':
+                          $statusClass = 'bg-gray-100 text-gray-800';
+                          break;
+                        default:
+                          $statusClass = 'bg-gray-100 text-gray-800';
+                      }
+                      ?>
+                      <div class="flex items-center">
+                        <span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full <?= $statusClass ?>"><?= $statusText ?></span>
+                      </div>
+                      <div class="text-sm text-gray-600 mt-1">Speed: <?= htmlspecialchars($printer['print_speed'] ?? 'N/A') ?></div>
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="text-sm mb-2">
+                        <div class="font-medium text-gray-900"><?= htmlspecialchars($printer['section_id'] ?? 'Unassigned') ?></div>
+                        <div class="text-gray-600 text-xs"><?= htmlspecialchars($printer['assigned_to'] ?? 'Not assigned') ?></div>
+                      </div>
+                      <span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full <?= $statusClass ?>">
+                        <i class="fas fa-circle text-xs mr-1"></i><?= $statusText ?>
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                      <div class="flex items-center justify-end space-x-2">
+                        <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="View Details">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Edit">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Delete">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>
