@@ -102,7 +102,7 @@
                 echo '
         <div class="mt-8 pt-8 border-t border-gray-100">
             <p class="text-xs font-semibold text-gray-400 uppercase px-4 mb-3">
-                WSS
+                Water Supply Management
             </p>
             <div class="space-y-1">
                 <a href="' . ($pathUpdate ? './admin/regions.php' : './regions.php') . '" 
@@ -121,7 +121,7 @@
                 class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl ' . isActive('water-schemes.php') . '"
                 >
                 <i class="fas fa-tint w-5"></i>
-                <span class="' . isFontWeight('water-schemes.php') . '">Water Supply Schemes</span>
+                <span class="' . isFontWeight('water-schemes.php') . '">WSS</span>
                 </a>
           </div>
         </div>
