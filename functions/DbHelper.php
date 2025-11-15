@@ -147,6 +147,16 @@ class DbHelper
 
         return $laptops ? $laptops : 0;
     }
+    public static function getAllOtherDevices()
+    {
+        self::init();
+
+        $otherDeviceId = self::$db->getId('device_categories', 'category_name', 'Other', 'category_id');
+
+        $otherDevices = self::$db->select('devices', ['*'], ['category_id' => $otherDeviceId]);
+
+        return $otherDevices ? $otherDevices : 0;
+    }
 
     public static function getAllPrinters()
     {

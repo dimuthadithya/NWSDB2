@@ -9,11 +9,16 @@ $name = $_SESSION['user']['name'];
 
 // get device count 
 $totalDevices = DbHelper::getRowCount('devices');
+$totalUsers = DbHelper::getRowCount('users');
+
+$adminUsers = DbHelper::getRowCountWithCondition('users', ['role' => 'admin']);
+$activeUsers = DbHelper::getRowCountWithCondition('users', ['status' => 'active']);
 $activeDevices = DbHelper::getRowCountWithCondition('devices', ['status' => 'active']);
 $repairDevices = DbHelper::getRowCountWithCondition('devices', ['status' => 'under_repair']);
 $laptopsCount = DbHelper::getAllLaptops();
 $printersCount = DbHelper::getAllPrinters();
 $computersCount = DbHelper::getAllComputers();
+$otherDevicesCount = DbHelper::getAllOtherDevices();
 
 
 
@@ -253,7 +258,9 @@ $computersCount = DbHelper::getAllComputers();
             </div>
             <div>
               <p class="text-gray-500 text-sm">Other Devices</p>
-              <h3 class="text-2xl font-bold text-gray-800">5</h3>
+              <h3 class="text-2xl font-bold text-gray-800">
+                <?php echo $otherDevicesCount; ?>
+              </h3>
             </div>
           </div>
         </div>
@@ -471,17 +478,23 @@ $computersCount = DbHelper::getAllComputers();
           <div class="grid grid-cols-2 gap-4">
             <div class="p-4 bg-blue-50 rounded-xl text-center">
               <i class="fas fa-users text-blue-600 text-2xl mb-2"></i>
-              <h4 class="text-2xl font-bold text-gray-800">45</h4>
+              <h4 class="text-2xl font-bold text-gray-800">
+                <?php echo $totalUsers; ?>
+              </h4>
               <p class="text-sm text-gray-600">Total Users</p>
             </div>
             <div class="p-4 bg-green-50 rounded-xl text-center">
               <i class="fas fa-user-check text-green-600 text-2xl mb-2"></i>
-              <h4 class="text-2xl font-bold text-gray-800">42</h4>
+              <h4 class="text-2xl font-bold text-gray-800">
+                <?php echo $activeUsers; ?>
+              </h4>
               <p class="text-sm text-gray-600">Active Users</p>
             </div>
             <div class="p-4 bg-purple-50 rounded-xl text-center">
               <i class="fas fa-user-shield text-purple-600 text-2xl mb-2"></i>
-              <h4 class="text-2xl font-bold text-gray-800">3</h4>
+              <h4 class="text-2xl font-bold text-gray-800">
+                <?php echo $adminUsers; ?>
+              </h4>
               <p class="text-sm text-gray-600">Admins</p>
             </div>
             <div class="p-4 bg-orange-50 rounded-xl text-center">
@@ -518,12 +531,23 @@ $computersCount = DbHelper::getAllComputers();
 
     // Device Distribution Chart
     const ctx = document.getElementById('deviceChart').getContext('2d');
+    const deviceData = {
+      desktops: <?php echo $computersCount; ?>,
+      laptops: <?php echo $laptopsCount; ?>,
+      printers: <?php echo $printersCount; ?>,
+      others: <?php echo $otherDevicesCount; ?>,
+    };
     new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: ['Desktop Computers', 'Laptops', 'Printers', 'Other Devices'],
         datasets: [{
-          data: [42, 28, 15, 5],
+          data: [
+            deviceData.desktops,
+            deviceData.laptops,
+            deviceData.printers,
+            deviceData.others
+          ],
           backgroundColor: [
             'rgba(59, 130, 246, 0.8)',
             'rgba(99, 102, 241, 0.8)',
