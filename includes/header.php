@@ -1,10 +1,87 @@
+   <?php
+   // Get current page name
+   $current_page = basename($_SERVER['PHP_SELF']);
+   
+   // Define page titles and descriptions
+   $page_info = [
+       'dashboard.php' => [
+           'title' => 'Dashboard',
+           'description' => 'Welcome back, ' . $name . '! Here\'s your device overview.'
+       ],
+       'computers.php' => [
+           'title' => 'Computers',
+           'description' => 'Manage and track all computer devices in the system.'
+       ],
+       'printers.php' => [
+           'title' => 'Printers',
+           'description' => 'View and manage printer inventory and status.'
+       ],
+       'rvpn-connections.php' => [
+           'title' => 'RVPN Connections',
+           'description' => 'Monitor and manage remote VPN connections.'
+       ],
+       'finger-device.php' => [
+           'title' => 'Finger Devices',
+           'description' => 'Track biometric and attendance devices.'
+       ],
+       'other-devices.php' => [
+           'title' => 'Other Devices',
+           'description' => 'Manage miscellaneous hardware and peripherals.'
+       ],
+       'repairs.php' => [
+           'title' => 'Repairs',
+           'description' => 'Track device repairs and maintenance history.'
+       ],
+       'summary.php' => [
+           'title' => 'Summary',
+           'description' => 'View comprehensive reports and statistics.'
+       ],
+       'regions.php' => [
+           'title' => 'Regions',
+           'description' => 'Manage regional divisions and coverage areas.'
+       ],
+       'areas.php' => [
+           'title' => 'Areas',
+           'description' => 'Manage service areas under regional divisions.'
+       ],
+       'water-schemes.php' => [
+           'title' => 'Water Supply Schemes',
+           'description' => 'Manage water supply projects and infrastructure.'
+       ],
+       'site_offices.php' => [
+           'title' => 'Site Offices',
+           'description' => 'Manage office locations and branch information.'
+       ],
+       'sections.php' => [
+           'title' => 'Sections',
+           'description' => 'Manage departments and organizational sections.'
+       ],
+       'users.php' => [
+           'title' => 'Users',
+           'description' => 'Manage system users and access permissions.'
+       ],
+       'categories.php' => [
+           'title' => 'Categories',
+           'description' => 'Manage device categories and classifications.'
+       ],
+       'reports.php' => [
+           'title' => 'Reports',
+           'description' => 'Generate and view detailed system reports.'
+       ]
+   ];
+   
+   // Get current page info or use default
+   $page_title = isset($page_info[$current_page]) ? $page_info[$current_page]['title'] : 'Dashboard';
+   $page_description = isset($page_info[$current_page]) ? $page_info[$current_page]['description'] : 'Welcome to NWSDB Hardware Management System.';
+   ?>
+   
    <header
        class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-30 border-b border-gray-100">
        <div class="px-6 py-4 flex items-center justify-between">
            <div class="animate-fade-up">
-               <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
+               <h1 class="text-2xl font-bold text-gray-800"><?php echo $page_title; ?></h1>
                <p class="text-sm text-gray-500 mt-1">
-                   Welcome back, <?php echo $name; ?>! Here's your device overview.
+                   <?php echo $page_description; ?>
                </p>
            </div>
            <div class="flex items-center space-x-4">

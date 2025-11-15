@@ -102,7 +102,7 @@
                 echo '
         <div class="mt-8 pt-8 border-t border-gray-100">
             <p class="text-xs font-semibold text-gray-400 uppercase px-4 mb-3">
-                Water Supply Management
+                WSS
             </p>
             <div class="space-y-1">
                 <a href="' . ($pathUpdate ? './admin/regions.php' : './regions.php') . '" 
