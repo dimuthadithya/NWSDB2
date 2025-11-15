@@ -134,7 +134,7 @@ class DbHelper
 
         $computers = self::$db->select('devices', ['*'], ['category_id' => $computerId]);
 
-        return $computers ? $computers : 0;
+        return $computers ? $computers : false;
     }
 
     public static function getAllLaptops()
@@ -145,7 +145,7 @@ class DbHelper
 
         $laptops = self::$db->select('devices', ['*'], ['category_id' => $laptopId]);
 
-        return $laptops ? $laptops : 0;
+        return $laptops ? $laptops : false;
     }
     public static function getAllOtherDevices()
     {
@@ -155,7 +155,7 @@ class DbHelper
 
         $otherDevices = self::$db->select('devices', ['*'], ['category_id' => $otherDeviceId]);
 
-        return $otherDevices ? $otherDevices : 0;
+        return $otherDevices ? $otherDevices : false;
     }
 
     public static function getAllPrinters()
@@ -166,7 +166,7 @@ class DbHelper
 
         $printers = self::$db->select('devices', ['*'], ['category_id' => $printerId]);
 
-        return $printers ? $printers : 0;
+        return $printers ? $printers : false;
     }
 
     public static function createBranch($branch_name, $branch_location)

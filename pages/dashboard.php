@@ -7,7 +7,14 @@ requireLogin();
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
-// get device count 
+// get category id s 
+$laptopCatId = DbHelper::getCategoryId('laptop');
+$desktopCatId = DbHelper::getCategoryId('Desktop Computer');
+$printerId = DbHelper::getCategoryId('printer');
+$otherId = DbHelper::getCategoryId('other');
+
+
+// get counts
 $totalDevices = DbHelper::getRowCount('devices');
 $totalUsers = DbHelper::getRowCount('users');
 
@@ -15,10 +22,10 @@ $adminUsers = DbHelper::getRowCountWithCondition('users', ['role' => 'admin']);
 $activeUsers = DbHelper::getRowCountWithCondition('users', ['status' => 'active']);
 $activeDevices = DbHelper::getRowCountWithCondition('devices', ['status' => 'active']);
 $repairDevices = DbHelper::getRowCountWithCondition('devices', ['status' => 'under_repair']);
-$laptopsCount = DbHelper::getAllLaptops();
-$printersCount = DbHelper::getAllPrinters();
-$computersCount = DbHelper::getAllComputers();
-$otherDevicesCount = DbHelper::getAllOtherDevices();
+$laptopsCount = DbHelper::getRowCountWithCondition('devices', ['category_id' => $laptopCatId]);
+$printersCount = DbHelper::getRowCountWithCondition('devices', ['category_id' => $printerId]);
+$computersCount = DbHelper::getRowCountWithCondition('devices', ['category_id' => $desktopCatId]);
+$otherDevicesCount = $totalDevices - ($laptopsCount + $printersCount + $computersCount);
 
 
 
@@ -358,7 +365,7 @@ $otherDevicesCount = DbHelper::getAllOtherDevices();
         class="bg-white rounded-2xl p-6 shadow-sm animate-fade-up"
         style="animation-delay: 1.1s">
         <h3 class="text-lg font-semibold text-gray-800 mb-6">
-          Device Distribution by Branch
+          Device Distribution by Sections
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div
