@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/../middleware/auth.php';
 requireLogin();
+
+$role = $_SESSION['user']['role'];
+$name = $_SESSION['user']['name'];
 ?>
 
 <!DOCTYPE html>
@@ -9,7 +12,7 @@ requireLogin();
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NWSDB Admin Dashboard</title>
+  <title>NWSDB Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link
     rel="stylesheet"
@@ -242,9 +245,9 @@ requireLogin();
       class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-30 border-b border-gray-100">
       <div class="px-6 py-4 flex items-center justify-between">
         <div class="animate-fade-up">
-          <h1 class="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
+          <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
           <p class="text-sm text-gray-500 mt-1">
-            Welcome back, Admin! Here's your device overview.
+            Welcome back, <?php echo $name; ?>! Here's your device overview.
           </p>
         </div>
         <div class="flex items-center space-x-4">
@@ -257,8 +260,8 @@ requireLogin();
           <div
             class="flex items-center space-x-3 pl-4 border-l border-gray-200">
             <div class="text-right">
-              <p class="text-sm font-medium text-gray-800">Admin User</p>
-              <p class="text-xs text-gray-500">Administrator</p>
+              <p class="text-sm font-medium text-gray-800"><?php echo $name; ?> </p>
+              <p class="text-xs text-gray-500"><?php echo $role;  ?></p>
             </div>
             <div
               class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
