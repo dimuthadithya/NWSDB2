@@ -78,7 +78,7 @@ CREATE TABLE sections (
 
 -- ===============================================================
 -- 6. Devices Table
--- Stores details of each device in the system
+-- Stores details of each device in the system including computers, printers, RVPN connections, and finger devices
 -- ===============================================================
 CREATE TABLE devices (
   device_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -87,6 +87,8 @@ CREATE TABLE devices (
   category_id INT UNSIGNED NOT NULL,        -- Device category reference
   section_id INT UNSIGNED NULL,             -- Optional section assignment
   assigned_to INT UNSIGNED NULL,            -- User assigned to this device
+  
+  -- Common fields for all devices
   operating_system VARCHAR(100) NULL,
   processor VARCHAR(100) NULL,
   ram VARCHAR(50) NULL,
@@ -103,6 +105,34 @@ CREATE TABLE devices (
   purchase_date DATE NULL,
   status ENUM('active','under_repair','retired','lost') DEFAULT 'active',
   notes TEXT NULL,
+  
+  -- RVPN Connection specific fields
+  employee_number VARCHAR(50) NULL,         -- Employee number for RVPN user
+  designation VARCHAR(100) NULL,            -- Designation of RVPN user
+  working_location VARCHAR(150) NULL,       -- Working location of RVPN user
+  cost_code VARCHAR(50) NULL,               -- Cost code for RVPN connection
+  rvpn_serial_number VARCHAR(100) NULL,     -- Serial number of RVPN connection
+  rvpn_username VARCHAR(100) NULL,          -- Username of RVPN connection
+  pin_number VARCHAR(50) NULL,              -- Pin number for RVPN
+  connection_required ENUM('required','not_required') NULL, -- Whether connection is required
+  
+  -- Finger Device specific fields
+  location_name VARCHAR(150) NULL,          -- Location name for finger device
+  sub_location VARCHAR(150) NULL,           -- Sub location for finger device
+  make VARCHAR(100) NULL,                   -- Manufacturer/Make
+  device_type VARCHAR(100) NULL,            -- Device type: Finger/Finger,Palm/Finger,Face
+  device_number VARCHAR(50) NULL,           -- Device number
+  identification_code VARCHAR(100) NULL,    -- Identification code/Serial number
+  ip_address_adsl VARCHAR(100) NULL,        -- IP Address or ADSL for finger device
+  installed_date DATE NULL,                 -- Installation date for finger device
+  company_name VARCHAR(150) NULL,           -- Company name/vendor
+  device_cost DECIMAL(10,2) NULL,           -- Device cost
+  warranty_period VARCHAR(50) NULL,         -- Warranty period in years
+  port_number VARCHAR(20) NULL,             -- Port number
+  managed_by VARCHAR(100) NULL,             -- Department/person managing the device
+  approval_status ENUM('approved','pending','rejected') NULL, -- Approval status
+  remark TEXT NULL,                         -- Additional remarks
+  
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (device_id),
