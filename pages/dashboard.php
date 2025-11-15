@@ -27,7 +27,9 @@ $printersCount = DbHelper::getRowCountWithCondition('devices', ['category_id' =>
 $computersCount = DbHelper::getRowCountWithCondition('devices', ['category_id' => $desktopCatId]);
 $otherDevicesCount = $totalDevices - ($laptopsCount + $printersCount + $computersCount);
 
-
+// Get top 3 sections by device count
+$topSections = DbHelper::getSectionsByDeviceCount();
+$top3Sections = $topSections ? array_slice($topSections, 0, 3) : [];
 
 ?>
 
@@ -370,56 +372,43 @@ $otherDevicesCount = $totalDevices - ($laptopsCount + $printersCount + $computer
         class="bg-white rounded-2xl p-6 shadow-sm animate-fade-up"
         style="animation-delay: 1.1s">
         <h3 class="text-lg font-semibold text-gray-800 mb-6">
-          Device Distribution by Sections
+          Top 3 Sections by Device Count
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div
-            class="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center space-x-3">
-                <i class="fas fa-building text-blue-600"></i>
-                <span class="font-medium text-gray-800">Engineering</span>
+          <?php if (!empty($top3Sections)): ?>
+            <?php
+            $colors = [
+              ['bg' => 'from-blue-50 to-indigo-50', 'border' => 'border-blue-100', 'text' => 'text-blue-600', 'progress' => 'bg-blue-600', 'progressBg' => 'bg-blue-200'],
+              ['bg' => 'from-green-50 to-emerald-50', 'border' => 'border-green-100', 'text' => 'text-green-600', 'progress' => 'bg-green-600', 'progressBg' => 'bg-green-200'],
+              ['bg' => 'from-purple-50 to-violet-50', 'border' => 'border-purple-100', 'text' => 'text-purple-600', 'progress' => 'bg-purple-600', 'progressBg' => 'bg-purple-200']
+            ];
+            $maxDevices = !empty($top3Sections) ? max(array_column($top3Sections, 'total_devices')) : 1;
+            ?>
+            <?php foreach ($top3Sections as $index => $section): ?>
+              <?php
+              $color = $colors[$index];
+              $percentage = $maxDevices > 0 ? ($section['total_devices'] / $maxDevices) * 100 : 0;
+              ?>
+              <div class="p-4 bg-gradient-to-br <?php echo $color['bg']; ?> rounded-xl border <?php echo $color['border']; ?>">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center space-x-3">
+                    <i class="fas fa-building <?php echo $color['text']; ?>"></i>
+                    <span class="font-medium text-gray-800"><?php echo htmlspecialchars($section['section_name']); ?></span>
+                  </div>
+                  <span class="text-2xl font-bold <?php echo $color['text']; ?>"><?php echo $section['total_devices']; ?></span>
+                </div>
+                <div class="w-full <?php echo $color['progressBg']; ?> rounded-full h-2">
+                  <div class="<?php echo $color['progress']; ?> h-2 rounded-full" style="width: <?php echo $percentage; ?>%"></div>
+                </div>
               </div>
-              <span class="text-2xl font-bold text-blue-600">35</span>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <div class="col-span-3 text-center py-8 text-gray-500">
+              <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+              <p class="text-lg font-medium">No sections found</p>
+              <p class="text-sm">Add sections to see device distribution</p>
             </div>
-            <div class="w-full bg-blue-200 rounded-full h-2">
-              <div
-                class="bg-blue-600 h-2 rounded-full"
-                style="width: 75%"></div>
-            </div>
-          </div>
-
-          <div
-            class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center space-x-3">
-                <i class="fas fa-building text-green-600"></i>
-                <span class="font-medium text-gray-800">Maintenance</span>
-              </div>
-              <span class="text-2xl font-bold text-green-600">28</span>
-            </div>
-            <div class="w-full bg-green-200 rounded-full h-2">
-              <div
-                class="bg-green-600 h-2 rounded-full"
-                style="width: 60%"></div>
-            </div>
-          </div>
-
-          <div
-            class="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-100">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center space-x-3">
-                <i class="fas fa-building text-purple-600"></i>
-                <span class="font-medium text-gray-800">Administration</span>
-              </div>
-              <span class="text-2xl font-bold text-purple-600">27</span>
-            </div>
-            <div class="w-full bg-purple-200 rounded-full h-2">
-              <div
-                class="bg-purple-600 h-2 rounded-full"
-                style="width: 58%"></div>
-            </div>
-          </div>
+          <?php endif; ?>
         </div>
       </div>
 
