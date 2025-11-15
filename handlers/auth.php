@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = $_POST['password'];
         $role = 'user';
 
-        $userId = DbHelper::createUser($first_name, $last_name, $email, $gender, $password, $role, $mobile);
+        $userId = DbHelper::createUser($first_name, $last_name, $email, $gender, $password,  $mobile, $role);
 
         if ($userId) {
             header('Location: ../pages/login.php?registration=success');

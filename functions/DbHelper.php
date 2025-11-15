@@ -46,9 +46,9 @@ class DbHelper
             'email' => $email,
             'gender' => $gender,
             'password' => $hashedPassword,
+            'mobile_number' => $mobile,
             'role' => $role,
             'status' => 'active',
-            'mobile_number' => $mobile
         ];
 
         return self::$db->insert('users', $userData);

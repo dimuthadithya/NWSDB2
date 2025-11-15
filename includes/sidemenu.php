@@ -164,7 +164,7 @@
 
       <div class="p-4 border-t border-gray-100 mt-auto">
           <a
-              href="../handlers/logout.php"
+              href="<?php echo $pathUpdate2 ? '../handlers/logout.php' : './handlers/logout.php' ?>"
               class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50">
               <i class="fas fa-sign-out-alt w-5"></i>
               <span>Logout</span>
