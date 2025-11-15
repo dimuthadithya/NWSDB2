@@ -7,6 +7,13 @@ requireLogin();
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
+// Fetch water supply schemes data
+$schemes = DbHelper::getAllWaterSupplySchemes();
+$totalSchemes = DbHelper::getWaterSupplySchemeCount();
+$activeSchemes = DbHelper::getActiveSchemeCount();
+$maintenanceSchemes = DbHelper::getMaintenanceSchemeCount();
+$areas = DbHelper::getAllAreas(); // For dropdown in modal
+
 ?>
 
 <!DOCTYPE html>
@@ -87,7 +94,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Total</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">128</h3>
+          <h3 class="text-3xl font-bold mb-1"><?php echo $totalSchemes; ?></h3>
           <p class="text-blue-100 text-sm">Total Schemes</p>
         </div>
 
@@ -100,7 +107,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Operational</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">115</h3>
+          <h3 class="text-3xl font-bold mb-1"><?php echo $activeSchemes; ?></h3>
           <p class="text-green-100 text-sm">Active Schemes</p>
         </div>
 
@@ -109,12 +116,12 @@ $name = $_SESSION['user']['name'];
           <div class="flex items-center justify-between mb-4">
             <div
               class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-              <i class="fas fa-users text-2xl"></i>
+              <i class="fas fa-wrench text-2xl"></i>
             </div>
-            <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Served</span>
+            <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Maintenance</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">3.2M</h3>
-          <p class="text-orange-100 text-sm">Population Served</p>
+          <h3 class="text-3xl font-bold mb-1"><?php echo $maintenanceSchemes; ?></h3>
+          <p class="text-orange-100 text-sm">Under Maintenance</p>
         </div>
 
         <div
@@ -195,11 +202,11 @@ $name = $_SESSION['user']['name'];
               <tr>
                 <th
                   class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                  Scheme Name
+                  Scheme Code
                 </th>
                 <th
                   class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                  Code
+                  Scheme Name
                 </th>
                 <th
                   class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
@@ -207,19 +214,15 @@ $name = $_SESSION['user']['name'];
                 </th>
                 <th
                   class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                  Type
-                </th>
-                <th
-                  class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                  Capacity
-                </th>
-                <th
-                  class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                  Connections
+                  Region
                 </th>
                 <th
                   class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
                   Status
+                </th>
+                <th
+                  class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
+                  Created Date
                 </th>
                 <th
                   class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase">
@@ -228,52 +231,55 @@ $name = $_SESSION['user']['name'];
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr class="table-row">
-                <td class="px-6 py-4">
-                  <div class="font-semibold text-gray-900">
-                    Colombo City Water Supply
-                  </div>
-                  <div class="text-xs text-gray-500">Commissioned 2018</div>
-                </td>
-                <td class="px-6 py-4">
-                  <span class="font-mono text-sm">WS-COL-001</span>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="font-medium">Colombo North</div>
-                  <div class="text-xs text-gray-500">Western Region</div>
-                </td>
-                <td class="px-6 py-4">
-                  <span
-                    class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800">Urban</span>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="font-semibold">50,000,000 L</div>
-                  <div class="text-xs text-gray-500">
-                    Source: Kelani River
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="font-semibold">12,500</div>
-                  <div class="text-xs text-gray-500">Serves: 45,000</div>
-                </td>
-                <td class="px-6 py-4">
-                  <span
-                    class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Operational</span>
-                </td>
-                <td class="px-6 py-4 text-right space-x-2">
-                  <button
-                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
-                    <i class="fas fa-eye"></i>
-                  </button>
-                  <button
-                    class="p-2 text-green-600 hover:bg-green-50 rounded-lg">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="p-2 text-red-600 hover:bg-red-50 rounded-lg">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
+              <?php if (!empty($schemes)): ?>
+                <?php foreach ($schemes as $scheme): ?>
+                  <tr class="table-row">
+                    <td class="px-6 py-4">
+                      <span class="font-mono text-sm font-semibold text-gray-900"><?php echo htmlspecialchars($scheme['wss_code']); ?></span>
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="font-semibold text-gray-900"><?php echo htmlspecialchars($scheme['wss_name']); ?></div>
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="font-medium text-gray-700"><?php echo htmlspecialchars($scheme['area_name'] ?? 'N/A'); ?></div>
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="text-sm text-gray-600"><?php echo htmlspecialchars($scheme['region_name'] ?? 'N/A'); ?></div>
+                    </td>
+                    <td class="px-6 py-4">
+                      <?php if ($scheme['status'] === 'active'): ?>
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                      <?php elseif ($scheme['status'] === 'maintenance'): ?>
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">Maintenance</span>
+                      <?php else: ?>
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Inactive</span>
+                      <?php endif; ?>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                      <?php echo date('M d, Y', strtotime($scheme['created_at'])); ?>
+                    </td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                      <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="View">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Edit">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Delete">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                    <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                    <p class="text-lg font-medium">No water supply schemes found</p>
+                    <p class="text-sm">Click "Add Scheme" to create your first water supply scheme</p>
+                  </td>
+                </tr>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>
@@ -282,7 +288,7 @@ $name = $_SESSION['user']['name'];
         <div
           class="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
           <div class="text-sm text-gray-600">
-            Showing 1 to 10 of 128 entries
+            Showing <?php echo count($schemes); ?> of <?php echo $totalSchemes; ?> entries
           </div>
           <div class="flex gap-2">
             <button
@@ -338,12 +344,15 @@ $name = $_SESSION['user']['name'];
               Area <span class="text-red-500">*</span>
             </label>
             <select
+              name="area_id"
               required
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
               <option value="">Select Area</option>
-              <option>Colombo North</option>
-              <option>Kandy Central</option>
-              <option>Galle South</option>
+              <?php foreach ($areas as $area): ?>
+                <option value="<?php echo $area['area_id']; ?>">
+                  <?php echo htmlspecialchars($area['area_name']); ?> - <?php echo htmlspecialchars($area['region_name'] ?? ''); ?>
+                </option>
+              <?php endforeach; ?>
             </select>
           </div>
 

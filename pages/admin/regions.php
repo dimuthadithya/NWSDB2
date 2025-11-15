@@ -7,6 +7,11 @@ requireLogin();
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
+// Fetch regions data
+$regions = DbHelper::getAllRegions();
+$totalRegions = DbHelper::getRegionCount();
+$activeRegions = DbHelper::getActiveRegionCount();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -83,7 +88,7 @@ include '../../includes/sidemenu.php';
           </div>
           <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Total</span>
         </div>
-        <h3 class="text-3xl font-bold mb-1">9</h3>
+        <h3 class="text-3xl font-bold mb-1"><?php echo $totalRegions; ?></h3>
         <p class="text-blue-100 text-sm">Total Regions</p>
       </div>
 
@@ -96,7 +101,7 @@ include '../../includes/sidemenu.php';
           </div>
           <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Active</span>
         </div>
-        <h3 class="text-3xl font-bold mb-1">9</h3>
+        <h3 class="text-3xl font-bold mb-1"><?php echo $activeRegions; ?></h3>
         <p class="text-green-100 text-sm">Active Regions</p>
       </div>
 
@@ -187,27 +192,19 @@ include '../../includes/sidemenu.php';
             <tr>
               <th
                 class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
+                Region Code
+              </th>
+              <th
+                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
                 Region Name
               </th>
               <th
                 class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                Code
-              </th>
-              <th
-                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                Province
-              </th>
-              <th
-                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                Regional Manager
-              </th>
-              <th
-                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                Contact
-              </th>
-              <th
-                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
                 Status
+              </th>
+              <th
+                class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
+                Created Date
               </th>
               <th
                 class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase">
@@ -216,39 +213,47 @@ include '../../includes/sidemenu.php';
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr class="table-row">
-              <td class="px-6 py-4">
-                <div class="font-semibold text-gray-900">Western Region</div>
-                <div class="text-xs text-gray-500">5 Areas</div>
-              </td>
-              <td class="px-6 py-4">
-                <span class="font-mono text-sm">WR-001</span>
-              </td>
-              <td class="px-6 py-4">Western Province</td>
-              <td class="px-6 py-4">
-                <div class="font-medium">Mr. Kamal Silva</div>
-                <div class="text-xs text-gray-500">Since 2020</div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="text-sm">011-2345678</div>
-                <div class="text-xs text-gray-500">western@nwsdb.lk</div>
-              </td>
-              <td class="px-6 py-4">
-                <span
-                  class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
-              </td>
-              <td class="px-6 py-4 text-right space-x-2">
-                <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
-                  <i class="fas fa-eye"></i>
-                </button>
-                <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button class="p-2 text-red-600 hover:bg-red-50 rounded-lg">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </td>
-            </tr>
+            <?php if (!empty($regions)): ?>
+              <?php foreach ($regions as $region): ?>
+                <tr class="table-row">
+                  <td class="px-6 py-4">
+                    <span class="font-mono text-sm font-semibold text-gray-900"><?php echo htmlspecialchars($region['region_code']); ?></span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="font-semibold text-gray-900"><?php echo htmlspecialchars($region['region_name']); ?></div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <?php if ($region['status'] === 'active'): ?>
+                      <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                    <?php else: ?>
+                      <span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Inactive</span>
+                    <?php endif; ?>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-600">
+                    <?php echo date('M d, Y', strtotime($region['created_at'])); ?>
+                  </td>
+                  <td class="px-6 py-4 text-right space-x-2">
+                    <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="View">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Edit">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Delete">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <tr>
+                <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                  <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                  <p class="text-lg font-medium">No regions found</p>
+                  <p class="text-sm">Click "Add Region" to create your first region</p>
+                </td>
+              </tr>
+            <?php endif; ?>
           </tbody>
         </table>
       </div>
@@ -256,7 +261,7 @@ include '../../includes/sidemenu.php';
       <!-- Pagination -->
       <div
         class="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
-        <div class="text-sm text-gray-600">Showing 1 to 10 of 9 entries</div>
+        <div class="text-sm text-gray-600">Showing <?php echo count($regions); ?> of <?php echo $totalRegions; ?> entries</div>
         <div class="flex gap-2">
           <button
             class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-100">

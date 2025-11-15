@@ -394,4 +394,264 @@ class DbHelper
 
         return $categoryId ? $categoryId : null;
     }
+
+    // ============================================
+    // REGIONS Functions
+    // ============================================
+
+    /**
+     * Get all regions
+     * @return array|bool Returns array of regions or false
+     */
+    public static function getAllRegions()
+    {
+        self::init();
+        $regions = self::$db->select('regions', ['*'], [], 'region_name ASC');
+        return $regions ? $regions : [];
+    }
+
+    /**
+     * Get region by ID
+     * @param int $region_id Region ID
+     * @return array|bool Returns region data or false
+     */
+    public static function getRegionById($region_id)
+    {
+        self::init();
+        if (!is_numeric($region_id)) {
+            return false;
+        }
+        $region = self::$db->getById('regions', $region_id, 'region_id');
+        return $region ? $region : false;
+    }
+
+    /**
+     * Get region count
+     * @return int Region count
+     */
+    public static function getRegionCount()
+    {
+        self::init();
+        $result = self::$db->count('regions');
+        return $result ? $result : 0;
+    }
+
+    /**
+     * Get active region count
+     * @return int Active region count
+     */
+    public static function getActiveRegionCount()
+    {
+        self::init();
+        $result = self::$db->count('regions', ['status' => 'active']);
+        return $result ? $result : 0;
+    }
+
+    // ============================================
+    // AREAS Functions
+    // ============================================
+
+    /**
+     * Get all areas with region information
+     * @return array Returns array of areas
+     */
+    public static function getAllAreas()
+    {
+        self::init();
+        // For now, get areas and regions separately
+        // TODO: Add JOIN support to Database class
+        $areas = self::$db->select('areas', ['*'], [], 'area_name ASC');
+        if (!$areas) {
+            return [];
+        }
+
+        // Get all regions for reference
+        $regions = self::$db->select('regions', ['region_id', 'region_name']);
+        $regionMap = [];
+        if ($regions) {
+            foreach ($regions as $region) {
+                $regionMap[$region['region_id']] = $region['region_name'];
+            }
+        }
+
+        // Add region names to areas
+        foreach ($areas as &$area) {
+            $area['region_name'] = isset($regionMap[$area['region_id']]) ? $regionMap[$area['region_id']] : 'N/A';
+        }
+
+        return $areas;
+    }
+
+    /**
+     * Get area by ID
+     * @param int $area_id Area ID
+     * @return array|bool Returns area data or false
+     */
+    public static function getAreaById($area_id)
+    {
+        self::init();
+        if (!is_numeric($area_id)) {
+            return false;
+        }
+        $area = self::$db->getById('areas', $area_id, 'area_id');
+        return $area ? $area : false;
+    }
+
+    /**
+     * Get areas by region ID
+     * @param int $region_id Region ID
+     * @return array Returns array of areas
+     */
+    public static function getAreasByRegion($region_id)
+    {
+        self::init();
+        $areas = self::$db->select('areas', ['*'], ['region_id' => $region_id], 'area_name ASC');
+        return $areas ? $areas : [];
+    }
+
+    /**
+     * Get area count
+     * @return int Area count
+     */
+    public static function getAreaCount()
+    {
+        self::init();
+        $result = self::$db->count('areas');
+        return $result ? $result : 0;
+    }
+
+    /**
+     * Get active area count
+     * @return int Active area count
+     */
+    public static function getActiveAreaCount()
+    {
+        self::init();
+        $result = self::$db->count('areas', ['status' => 'active']);
+        return $result ? $result : 0;
+    }
+
+    // ============================================
+    // WATER SUPPLY SCHEMES Functions
+    // ============================================
+
+    /**
+     * Get all water supply schemes with area and region information
+     * @return array Returns array of schemes
+     */
+    public static function getAllWaterSupplySchemes()
+    {
+        self::init();
+        // Get schemes and related data separately
+        $schemes = self::$db->select('water_supply_schemes', ['*'], [], 'wss_name ASC');
+        if (!$schemes) {
+            return [];
+        }
+
+        // Get areas
+        $areas = self::$db->select('areas', ['area_id', 'area_name', 'region_id']);
+        $areaMap = [];
+        if ($areas) {
+            foreach ($areas as $area) {
+                $areaMap[$area['area_id']] = [
+                    'area_name' => $area['area_name'],
+                    'region_id' => $area['region_id']
+                ];
+            }
+        }
+
+        // Get regions
+        $regions = self::$db->select('regions', ['region_id', 'region_name']);
+        $regionMap = [];
+        if ($regions) {
+            foreach ($regions as $region) {
+                $regionMap[$region['region_id']] = $region['region_name'];
+            }
+        }
+
+        // Add area and region names to schemes
+        foreach ($schemes as &$scheme) {
+            if (isset($areaMap[$scheme['area_id']])) {
+                $scheme['area_name'] = $areaMap[$scheme['area_id']]['area_name'];
+                $regionId = $areaMap[$scheme['area_id']]['region_id'];
+                $scheme['region_name'] = isset($regionMap[$regionId]) ? $regionMap[$regionId] : 'N/A';
+            } else {
+                $scheme['area_name'] = 'N/A';
+                $scheme['region_name'] = 'N/A';
+            }
+        }
+
+        return $schemes;
+    }
+
+    /**
+     * Get water supply scheme by ID
+     * @param int $wss_id Scheme ID
+     * @return array|bool Returns scheme data or false
+     */
+    public static function getWaterSupplySchemeById($wss_id)
+    {
+        self::init();
+        if (!is_numeric($wss_id)) {
+            return false;
+        }
+        $scheme = self::$db->getById('water_supply_schemes', $wss_id, 'wss_id');
+        return $scheme ? $scheme : false;
+    }
+
+    /**
+     * Get schemes by area ID
+     * @param int $area_id Area ID
+     * @return array Returns array of schemes
+     */
+    public static function getSchemesByArea($area_id)
+    {
+        self::init();
+        $schemes = self::$db->select('water_supply_schemes', ['*'], ['area_id' => $area_id], 'wss_name ASC');
+        return $schemes ? $schemes : [];
+    }
+
+    /**
+     * Get water supply scheme count
+     * @return int Scheme count
+     */
+    public static function getWaterSupplySchemeCount()
+    {
+        self::init();
+        $result = self::$db->count('water_supply_schemes');
+        return $result ? $result : 0;
+    }
+
+    /**
+     * Get active scheme count
+     * @return int Active scheme count
+     */
+    public static function getActiveSchemeCount()
+    {
+        self::init();
+        $result = self::$db->count('water_supply_schemes', ['status' => 'active']);
+        return $result ? $result : 0;
+    }
+
+    /**
+     * Get operational scheme count
+     * @return int Operational scheme count
+     */
+    public static function getOperationalSchemeCount()
+    {
+        self::init();
+        $result = self::$db->count('water_supply_schemes', ['status' => 'active']);
+        return $result ? $result : 0;
+    }
+
+    /**
+     * Get maintenance scheme count
+     * @return int Maintenance scheme count
+     */
+    public static function getMaintenanceSchemeCount()
+    {
+        self::init();
+        $result = self::$db->count('water_supply_schemes', ['status' => 'maintenance']);
+        return $result ? $result : 0;
+    }
 }

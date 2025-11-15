@@ -7,6 +7,12 @@ requireLogin();
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
+// Fetch areas data
+$areas = DbHelper::getAllAreas();
+$totalAreas = DbHelper::getAreaCount();
+$activeAreas = DbHelper::getActiveAreaCount();
+$regions = DbHelper::getAllRegions(); // For dropdown in modal
+
 ?>
 
 <!DOCTYPE html>
@@ -86,7 +92,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Total</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">45</h3>
+          <h3 class="text-3xl font-bold mb-1"><?php echo $totalAreas; ?></h3>
           <p class="text-blue-100 text-sm">Total Areas</p>
         </div>
 
@@ -99,7 +105,7 @@ $name = $_SESSION['user']['name'];
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Active</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">42</h3>
+          <h3 class="text-3xl font-bold mb-1"><?php echo $activeAreas; ?></h3>
           <p class="text-green-100 text-sm">Active Areas</p>
         </div>
 
@@ -108,12 +114,12 @@ $name = $_SESSION['user']['name'];
           <div class="flex items-center justify-between mb-4">
             <div
               class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-              <i class="fas fa-users text-2xl"></i>
+              <i class="fas fa-globe-asia text-2xl"></i>
             </div>
-            <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Coverage</span>
+            <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Regions</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">2.5M</h3>
-          <p class="text-orange-100 text-sm">Total Population</p>
+          <h3 class="text-3xl font-bold mb-1"><?php echo DbHelper::getRegionCount(); ?></h3>
+          <p class="text-orange-100 text-sm">Total Regions</p>
         </div>
 
         <div
@@ -184,11 +190,11 @@ $name = $_SESSION['user']['name'];
               <tr>
                 <th
                   class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                  Area Name
+                  Area Code
                 </th>
                 <th
                   class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                  Code
+                  Area Name
                 </th>
                 <th
                   class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
@@ -196,19 +202,11 @@ $name = $_SESSION['user']['name'];
                 </th>
                 <th
                   class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                  District/City
-                </th>
-                <th
-                  class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                  Area Manager
-                </th>
-                <th
-                  class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
-                  Population
-                </th>
-                <th
-                  class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
                   Status
+                </th>
+                <th
+                  class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">
+                  Created Date
                 </th>
                 <th
                   class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase">
@@ -217,45 +215,50 @@ $name = $_SESSION['user']['name'];
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr class="table-row">
-                <td class="px-6 py-4">
-                  <div class="font-semibold text-gray-900">Colombo North</div>
-                  <div class="text-xs text-gray-500">8 Water Schemes</div>
-                </td>
-                <td class="px-6 py-4">
-                  <span class="font-mono text-sm">WR-CN-001</span>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="font-medium">Western Region</div>
-                  <div class="text-xs text-gray-500">WR-001</div>
-                </td>
-                <td class="px-6 py-4">
-                  <div>Colombo</div>
-                  <div class="text-xs text-gray-500">10400</div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="font-medium">Ms. Nimal Perera</div>
-                  <div class="text-xs text-gray-500">077-1234567</div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="font-semibold">125,000</div>
-                </td>
-                <td class="px-6 py-4">
-                  <span
-                    class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
-                </td>
-                <td class="px-6 py-4 text-right space-x-2">
-                  <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
-                    <i class="fas fa-eye"></i>
-                  </button>
-                  <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="p-2 text-red-600 hover:bg-red-50 rounded-lg">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
+              <?php if (!empty($areas)): ?>
+                <?php foreach ($areas as $area): ?>
+                  <tr class="table-row">
+                    <td class="px-6 py-4">
+                      <span class="font-mono text-sm font-semibold text-gray-900"><?php echo htmlspecialchars($area['area_code']); ?></span>
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="font-semibold text-gray-900"><?php echo htmlspecialchars($area['area_name']); ?></div>
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="font-medium text-gray-700"><?php echo htmlspecialchars($area['region_name'] ?? 'N/A'); ?></div>
+                    </td>
+                    <td class="px-6 py-4">
+                      <?php if ($area['status'] === 'active'): ?>
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                      <?php else: ?>
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Inactive</span>
+                      <?php endif; ?>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                      <?php echo date('M d, Y', strtotime($area['created_at'])); ?>
+                    </td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                      <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="View">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Edit">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Delete">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                    <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                    <p class="text-lg font-medium">No areas found</p>
+                    <p class="text-sm">Click "Add Area" to create your first area</p>
+                  </td>
+                </tr>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>
@@ -263,7 +266,7 @@ $name = $_SESSION['user']['name'];
         <!-- Pagination -->
         <div
           class="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
-          <div class="text-sm text-gray-600">Showing 1 to 10 of 45 entries</div>
+          <div class="text-sm text-gray-600">Showing <?php echo count($areas); ?> of <?php echo $totalAreas; ?> entries</div>
           <div class="flex gap-2">
             <button
               class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-100">
@@ -314,13 +317,15 @@ $name = $_SESSION['user']['name'];
               Region <span class="text-red-500">*</span>
             </label>
             <select
+              name="region_id"
               required
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
               <option value="">Select Region</option>
-              <option>Western Region</option>
-              <option>Central Region</option>
-              <option>Southern Region</option>
-              <option>Northern Region</option>
+              <?php foreach ($regions as $region): ?>
+                <option value="<?php echo $region['region_id']; ?>">
+                  <?php echo htmlspecialchars($region['region_name']); ?>
+                </option>
+              <?php endforeach; ?>
             </select>
           </div>
 
@@ -351,38 +356,29 @@ $name = $_SESSION['user']['name'];
               Status
             </label>
             <select
+              name="status"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
           </div>
         </div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">
-          Status
-        </label>
-        <select
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
-    </div>
-  </div>
 
-  <div class="mt-6 flex gap-3 justify-end">
-    <button
-      type="button"
-      onclick="closeAddModal()"
-      class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-      <i class="fas fa-times mr-2"></i>Cancel
-    </button>
-    <button
-      type="submit"
-      class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all">
-      <i class="fas fa-save mr-2"></i>Save Area
-    </button>
-  </div>
-  </form>
-  </div>
+        <div class="mt-6 flex gap-3 justify-end">
+          <button
+            type="button"
+            onclick="closeAddModal()"
+            class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            <i class="fas fa-times mr-2"></i>Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all">
+            <i class="fas fa-save mr-2"></i>Save Area
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <script>
