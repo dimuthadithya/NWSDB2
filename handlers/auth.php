@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $first_name = trim($_POST['first_name']);
         $last_name = trim($_POST['last_name']);
         $email = trim($_POST['email']);
-        $gender = trim($_POST['gender']);
+        $gender = isset($_POST['gender']) ? trim($_POST['gender']) : 'Male'; // Default to Male if not provided
         $mobile = trim($_POST['mobile']);
         $password = $_POST['password'];
         $role = 'user';
@@ -16,10 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $userId = DbHelper::createUser($first_name, $last_name, $email, $gender, $password, $role, $mobile);
 
         if ($userId) {
-            header('Location: ../index.php?registration=success');
+            header('Location: ../pages/login.php?registration=success');
             exit();
         } else {
-            header('Location: ../register.php?registration=failed');
+            error_log("Registration failed for email: " . $email);
+            header('Location: ../pages/register.php?registration=failed');
             exit();
         }
     }

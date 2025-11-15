@@ -184,7 +184,7 @@
         <div class="text-center pt-4 border-t border-white/10">
           <p class="text-sm text-gray-400">
             Already have an account?
-            <a href="login.html" class="text-cyan-400 hover:underline">Sign in here</a>
+            <a href="./login.php" class="text-cyan-400 hover:underline">Sign in here</a>
           </p>
         </div>
       </form>

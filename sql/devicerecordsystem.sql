@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS users (
   username VARCHAR(50) UNIQUE,
   email VARCHAR(150) NOT NULL UNIQUE,
   mobile_number VARCHAR(15) UNIQUE,
-  gender ENUM('Male', 'Female') NOT NULL,
+  gender VARCHAR(10),
   password VARCHAR(255) NOT NULL,
   site_office VARCHAR(100),
   role ENUM('admin', 'user') NOT NULL DEFAULT 'user',
