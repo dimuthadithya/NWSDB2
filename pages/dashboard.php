@@ -126,7 +126,10 @@ $otherDevicesCount = $totalDevices - ($laptopsCount + $printersCount + $computer
 
 <body
   class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
-  <?php include_once __DIR__ . '/../includes/sidemenu.php'; ?>
+  <?php
+  $pathUpdate = true;
+  include_once __DIR__ . '/../includes/sidemenu.php';
+  ?>
 
   <!-- Main Content -->
   <main class="lg:ml-64 min-h-screen">

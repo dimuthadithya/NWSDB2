@@ -81,38 +81,59 @@
 
           <?php if ($role == 'admin')
                 echo '
+
+    <div class="mt-8 pt-8 border-t border-gray-100">
+          <p class="text-xs font-semibold text-gray-400 uppercase px-4 mb-3">
+            Water Supply Management
+          </p>
+          <div class="space-y-1">
+              <a href="' . ($pathUpdate ? './admin/regions.php' : './regions.php') . '" 
+              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+            >
+              <i class="fas fa-globe-asia w-5"></i>
+              <span>Regions</span>
+            </a>
+              <a href="' . ($pathUpdate ? './admin/areas.php' : './areas.php') . '" 
+              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+            >
+              <i class="fas fa-map-marked-alt w-5"></i>
+              <span class="font-medium">Areas</span>
+            </a>
+              <a href="' . ($pathUpdate ? './admin/water-schemes.php' : './water-schemes.php') . '" 
+              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+            >
+              <i class="fas fa-tint w-5"></i>
+              <span>Water Supply Schemes</span>
+            </a>
+          </div>
+        </div>
+
           <div class="mt-8 pt-8 border-t border-gray-100">
               <p class="text-xs font-semibold text-gray-400 uppercase px-4 mb-3">
                   Administration
               </p>
               <div class="space-y-1">
-                  <a
-                      href="./site_offices.html"
+                     <a href="' . ($pathUpdate ? './admin/site_offices.php' : './site_offices.php') . '" 
                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
                       <i class="fas fa-building w-5"></i>
                       <span>Site Offices</span>
                   </a>
-                  <a
-                      href="./admin/sections.html"
+                     <a href="' . ($pathUpdate ? './admin/sections.php' : './sections.php') . '" 
                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
                       <i class="fas fa-sitemap w-5"></i>
                       <span>Sections</span>
                   </a>
-
-                  <a
-                      href="./admin/users.html"
+                      <a href="' . ($pathUpdate ? './admin/users.php' : './users.php') . '" 
                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
                       <i class="fas fa-users w-5"></i>
                       <span>Users</span>
                   </a>
-                  <a
-                      href="./admin/categories.html"
+                      <a href="' . ($pathUpdate ? './admin/categories.php' : './categories.php') . '" 
                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
                       <i class="fas fa-tags w-5"></i>
                       <span>Categories</span>
                   </a>
-                  <a
-                      href="./admin/reports.html"
+                      <a href="' . ($pathUpdate ? './admin/reports.php' : './reports.php') . '" 
                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
                       <i class="fas fa-chart-line w-5"></i>
                       <span>Reports</span>
