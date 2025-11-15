@@ -79,6 +79,8 @@
               </a>
           </div>
 
+          <?php if ($role == 'admin')
+                echo '
           <div class="mt-8 pt-8 border-t border-gray-100">
               <p class="text-xs font-semibold text-gray-400 uppercase px-4 mb-3">
                   Administration
@@ -122,12 +124,15 @@
                       <span>Settings</span>
                   </a>
               </div>
-          </div>
+          </div>'
+
+            ?>
+
       </nav>
 
       <div class="p-4 border-t border-gray-100 mt-auto">
           <a
-              href="#"
+              href="../handlers/logout.php"
               class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50">
               <i class="fas fa-sign-out-alt w-5"></i>
               <span>Logout</span>
