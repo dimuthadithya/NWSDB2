@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NWSDB - Finger Device Management</title>
+    <title>NWSDB - User Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
@@ -26,12 +26,7 @@
       }
 
       .stat-card {
-        transition: all 0.3s ease;
-      }
-
-      .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       }
 
       .sidebar-link {
@@ -77,7 +72,7 @@
           </div>
           <div>
             <h2 class="text-lg font-bold text-gray-800">NWSDB</h2>
-            <p class="text-xs text-gray-500">Hardware Device Manager</p>
+            <p class="text-xs text-gray-500">Device Manager</p>
           </div>
         </div>
       </div>
@@ -85,39 +80,25 @@
       <nav class="p-4">
         <div class="space-y-1">
           <a
-            href="./dashboard.html"
+            href="../dashboard.html"
             class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
           >
             <i class="fas fa-home w-5"></i>
             <span>Dashboard</span>
           </a>
           <a
-            href="./computers.html"
+            href="../computers.html"
             class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
           >
             <i class="fas fa-desktop w-5"></i>
             <span>Computers</span>
           </a>
           <a
-            href="./printers.html"
+            href="../printers.html"
             class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
           >
             <i class="fas fa-print w-5"></i>
             <span>Printers</span>
-          </a>
-          <a
-            href="./rvpn-connections.html"
-            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
-          >
-            <i class="fas fa-network-wired w-5"></i>
-            <span>RVPN Connections</span>
-          </a>
-          <a
-            href="./finger-device.html"
-            class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600"
-          >
-            <i class="fas fa-fingerprint w-5"></i>
-            <span class="font-medium">Finger Devices</span>
           </a>
           <a
             href="#"
@@ -141,7 +122,7 @@
             <span>Issues</span>
           </a>
           <a
-            href="./summary.html"
+            href="../summary.html"
             class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
           >
             <i class="fas fa-chart-pie w-5"></i>
@@ -155,35 +136,49 @@
           </p>
           <div class="space-y-1">
             <a
-              href="./admin/site_offices.html"
+              href="./site_offices.html"
               class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
             >
               <i class="fas fa-building w-5"></i>
               <span>Site Offices</span>
             </a>
             <a
-              href="./admin/sections.html"
+              href="./sections.html"
               class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
             >
               <i class="fas fa-sitemap w-5"></i>
               <span>Sections</span>
             </a>
             <a
-              href="./admin/users.html"
+              href="../rvpn-connections.html"
               class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
             >
-              <i class="fas fa-users w-5"></i>
-              <span>Users</span>
+              <i class="fas fa-network-wired w-5"></i>
+              <span>RVPN Connections</span>
             </a>
             <a
-              href="./admin/categories.html"
+              href="../finger-device.html"
+              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
+            >
+              <i class="fas fa-fingerprint w-5"></i>
+              <span>Finger Devices</span>
+            </a>
+            <a
+              href="./users.html"
+              class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-600"
+            >
+              <i class="fas fa-users w-5"></i>
+              <span class="font-medium">Users</span>
+            </a>
+            <a
+              href="./categories.html"
               class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
             >
               <i class="fas fa-tags w-5"></i>
               <span>Categories</span>
             </a>
             <a
-              href="./admin/reports.html"
+              href="./reports.html"
               class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50"
             >
               <i class="fas fa-chart-line w-5"></i>
@@ -219,11 +214,9 @@
       >
         <div class="px-6 py-4 flex items-center justify-between">
           <div class="animate-fade-up">
-            <h1 class="text-2xl font-bold text-gray-800">
-              Finger Device Management
-            </h1>
+            <h1 class="text-2xl font-bold text-gray-800">User Management</h1>
             <p class="text-sm text-gray-500 mt-1">
-              Manage and track all biometric finger devices
+              Manage all system users and their permissions
             </p>
           </div>
           <div class="flex items-center space-x-4">
@@ -264,14 +257,14 @@
               <div
                 class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center"
               >
-                <i class="fas fa-fingerprint text-2xl"></i>
+                <i class="fas fa-users text-2xl"></i>
               </div>
               <span class="text-sm bg-white/20 px-3 py-1 rounded-full"
                 >Total</span
               >
             </div>
-            <h3 class="text-3xl font-bold mb-1">67</h3>
-            <p class="text-blue-100 text-sm">Total Devices</p>
+            <h3 class="text-3xl font-bold mb-1">342</h3>
+            <p class="text-blue-100 text-sm">Total Users</p>
           </div>
 
           <div
@@ -288,8 +281,8 @@
                 >Active</span
               >
             </div>
-            <h3 class="text-3xl font-bold mb-1">62</h3>
-            <p class="text-green-100 text-sm">Active Devices</p>
+            <h3 class="text-3xl font-bold mb-1">298</h3>
+            <p class="text-green-100 text-sm">Active Users</p>
           </div>
 
           <div
@@ -300,14 +293,14 @@
               <div
                 class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center"
               >
-                <i class="fas fa-map-marker-alt text-2xl"></i>
+                <i class="fas fa-user-shield text-2xl"></i>
               </div>
               <span class="text-sm bg-white/20 px-3 py-1 rounded-full"
-                >Locations</span
+                >Admin</span
               >
             </div>
-            <h3 class="text-3xl font-bold mb-1">24</h3>
-            <p class="text-orange-100 text-sm">Locations</p>
+            <h3 class="text-3xl font-bold mb-1">12</h3>
+            <p class="text-orange-100 text-sm">Administrators</p>
           </div>
 
           <div
@@ -318,14 +311,14 @@
               <div
                 class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center"
               >
-                <i class="fas fa-shield-alt text-2xl"></i>
+                <i class="fas fa-pause-circle text-2xl"></i>
               </div>
               <span class="text-sm bg-white/20 px-3 py-1 rounded-full"
-                >Warranty</span
+                >Inactive</span
               >
             </div>
-            <h3 class="text-3xl font-bold mb-1">45</h3>
-            <p class="text-purple-100 text-sm">Under Warranty</p>
+            <h3 class="text-3xl font-bold mb-1">44</h3>
+            <p class="text-purple-100 text-sm">Inactive Users</p>
           </div>
         </div>
 
@@ -336,7 +329,7 @@
             class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all"
           >
             <i class="fas fa-plus mr-2"></i>
-            Add New Finger Device
+            Add New User
           </button>
           <button
             class="inline-flex items-center px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm border border-gray-200 transition-all"
@@ -352,7 +345,7 @@
           </button>
         </div>
 
-        <!-- Finger Devices Table -->
+        <!-- Users Table -->
         <div
           class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up"
         >
@@ -364,21 +357,21 @@
                 <div
                   class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center"
                 >
-                  <i class="fas fa-fingerprint text-white"></i>
+                  <i class="fas fa-users text-white"></i>
                 </div>
                 <div>
                   <h3 class="text-lg font-semibold text-gray-900">
-                    Finger Devices List
+                    Users List
                   </h3>
                   <p class="text-sm text-gray-600">
-                    View and manage all biometric devices
+                    View and manage all system users
                   </p>
                 </div>
               </div>
               <div class="relative">
                 <input
                   type="text"
-                  placeholder="Search devices..."
+                  placeholder="Search users..."
                   class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                 />
                 <i
@@ -395,77 +388,42 @@
                   <th
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Location Name
+                    User ID
                   </th>
                   <th
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Sub Location
+                    Name
                   </th>
                   <th
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Make
+                    Username
                   </th>
                   <th
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Model
+                    Email
                   </th>
                   <th
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Device Type
+                    Mobile Number
                   </th>
                   <th
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Device No
-                  </th>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Serial No
-                  </th>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    IP Address
-                  </th>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Installed Date
-                  </th>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Company
-                  </th>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Cost
-                  </th>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Warranty
-                  </th>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Port No
-                  </th>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Managed By
+                    Role
                   </th>
                   <th
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Status
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Last Login
                   </th>
                   <th
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -476,55 +434,37 @@
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
                 <tr class="table-row">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    001
+                  </td>
                   <td
                     class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                   >
-                    Main Office
+                    John Doe
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    Reception
+                    jdoe
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    ZKTeco
+                    john.doe@nwsdb.lk
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    F18
+                    077-1234567
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    Finger
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    DEV001
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    ZK123456
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    192.168.1.100
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    2023-01-15
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    ZKTeco Inc
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    $250
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    2 yrs
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    4370
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    IT Dept
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span
+                      class="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full"
+                      >Admin</span
+                    >
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <span
                       class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full"
-                      >Approved</span
+                      >Active</span
                     >
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    2025-11-15 09:30
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button
@@ -541,7 +481,6 @@
                     </button>
                   </td>
                 </tr>
-                <!-- Add more sample rows as needed -->
               </tbody>
             </table>
           </div>
@@ -552,7 +491,7 @@
               <div class="text-sm text-gray-700">
                 Showing <span class="font-medium">1</span> to
                 <span class="font-medium">10</span> of
-                <span class="font-medium">67</span> results
+                <span class="font-medium">342</span> results
               </div>
               <div class="flex gap-2">
                 <button
@@ -588,19 +527,19 @@
       </div>
     </main>
 
-    <!-- Add Finger Device Modal -->
+    <!-- Add User Modal -->
     <div
       id="addModal"
       class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
     >
       <div
-        class="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto"
+        class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
       >
         <div
           class="sticky top-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 rounded-t-2xl"
         >
           <div class="flex items-center justify-between">
-            <h3 class="text-xl font-bold text-white">Add New Finger Device</h3>
+            <h3 class="text-xl font-bold text-white">Add New User</h3>
             <button
               onclick="closeAddModal()"
               class="text-white hover:text-gray-200 transition-colors"
@@ -611,10 +550,10 @@
         </div>
 
         <form class="p-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Location Name</label
+                >First Name</label
               >
               <input
                 type="text"
@@ -625,17 +564,7 @@
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Sub Location</label
-              >
-              <input
-                type="text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Make</label
+                >Last Name</label
               >
               <input
                 type="text"
@@ -646,7 +575,7 @@
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Model</label
+                >Username</label
               >
               <input
                 type="text"
@@ -657,25 +586,45 @@
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Device Type</label
+                >Email</label
+              >
+              <input
+                type="email"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Mobile Number</label
+              >
+              <input
+                type="tel"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Gender</label
               >
               <select
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               >
-                <option value="">Select Type</option>
-                <option value="finger">Finger</option>
-                <option value="finger_palm">Finger, Palm</option>
-                <option value="finger_face">Finger, Face</option>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
               </select>
             </div>
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Device No</label
+                >Password</label
               >
               <input
-                type="text"
+                type="password"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               />
@@ -683,18 +632,7 @@
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Identification Code (Serial No)</label
-              >
-              <input
-                type="text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"
-                >IP Address / ADSL</label
+                >Site Office</label
               >
               <input
                 type="text"
@@ -704,96 +642,29 @@
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Installed Date</label
-              >
-              <input
-                type="date"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Company Name</label
-              >
-              <input
-                type="text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Device Cost</label
-              >
-              <input
-                type="number"
-                step="0.01"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Warranty Period (yrs)</label
-              >
-              <input
-                type="number"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Port No</label
-              >
-              <input
-                type="text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Managed By</label
-              >
-              <input
-                type="text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"
-                >User</label
-              >
-              <input
-                type="text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Approve</label
+                >Role</label
               >
               <select
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
               >
-                <option value="approved">Approved</option>
-                <option value="pending">Pending</option>
-                <option value="rejected">Rejected</option>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
               </select>
             </div>
 
-            <div class="md:col-span-3">
+            <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Remark</label
+                >Status</label
               >
-              <textarea
-                rows="3"
+              <select
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              ></textarea>
+                required
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="suspended">Suspended</option>
+              </select>
             </div>
           </div>
 
@@ -809,7 +680,7 @@
               type="submit"
               class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all"
             >
-              <i class="fas fa-save mr-2"></i>Save Device
+              <i class="fas fa-save mr-2"></i>Save User
             </button>
           </div>
         </form>
