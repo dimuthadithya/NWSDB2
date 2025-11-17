@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NWSDB Error Codes & Solutions</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        line-height: 1.6;
+        color: #2c3e50;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 210mm;
+        margin: 0 auto;
+        background: #ffffff;
+        padding: 40px;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 5px solid #e74c3c;
+      }
+
+      h1 {
+        color: #e74c3c;
+        font-size: 32px;
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+
+      .subtitle {
+        color: #7f8c8d;
+        font-size: 18px;
+        font-style: italic;
+      }
+
+      .version-info {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        text-align: center;
+      }
+
+      .version-item {
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+      }
+
+      .version-label {
+        font-size: 12px;
+        opacity: 0.9;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      .version-value {
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .phase-section {
+        margin: 40px 0;
+        page-break-inside: avoid;
+      }
+
+      .phase-header {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        font-size: 22px;
+        font-weight: bold;
+      }
+
+      .error-card {
+        background: #f8f9fa;
+        border-left: 6px solid #e74c3c;
+        padding: 25px;
+        margin: 25px 0;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        page-break-inside: avoid;
+      }
+
+      .error-title {
+        color: #c0392b;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .error-number {
+        background: #e74c3c;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 50%;
+        font-size: 16px;
+      }
+
+      .code-comparison {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 20px 0;
+      }
+
+      .code-block-wrapper {
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .code-label {
+        padding: 10px 15px;
+        font-weight: bold;
+        font-size: 14px;
+      }
+
+      .before-label {
+        background: #e74c3c;
+        color: white;
+      }
+
+      .after-label {
+        background: #27ae60;
+        color: white;
+      }
+
+      .code-block {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        padding: 20px;
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        font-size: 13px;
+        overflow-x: auto;
+        margin: 0;
+        line-height: 1.6;
+        border: 1px solid #333;
+      }
+
+      .code-block pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      /* VS Code Syntax Highlighting */
+      .keyword {
+        color: #569cd6;
+        font-weight: normal;
+      }
+
+      .string {
+        color: #ce9178;
+      }
+
+      .comment {
+        color: #6a9955;
+        font-style: italic;
+      }
+
+      .function {
+        color: #dcdcaa;
+      }
+
+      .variable {
+        color: #9cdcfe;
+      }
+
+      .tag {
+        color: #569cd6;
+      }
+
+      .attribute {
+        color: #9cdcfe;
+      }
+
+      .value {
+        color: #ce9178;
+      }
+
+      .punctuation {
+        color: #d4d4d4;
+      }
+
+      .number {
+        color: #b5cea8;
+      }
+
+      .operator {
+        color: #d4d4d4;
+      }
+
+      .sql-keyword {
+        color: #c586c0;
+      }
+
+      .php-tag {
+        color: #569cd6;
+      }
+
+      .type {
+        color: #4ec9b0;
+      }
+      .single-code {
+        margin: 20px 0;
+      }
+
+      .best-practices {
+        background: #e8f5e9;
+        border-left: 6px solid #27ae60;
+        padding: 25px;
+        margin: 40px 0;
+        border-radius: 5px;
+      }
+
+      .best-practices h2 {
+        color: #27ae60;
+        margin-bottom: 20px;
+        font-size: 24px;
+      }
+
+      .best-practices h3 {
+        color: #2c3e50;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        font-size: 18px;
+      }
+
+      .toc {
+        background: #ecf0f1;
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+      }
+
+      .toc h2 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        font-size: 22px;
+      }
+
+      .toc ul {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .toc li {
+        padding: 8px 0;
+        border-bottom: 1px solid #bdc3c7;
+      }
+
+      .toc li:last-child {
+        border-bottom: none;
+      }
+
+      .toc a {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .toc a:hover {
+        color: #2980b9;
+        text-decoration: underline;
+      }
+
+      .footer {
+        background: #34495e;
+        color: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-top: 50px;
+        text-align: center;
+      }
+
+      .footer h3 {
+        margin-bottom: 15px;
+        font-size: 24px;
+      }
+
+      .print-button {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        transition: all 0.3s ease;
+      }
+
+      .print-button:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      @media print {
+        body {
+          background: white;
+          padding: 0;
+        }
+
+        .print-button {
+          display: none;
+        }
+
+        .container {
+          box-shadow: none;
+          padding: 20px;
+        }
+
+        .phase-section,
+        .error-card {
+          page-break-inside: avoid;
+        }
+
+        .code-comparison {
+          page-break-inside: avoid;
+        }
+      }
+
+      @media screen and (max-width: 768px) {
+        .code-comparison {
+          grid-template-columns: 1fr;
+        }
+
+        .version-info {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button class="print-button" onclick="window.print()">
+      🖨️ Print to PDF
+    </button>
+
+    <div class="container">
+      <div class="header">
+        <h1>NWSDB Device Record System</h1>
+        <div class="subtitle">Error Codes & Solutions Reference Guide</div>
+      </div>
+
+      <div class="version-info">
+        <div class="version-item">
+          <span class="version-label">Document Version</span>
+          <span class="version-value">1.0</span>
+        </div>
+        <div class="version-item">
+          <span class="version-label">Total Errors</span>
+          <span class="version-value">30</span>
+        </div>
+        <div class="version-item">
+          <span class="version-label">Last Updated</span>
+          <span class="version-value">Nov 17, 2025</span>
+        </div>
+      </div>
+
+      <div class="toc">
+        <h2>📑 Table of Contents</h2>
+        <ul>
+          <li>
+            <a href="#phase1"
+              >Phase 1: Initial Setup & Authentication (Errors 1-3)</a
+            >
+          </li>
+          <li>
+            <a href="#phase2"
+              >Phase 2: User Registration & Authentication (Errors 4-8)</a
+            >
+          </li>
+          <li>
+            <a href="#phase3"
+              >Phase 3: Session Management & Navigation (Errors 9-11)</a
+            >
+          </li>
+          <li>
+            <a href="#phase4"
+              >Phase 4: Database Integration & CRUD (Errors 12-14)</a
+            >
+          </li>
+          <li>
+            <a href="#phase5">Phase 5: Navigation & UI Issues (Errors 15-17)</a>
+          </li>
+          <li>
+            <a href="#phase6"
+              >Phase 6: Data Display & Frontend (Errors 18-20)</a
+            >
+          </li>
+          <li>
+            <a href="#phase7"
+              >Phase 7: Water Supply Management (Errors 21-23)</a
+            >
+          </li>
+          <li>
+            <a href="#phase8"
+              >Phase 8: Active Navigation & Dynamic Content (Errors 24-25)</a
+            >
+          </li>
+          <li>
+            <a href="#phase9"
+              >Phase 9: Advanced Features & Optimization (Errors 26-28)</a
+            >
+          </li>
+          <li>
+            <a href="#phase10"
+              >Phase 10: Database Integration for Device Pages (Errors 29-30)</a
+            >
+          </li>
+          <li><a href="#best-practices">Best Practice Code Examples</a></li>
+        </ul>
+      </div>
+
+      <!-- Phase 1 -->
+      <div class="phase-section" id="phase1">
+        <div class="phase-header">Phase 1: Initial Setup & Authentication</div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">1</span>
+            Form Attribute Case Sensitivity
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre><span class="tag">&lt;form</span> <span class="attribute">method</span>=<span class="value">"post"</span> <span class="attribute">action</span>=<span class="value">"auth.php"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;/form&gt;</span></pre>
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre><span class="tag">&lt;form</span> <span class="attribute">method</span>=<span class="value">"POST"</span> <span class="attribute">action</span>=<span class="value">"auth.php"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;/form&gt;</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">2</span>
+            Incorrect File Extension in Links
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre><span class="tag">&lt;a</span> <span class="attribute">href</span>=<span class="value">"index.html"</span><span class="tag">&gt;</span>Sign In<span class="tag">&lt;/a&gt;</span></pre>
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre><span class="tag">&lt;a</span> <span class="attribute">href</span>=<span class="value">"index.php"</span><span class="tag">&gt;</span>Sign In<span class="tag">&lt;/a&gt;</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">3</span>
+            Database Schema - NULL Value Constraints
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre><span class="sql-keyword">CREATE TABLE</span> <span class="variable">users</span> (
+    <span class="variable">user_id</span> <span class="type">INT</span> <span class="sql-keyword">PRIMARY KEY AUTO_INCREMENT</span>,
+    <span class="variable">username</span> <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="sql-keyword">NOT NULL</span>,
+    <span class="variable">mobile_number</span> <span class="type">VARCHAR</span>(<span class="number">15</span>) <span class="sql-keyword">NOT NULL</span>
+);</pre>
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre><span class="sql-keyword">CREATE TABLE</span> <span class="variable">users</span> (
+    <span class="variable">user_id</span> <span class="type">INT</span> <span class="sql-keyword">PRIMARY KEY AUTO_INCREMENT</span>,
+    <span class="variable">username</span> <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="sql-keyword">NULL</span>,
+    <span class="variable">mobile_number</span> <span class="type">VARCHAR</span>(<span class="number">15</span>) <span class="sql-keyword">NULL</span>
+);</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="phase-section" id="phase2">
+        <div class="phase-header">
+          Phase 2: User Registration & Authentication System
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">4</span>
+            Form Submission Parameter Mismatch
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre><span class="tag">&lt;form</span> <span class="attribute">method</span>=<span class="value">"POST"</span> <span class="attribute">action</span>=<span class="value">"auth.php"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;button</span> <span class="attribute">type</span>=<span class="value">"submit"</span> <span class="attribute">name</span>=<span class="value">"submit"</span><span class="tag">&gt;</span>
+    Register
+  <span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/form&gt;</span>
+
+<span class="php-tag">&lt;?php</span>
+<span class="keyword">if</span> (<span class="function">isset</span>(<span class="variable">$_POST</span>[<span class="string">'register'</span>])) {
+    <span class="comment">// Process registration</span>
+}
+<span class="php-tag">?&gt;</span></pre>
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre><span class="tag">&lt;form</span> <span class="attribute">method</span>=<span class="value">"POST"</span> <span class="attribute">action</span>=<span class="value">"auth.php"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;button</span> <span class="attribute">type</span>=<span class="value">"submit"</span> <span class="attribute">name</span>=<span class="value">"register"</span><span class="tag">&gt;</span>
+    Register
+  <span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/form&gt;</span>
+
+<span class="php-tag">&lt;?php</span>
+<span class="keyword">if</span> (<span class="function">isset</span>(<span class="variable">$_POST</span>[<span class="string">'register'</span>])) {
+    <span class="comment">// Process registration</span>
+}
+<span class="php-tag">?&gt;</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">5</span>
+            Incorrect Form Action Path
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre><span class="tag">&lt;form</span> <span class="attribute">action</span>=<span class="value">"process_register.php"</span> 
+      <span class="attribute">method</span>=<span class="value">"POST"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;/form&gt;</span></pre>
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre><span class="tag">&lt;form</span> <span class="attribute">action</span>=<span class="value">"auth.php"</span> 
+      <span class="attribute">method</span>=<span class="value">"POST"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;/form&gt;</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">6</span>
+            Method Parameter Misalignment
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre><span class="keyword">public function</span> <span class="function">createUser</span>(
+    <span class="variable">$username</span>, 
+    <span class="variable">$email</span>, 
+    <span class="variable">$password</span>, 
+    <span class="variable">$mobile_number</span>, 
+    <span class="variable">$site_office</span>
+) {
+    <span class="comment">// Insert user</span>
+}
+
+<span class="comment">// Call</span>
+<span class="variable">$result</span> = <span class="variable">$dbHelper</span>-><span class="function">createUser</span>(
+    <span class="variable">$username</span>, 
+    <span class="variable">$email</span>, 
+    <span class="variable">$password</span>, 
+    <span class="variable">$mobile</span>, 
+    <span class="variable">$site</span>
+);</pre>
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre><span class="keyword">public function</span> <span class="function">createUser</span>(
+    <span class="variable">$email</span>, 
+    <span class="variable">$password</span>, 
+    <span class="variable">$gender</span> = <span class="string">'Male'</span>
+) {
+    <span class="variable">$username</span> = <span class="variable">$this</span>-><span class="function">generateUsername</span>(<span class="variable">$email</span>);
+    <span class="comment">// Insert user</span>
+}
+
+<span class="comment">// Call</span>
+<span class="variable">$result</span> = <span class="variable">$dbHelper</span>-><span class="function">createUser</span>(
+    <span class="variable">$email</span>, 
+    <span class="variable">$password</span>
+);</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">7</span>
+            Mobile Number Field Name Inconsistency
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre><span class="tag">&lt;input</span> <span class="attribute">type</span>=<span class="value">"tel"</span> 
+       <span class="attribute">name</span>=<span class="value">"mobile"</span> 
+       <span class="attribute">required</span> <span class="tag">/&gt;</span>
+
+<span class="php-tag">&lt;?php</span>
+<span class="variable">$mobile</span> = <span class="variable">$_POST</span>[<span class="string">'mobile'</span>];
+<span class="variable">$stmt</span> = <span class="variable">$pdo</span>-><span class="function">prepare</span>(
+    <span class="string">"INSERT INTO users (mobile_number) 
+     VALUES (?)"</span>
+);
+<span class="php-tag">?&gt;</span></pre>
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre><span class="tag">&lt;input</span> <span class="attribute">type</span>=<span class="value">"tel"</span> 
+       <span class="attribute">name</span>=<span class="value">"mobile_number"</span> 
+       <span class="attribute">required</span> <span class="tag">/&gt;</span>
+
+<span class="php-tag">&lt;?php</span>
+<span class="variable">$mobile_number</span> = <span class="variable">$_POST</span>[<span class="string">'mobile_number'</span>];
+<span class="variable">$stmt</span> = <span class="variable">$pdo</span>-><span class="function">prepare</span>(
+    <span class="string">"INSERT INTO users (mobile_number) 
+     VALUES (?)"</span>
+);
+<span class="php-tag">?&gt;</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">8</span>
+            User ID Field Mismatch
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre><span class="php-tag">&lt;?php</span>
+<span class="variable">$user</span> = <span class="variable">$db</span>-><span class="function">select</span>(
+    <span class="string">'users'</span>, 
+    [<span class="string">'*'</span>], 
+    [<span class="string">'id'</span> => <span class="variable">$userId</span>]
+);
+<span class="variable">$_SESSION</span>[<span class="string">'user_id'</span>] = <span class="variable">$user</span>[<span class="string">'userId'</span>];
+<span class="php-tag">?&gt;</span></pre>
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre><span class="php-tag">&lt;?php</span>
+<span class="variable">$user</span> = <span class="variable">$db</span>-><span class="function">select</span>(
+    <span class="string">'users'</span>, 
+    [<span class="string">'*'</span>], 
+    [<span class="string">'user_id'</span> => <span class="variable">$userId</span>]
+);
+<span class="variable">$_SESSION</span>[<span class="string">'user_id'</span>] = <span class="variable">$user</span>[<span class="string">'user_id'</span>];
+<span class="php-tag">?&gt;</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="phase-section" id="phase3">
+        <div class="phase-header">Phase 3: Session Management & Navigation</div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">9</span>
+            Login Redirect Path
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre><span class="php-tag">&lt;?php</span>
+<span class="keyword">if</span> (<span class="variable">$user</span>) {
+    <span class="function">header</span>(<span class="string">'Location: dashboard.php'</span>);
+    <span class="keyword">exit</span>();
+}
+<span class="php-tag">?&gt;</span></pre>
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre><span class="php-tag">&lt;?php</span>
+<span class="keyword">if</span> (<span class="variable">$user</span>) {
+    <span class="function">header</span>(<span class="string">'Location: index.php'</span>);
+    <span class="keyword">exit</span>();
+}
+<span class="php-tag">?&gt;</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">10</span>
+            Session Handling Issues
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+// Each page separately
+&lt;?php
+session_start();
+require_once 'config/db.php';
+require_once 'functions/DbHelper.php';
+?&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+// sessions.php
+&lt;?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../functions/Database.php';
+require_once __DIR__ . '/../functions/DbHelper.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ../index.php');
+    exit();
+}
+?&gt;
+
+// Each page
+&lt;?php require_once 'middleware/sessions.php'; ?&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">11</span>
+            DbHelper Not Included in Sessions
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+// sessions.php
+&lt;?php
+session_start();
+require_once __DIR__ . '/../config/db.php';
+?&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+// sessions.php
+&lt;?php
+session_start();
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../functions/Database.php';
+require_once __DIR__ . '/../functions/DbHelper.php';
+?&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 4 -->
+      <div class="phase-section" id="phase4">
+        <div class="phase-header">
+          Phase 4: Database Integration & CRUD Operations
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">12</span>
+            Missing Database Method
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+// Database.php - getId() not implemented
+&lt;?php
+$lastId = $db->getId();  // Fatal error
+?&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+// Database.php
+&lt;?php
+public function getId() {
+    return $this->conn->lastInsertId();
+}
+
+// Usage
+$db->insert('users', $data);
+$userId = $db->getId();
+?&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">13</span>
+            Device Category Name Inconsistency
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+// DbHelper.php
+&lt;?php
+public function getAllComputers() {
+    $categoryId = $this->getCategoryIdByName(
+        'Computer'
+    );
+    return self::$db->select(
+        'devices', 
+        ['*'], 
+        ['category_id' => $categoryId]
+    );
+}
+?&gt;
+
+-- Database
+INSERT INTO device_categories (category_name) 
+VALUES ('Desktop Computer');</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+// DbHelper.php
+&lt;?php
+public function getAllComputers() {
+    $categoryId = $this->getCategoryIdByName(
+        'Desktop Computer'
+    );
+    return self::$db->select(
+        'devices', 
+        ['*'], 
+        ['category_id' => $categoryId]
+    );
+}
+?&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">14</span>
+            Foreign Key Relationship Errors
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+CREATE TABLE devices (
+    device_id INT PRIMARY KEY AUTO_INCREMENT,
+    category_id INT,
+    FOREIGN KEY (category_id) 
+    REFERENCES device_categories(category_id) 
+    ON DELETE CASCADE
+);</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+CREATE TABLE devices (
+    device_id INT PRIMARY KEY AUTO_INCREMENT,
+    category_id INT,
+    FOREIGN KEY (category_id) 
+    REFERENCES device_categories(category_id) 
+    ON DELETE RESTRICT
+);</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 5 -->
+      <div class="phase-section" id="phase5">
+        <div class="phase-header">Phase 5: Navigation & UI Issues</div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">15</span>
+            Broken Sidebar Links
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+&lt;a href="computer.php"&gt;Computers&lt;/a&gt;
+&lt;a href="printer.php"&gt;Printers&lt;/a&gt;
+&lt;a href="admin/site-offices.php"&gt;
+  Site Offices
+&lt;/a&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+&lt;a href="computers.php"&gt;Computers&lt;/a&gt;
+&lt;a href="printers.php"&gt;Printers&lt;/a&gt;
+&lt;a href="admin/site_offices.php"&gt;
+  Site Offices
+&lt;/a&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">16</span>
+            Duplicate Navigation Items
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+// sidemenu.php
+&lt;a href="reports.php"&gt;Reports&lt;/a&gt;
+&lt;!-- ... other items ... --&gt;
+&lt;a href="reports.php"&gt;Reports&lt;/a&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+// sidemenu.php
+&lt;a href="reports.php"&gt;Reports&lt;/a&gt;
+&lt;!-- ... other items ... --&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">17</span>
+            File Naming Convention Conflicts
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+site-offices.php
+site_offices.html
+laptops.php (duplicate)</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+site_offices.php
+laptops.php (single file)</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 6 -->
+      <div class="phase-section" id="phase6">
+        <div class="phase-header">Phase 6: Data Display & Frontend Issues</div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">18</span>
+            Missing Data Fetching Functions
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+// printers.php
+&lt;?php
+require_once 'middleware/sessions.php';
+$printers = DbHelper::getAllPrinters();
+// Method doesn't exist
+?&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+// DbHelper.php
+&lt;?php
+public static function getAllPrinters() {
+    $categoryId = self::getCategoryIdByName(
+        'Printer'
+    );
+    return self::$db->select(
+        'devices', 
+        ['*'], 
+        ['category_id' => $categoryId]
+    );
+}
+?&gt;
+
+// printers.php
+&lt;?php
+require_once 'middleware/sessions.php';
+$printers = DbHelper::getAllPrinters();
+?&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">19</span>
+            Device Count Calculation Errors
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+&lt;?php
+public function getDeviceCount($categoryName) {
+    $devices = self::$db->select(
+        'devices', 
+        ['*']
+    );
+    return count($devices);
+    // Returns all devices, not filtered
+}
+?&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+&lt;?php
+public function getDeviceCount($categoryName) {
+    $categoryId = self::getCategoryIdByName(
+        $categoryName
+    );
+    if (!$categoryId) return 0;
+
+    $devices = self::$db->select(
+        'devices', 
+        ['*'], 
+        ['category_id' => $categoryId]
+    );
+    return count($devices);
+}
+?&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">20</span>
+            Hardcoded Statistics Not Updated
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+&lt;div class="stat-card"&gt;
+  &lt;h3&gt;Total Computers&lt;/h3&gt;
+  &lt;p class="stat-number"&gt;150&lt;/p&gt;
+&lt;/div&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+&lt;?php
+$computerCount = DbHelper::getDeviceCount(
+    'Desktop Computer'
+);
+?&gt;
+&lt;div class="stat-card"&gt;
+  &lt;h3&gt;Total Computers&lt;/h3&gt;
+  &lt;p class="stat-number"&gt;
+    &lt;?php echo $computerCount; ?&gt;
+  &lt;/p&gt;
+&lt;/div&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 7 -->
+      <div class="phase-section" id="phase7">
+        <div class="phase-header">Phase 7: Water Supply Management Module</div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">21</span>
+            Extra Form Fields Not Matching Schema
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+&lt;form id="addRegionForm"&gt;
+  &lt;input type="text" 
+         name="region_name" 
+         required /&gt;
+  &lt;input type="text" 
+         name="description" /&gt;
+  &lt;input type="text" 
+         name="manager_name" /&gt;
+  &lt;input type="email" 
+         name="manager_email" /&gt;
+  &lt;input type="tel" 
+         name="phone_number" /&gt;
+  &lt;!-- 10 more unnecessary fields --&gt;
+&lt;/form&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+&lt;form id="addRegionForm"&gt;
+  &lt;input type="text" 
+         name="region_name" 
+         required /&gt;
+&lt;/form&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">22</span>
+            Duplicate Field in Modal
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+&lt;div class="modal"&gt;
+  &lt;label&gt;Status&lt;/label&gt;
+  &lt;select name="status"&gt;
+    &lt;option value="Active"&gt;Active&lt;/option&gt;
+  &lt;/select&gt;
+
+  &lt;label&gt;Status&lt;/label&gt;
+  &lt;select name="status"&gt;
+    &lt;option value="Active"&gt;Active&lt;/option&gt;
+  &lt;/select&gt;
+&lt;/div&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+&lt;div class="modal"&gt;
+  &lt;label&gt;Status&lt;/label&gt;
+  &lt;select name="status"&gt;
+    &lt;option value="Active"&gt;Active&lt;/option&gt;
+    &lt;option value="Inactive"&gt;Inactive&lt;/option&gt;
+  &lt;/select&gt;
+&lt;/div&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">23</span>
+            SQL Schema Verbosity
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+CREATE TABLE regions (
+    region_id INT PRIMARY KEY AUTO_INCREMENT,
+    region_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    manager_name VARCHAR(100),
+    manager_email VARCHAR(100),
+    phone_number VARCHAR(15),
+    fax_number VARCHAR(15),
+    address TEXT,
+    established_date DATE,
+    budget DECIMAL(15,2)
+    -- 5 more unnecessary columns
+);</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+CREATE TABLE regions (
+    region_id INT PRIMARY KEY AUTO_INCREMENT,
+    region_name VARCHAR(100) NOT NULL
+);</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 8 -->
+      <div class="phase-section" id="phase8">
+        <div class="phase-header">
+          Phase 8: Active Navigation & Dynamic Content
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">24</span>
+            Static Navigation Highlighting
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+&lt;a href="dashboard.php" class="active"&gt;
+  Dashboard
+&lt;/a&gt;
+&lt;a href="computers.php"&gt;Computers&lt;/a&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+&lt;?php
+function isActive($page) {
+    $currentPage = basename($_SERVER['PHP_SELF']);
+    return $currentPage === $page ? 'active' : '';
+}
+?&gt;
+&lt;a href="dashboard.php" 
+   class="&lt;?php echo isActive('dashboard.php'); ?&gt;"&gt;
+  Dashboard
+&lt;/a&gt;
+&lt;a href="computers.php" 
+   class="&lt;?php echo isActive('computers.php'); ?&gt;"&gt;
+  Computers
+&lt;/a&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">25</span>
+            Static Header Content
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+// header.php
+&lt;h1&gt;Dashboard&lt;/h1&gt;
+&lt;p&gt;Welcome to Device Management System&lt;/p&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+// Each page
+&lt;?php
+$page_info = [
+    'title' => 'Computers',
+    'description' => 'Manage desktop computers'
+];
+require_once 'includes/header.php';
+?&gt;
+
+// header.php
+&lt;h1&gt;&lt;?php echo $page_info['title']; ?&gt;&lt;/h1&gt;
+&lt;p&gt;&lt;?php echo $page_info['description']; ?&gt;&lt;/p&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 9 -->
+      <div class="phase-section" id="phase9">
+        <div class="phase-header">
+          Phase 9: Advanced Features & Optimization
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">26</span>
+            Missing Manual JOIN Logic
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+&lt;?php
+public function getAllAreas() {
+    return self::$db->select('areas', ['*']);
+    // No region_name available
+}
+?&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+&lt;?php
+public function getAllAreas() {
+    $areas = self::$db->select('areas', ['*']);
+    $regions = self::$db->select('regions', ['*']);
+
+    foreach ($areas as &$area) {
+        $region = array_filter($regions, 
+            function($r) use ($area) {
+                return $r['region_id'] == 
+                       $area['region_id'];
+            }
+        );
+        $area['region_name'] = $region ? 
+            reset($region)['region_name'] : 'N/A';
+    }
+    return $areas;
+}
+?&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">27</span>
+            Incorrect Default Gender Value
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+&lt;?php
+public function createUser($email, $password) {
+    $data = [
+        'email' => $email,
+        'password' => password_hash(
+            $password, 
+            PASSWORD_DEFAULT
+        ),
+        'gender' => NULL  // Fails if NOT NULL
+    ];
+    return self::$db->insert('users', $data);
+}
+?&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+&lt;?php
+public function createUser(
+    $email, 
+    $password, 
+    $gender = 'Male'
+) {
+    $data = [
+        'email' => $email,
+        'password' => password_hash(
+            $password, 
+            PASSWORD_DEFAULT
+        ),
+        'gender' => $gender
+    ];
+    return self::$db->insert('users', $data);
+}
+?&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">28</span>
+            Logout Link Path Error
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+// sidemenu.php
+&lt;a href="logout.php"&gt;Logout&lt;/a&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+// sidemenu.php
+&lt;a href="middleware/logout.php"&gt;Logout&lt;/a&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 10 -->
+      <div class="phase-section" id="phase10">
+        <div class="phase-header">
+          Phase 10: Database Integration for Device Pages
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">29</span>
+            Table Bodies Not Updated with Database Data
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+&lt;?php
+$computers = DbHelper::getAllComputers();
+$computerCount = count($computers);
+?&gt;
+
+&lt;p&gt;Total: &lt;?php echo $computerCount; ?&gt;&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;COMP-001&lt;/td&gt;
+      &lt;td&gt;Dell OptiPlex 7090&lt;/td&gt;
+      &lt;td&gt;Section A&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;COMP-002&lt;/td&gt;
+      &lt;td&gt;HP EliteDesk 800&lt;/td&gt;
+      &lt;td&gt;Section B&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+&lt;?php
+$computers = DbHelper::getAllComputers();
+$computerCount = count($computers);
+?&gt;
+
+&lt;p&gt;Total: &lt;?php echo $computerCount; ?&gt;&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;?php foreach ($computers as $computer): ?&gt;
+    &lt;tr&gt;
+      &lt;td&gt;
+        &lt;?php echo htmlspecialchars(
+          $computer['device_id']
+        ); ?&gt;
+      &lt;/td&gt;
+      &lt;td&gt;
+        &lt;?php echo htmlspecialchars(
+          $computer['device_name']
+        ); ?&gt;
+      &lt;/td&gt;
+      &lt;td&gt;
+        &lt;?php echo htmlspecialchars(
+          $computer['section_name']
+        ); ?&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;?php endforeach; ?&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-title">
+            <span class="error-number">30</span>
+            Empty State Not Handled
+          </div>
+          <div class="code-comparison">
+            <div class="code-block-wrapper">
+              <div class="code-label before-label">❌ Before</div>
+              <div class="code-block">
+                <pre>
+&lt;?php
+$devices = DbHelper::getAllComputers();
+?&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;?php foreach ($devices as $device): ?&gt;
+    &lt;tr&gt;
+      &lt;td&gt;
+        &lt;?php echo $device['device_name']; ?&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;?php endforeach; ?&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</pre
+                >
+              </div>
+            </div>
+            <div class="code-block-wrapper">
+              <div class="code-label after-label">✓ After</div>
+              <div class="code-block">
+                <pre>
+&lt;?php
+$devices = DbHelper::getAllComputers();
+?&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;?php if (empty($devices)): ?&gt;
+    &lt;tr&gt;
+      &lt;td colspan="5" class="text-center py-4"&gt;
+        &lt;p class="text-gray-500"&gt;
+          No devices found
+        &lt;/p&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;?php else: ?&gt;
+    &lt;?php foreach ($devices as $device): ?&gt;
+    &lt;tr&gt;
+      &lt;td&gt;
+        &lt;?php echo htmlspecialchars(
+          $device['device_name']
+        ); ?&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;?php endforeach; ?&gt;
+    &lt;?php endif; ?&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</pre
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Best Practices -->
+      <div class="best-practices" id="best-practices">
+        <h2>💡 Additional Best Practice Code Examples</h2>
+
+        <h3>Consistent Error Handling</h3>
+        <div class="single-code">
+          <div class="code-block-wrapper">
+            <div class="code-label after-label">✓ Database.php</div>
+            <div class="code-block">
+              <pre>
+&lt;?php
+public function select($table, $columns = ['*'], $conditions = []) {
+    try {
+        $columnList = implode(', ', $columns);
+        $sql = "SELECT $columnList FROM $table";
+
+        if (!empty($conditions)) {
+            $where = [];
+            foreach ($conditions as $key => $value) {
+                $where[] = "$key = :$key";
+            }
+            $sql .= " WHERE " . implode(' AND ', $where);
+        }
+
+        $stmt = $this->conn->prepare($sql);
+        foreach ($conditions as $key => $value) {
+            $stmt->bindValue(":$key", $value);
+        }
+
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Database Error: " . $e->getMessage());
+        return [];
+    }
+}
+?&gt;</pre
+              >
+            </div>
+          </div>
+        </div>
+
+        <h3>Dynamic Page Title System</h3>
+        <div class="single-code">
+          <div class="code-block-wrapper">
+            <div class="code-label after-label">✓ config/page_titles.php</div>
+            <div class="code-block">
+              <pre>
+&lt;?php
+return [
+    'dashboard.php' => [
+        'title' => 'Dashboard',
+        'description' => 'Overview of all devices and statistics'
+    ],
+    'computers.php' => [
+        'title' => 'Desktop Computers',
+        'description' => 'Manage desktop computers and workstations'
+    ],
+    'printers.php' => [
+        'title' => 'Printers',
+        'description' => 'Manage printing devices'
+    ]
+];
+?&gt;
+
+&lt;!-- Usage in pages --&gt;
+&lt;?php
+$pageTitles = require_once 'config/page_titles.php';
+$currentPage = basename($_SERVER['PHP_SELF']);
+$page_info = $pageTitles[$currentPage] ?? 
+    ['title' => 'Page', 'description' => ''];
+?&gt;</pre
+              >
+            </div>
+          </div>
+        </div>
+
+        <h3>Centralized Database Constants</h3>
+        <div class="single-code">
+          <div class="code-block-wrapper">
+            <div class="code-label after-label">✓ config/constants.php</div>
+            <div class="code-block">
+              <pre>
+&lt;?php
+define('DEVICE_CATEGORIES', [
+    'DESKTOP' => 'Desktop Computer',
+    'LAPTOP' => 'Laptop',
+    'PRINTER' => 'Printer',
+    'RVPN' => 'RVPN Connection',
+    'FINGERPRINT' => 'Fingerprint Device'
+]);
+
+define('USER_ROLES', [
+    'ADMIN' => 1,
+    'USER' => 2,
+    'VIEWER' => 3
+]);
+?&gt;
+
+&lt;!-- Usage --&gt;
+&lt;?php
+$computers = DbHelper::getAllDevicesByCategory(
+    DEVICE_CATEGORIES['DESKTOP']
+);
+?&gt;</pre
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <h3>📄 Document Information</h3>
+        <p style="margin-top: 15px">
+          <strong>Version:</strong> 1.0 |
+          <strong>Last Updated:</strong> November 17, 2025 |
+          <strong>Total Errors:</strong> 30
+        </p>
+        <p style="margin-top: 10px; font-size: 14px; opacity: 0.8">
+          NWSDB Device Record System - Internal Development Documentation
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
