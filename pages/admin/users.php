@@ -7,12 +7,27 @@ requireLogin();
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
+// Handle success/error messages
+$successMessage = '';
+$errorMessage = '';
+
+if (isset($_SESSION['success_message'])) {
+  $successMessage = $_SESSION['success_message'];
+  unset($_SESSION['success_message']);
+}
+
+if (isset($_SESSION['error_message'])) {
+  $errorMessage = $_SESSION['error_message'];
+  unset($_SESSION['error_message']);
+}
+
 // Fetch users data
 $users = DbHelper::getAllUsers();
 $totalUsers = count($users);
 $activeUsers = count(array_filter($users, fn($u) => $u['status'] === 'active'));
 $adminUsers = count(array_filter($users, fn($u) => $u['role'] === 'admin'));
 $inactiveUsers = count(array_filter($users, fn($u) => $u['status'] === 'inactive'));
+$waterSchemes = DbHelper::getAllWaterSupplySchemes(); // For dropdown
 
 ?>
 
@@ -142,6 +157,22 @@ $inactiveUsers = count(array_filter($users, fn($u) => $u['status'] === 'inactive
         </div>
       </div>
 
+      <!-- Success Message -->
+      <?php if (!empty($successMessage)): ?>
+        <div id="successMessage" class="mb-4 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded-lg flex items-center">
+          <i class="fas fa-check-circle text-green-500 mr-3"></i>
+          <span><?php echo htmlspecialchars($successMessage); ?></span>
+        </div>
+      <?php endif; ?>
+
+      <!-- Error Message -->
+      <?php if (!empty($errorMessage)): ?>
+        <div id="errorMessage" class="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg flex items-center">
+          <i class="fas fa-exclamation-circle text-red-500 mr-3"></i>
+          <span><?php echo htmlspecialchars($errorMessage); ?></span>
+        </div>
+      <?php endif; ?>
+
       <!-- Quick Actions -->
       <div class="flex flex-wrap gap-3">
         <button
@@ -219,6 +250,10 @@ $inactiveUsers = count(array_filter($users, fn($u) => $u['status'] === 'inactive
                 </th>
                 <th
                   class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Water Supply Scheme
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Role
                 </th>
                 <th
@@ -254,6 +289,9 @@ $inactiveUsers = count(array_filter($users, fn($u) => $u['status'] === 'inactive
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       <?php echo htmlspecialchars($user['mobile_number'] ?? 'N/A'); ?>
                     </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <?php echo htmlspecialchars($user['wss_name'] ?? 'N/A'); ?>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span class="px-2 py-1 text-xs font-medium <?php echo $user['role'] === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'; ?> rounded-full">
                         <?php echo ucfirst($user['role']); ?>
@@ -272,10 +310,10 @@ $inactiveUsers = count(array_filter($users, fn($u) => $u['status'] === 'inactive
                       <?php echo $user['last_login'] ? date('Y-m-d H:i', strtotime($user['last_login'])) : 'Never'; ?>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button class="text-blue-600 hover:text-blue-900 mr-3" title="Edit">
+                      <button onclick='openEditModal(<?php echo json_encode($user); ?>)' class="text-green-600 hover:text-green-900 mr-3" title="Edit">
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button class="text-red-600 hover:text-red-900" title="Delete">
+                      <button onclick="confirmDelete(<?php echo $user['user_id']; ?>, '<?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>')" class="text-red-600 hover:text-red-900" title="Delete">
                         <i class="fas fa-trash"></i>
                       </button>
                     </td>
@@ -348,20 +386,23 @@ $inactiveUsers = count(array_filter($users, fn($u) => $u['status'] === 'inactive
         </div>
       </div>
 
-      <form class="p-6">
+      <form method="POST" action="handlers/user-handler.php" class="p-6">
+        <input type="hidden" name="action" value="create">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">First Name <span class="text-red-500">*</span></label>
             <input
               type="text"
+              name="first_name"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Last Name <span class="text-red-500">*</span></label>
             <input
               type="text"
+              name="last_name"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required />
           </div>
@@ -370,14 +411,15 @@ $inactiveUsers = count(array_filter($users, fn($u) => $u['status'] === 'inactive
             <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
             <input
               type="text"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required />
+              name="username"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email <span class="text-red-500">*</span></label>
             <input
               type="email"
+              name="email"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required />
           </div>
@@ -386,12 +428,14 @@ $inactiveUsers = count(array_filter($users, fn($u) => $u['status'] === 'inactive
             <label class="block text-sm font-medium text-gray-700 mb-2">Mobile Number</label>
             <input
               type="tel"
+              name="mobile_number"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Gender <span class="text-red-500">*</span></label>
             <select
+              name="gender"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required>
               <option value="">Select Gender</option>
@@ -401,25 +445,33 @@ $inactiveUsers = count(array_filter($users, fn($u) => $u['status'] === 'inactive
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Password <span class="text-red-500">*</span></label>
             <input
               type="password"
+              name="password"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Site Office</label>
-            <input
-              type="text"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+            <label class="block text-sm font-medium text-gray-700 mb-2">Water Supply Scheme</label>
+            <select
+              name="wss_id"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="">Select Water Supply Scheme</option>
+              <?php foreach ($waterSchemes as $scheme): ?>
+                <option value="<?php echo $scheme['wss_id']; ?>">
+                  <?php echo htmlspecialchars($scheme['wss_name']); ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
             <select
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required>
+              name="role"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
               <option value="user">User</option>
               <option value="admin">Admin</option>
             </select>
@@ -428,8 +480,8 @@ $inactiveUsers = count(array_filter($users, fn($u) => $u['status'] === 'inactive
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
             <select
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required>
+              name="status"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
               <option value="suspended">Suspended</option>
@@ -442,12 +494,221 @@ $inactiveUsers = count(array_filter($users, fn($u) => $u['status'] === 'inactive
             type="button"
             onclick="closeAddModal()"
             class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-            Cancel
+            <i class="fas fa-times mr-2"></i>Cancel
           </button>
           <button
             type="submit"
             class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all">
             <i class="fas fa-save mr-2"></i>Save User
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div
+    id="editModal"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div
+      class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+      <div
+        class="sticky top-0 bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4 rounded-t-2xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-bold text-white">
+            <i class="fas fa-edit mr-2"></i>Edit User
+          </h3>
+          <button
+            onclick="closeEditModal()"
+            class="text-white hover:text-gray-200 transition-colors">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <form method="POST" action="handlers/user-handler.php" class="p-6">
+        <input type="hidden" name="action" value="update">
+        <input type="hidden" name="user_id" id="edit_user_id">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">First Name <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              name="first_name"
+              id="edit_first_name"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              required />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Last Name <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              name="last_name"
+              id="edit_last_name"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              required />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+            <input
+              type="text"
+              name="username"
+              id="edit_username"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email <span class="text-red-500">*</span></label>
+            <input
+              type="email"
+              name="email"
+              id="edit_email"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              required />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Mobile Number</label>
+            <input
+              type="tel"
+              name="mobile_number"
+              id="edit_mobile_number"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+            <select
+              name="gender"
+              id="edit_gender"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Password <small class="text-gray-500">(leave blank to keep current)</small></label>
+            <input
+              type="password"
+              name="password"
+              id="edit_password"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Water Supply Scheme</label>
+            <select
+              name="wss_id"
+              id="edit_wss_id"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="">Select Water Supply Scheme</option>
+              <?php foreach ($waterSchemes as $scheme): ?>
+                <option value="<?php echo $scheme['wss_id']; ?>">
+                  <?php echo htmlspecialchars($scheme['wss_name']); ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+            <select
+              name="role"
+              id="edit_role"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select
+              name="status"
+              id="edit_status"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="suspended">Suspended</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-6 flex gap-3 justify-end">
+          <button
+            type="button"
+            onclick="closeEditModal()"
+            class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            <i class="fas fa-times mr-2"></i>Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-6 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all">
+            <i class="fas fa-save mr-2"></i>Update User
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div
+    id="deleteModal"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+      <div
+        class="bg-gradient-to-r from-red-600 to-rose-600 px-6 py-4 rounded-t-2xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-bold text-white">
+            <i class="fas fa-exclamation-triangle mr-2"></i>Confirm Deletion
+          </h3>
+          <button
+            onclick="closeDeleteModal()"
+            class="text-white hover:text-gray-200 transition-colors">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <form method="POST" action="handlers/user-handler.php" class="p-6">
+        <input type="hidden" name="action" value="delete">
+        <input type="hidden" name="user_id" id="delete_user_id">
+
+        <div class="mb-6">
+          <p class="text-gray-700 mb-4">
+            Are you sure you want to delete user
+            <strong class="text-red-600" id="delete_user_name"></strong>?
+          </p>
+          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-yellow-700">
+                  <strong>Warning:</strong> This action cannot be undone.
+                  All data associated with this user will be permanently deleted.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-3 justify-end">
+          <button
+            type="button"
+            onclick="closeDeleteModal()"
+            class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            <i class="fas fa-times mr-2"></i>Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-6 py-2 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-lg hover:from-red-700 hover:to-rose-700 transition-all">
+            <i class="fas fa-trash mr-2"></i>Delete
           </button>
         </div>
       </form>
@@ -470,16 +731,68 @@ $inactiveUsers = count(array_filter($users, fn($u) => $u['status'] === 'inactive
 
     function closeAddModal() {
       document.getElementById('addModal').classList.add('hidden');
+      document.querySelector('#addModal form').reset();
     }
 
-    // Close modal on outside click
-    document
-      .getElementById('addModal')
-      .addEventListener('click', function(e) {
-        if (e.target === this) {
-          closeAddModal();
-        }
-      });
+    function openEditModal(user) {
+      document.getElementById('edit_user_id').value = user.user_id;
+      document.getElementById('edit_first_name').value = user.first_name;
+      document.getElementById('edit_last_name').value = user.last_name;
+      document.getElementById('edit_username').value = user.username || '';
+      document.getElementById('edit_email').value = user.email;
+      document.getElementById('edit_mobile_number').value = user.mobile_number || '';
+      document.getElementById('edit_gender').value = user.gender || '';
+      document.getElementById('edit_wss_id').value = user.wss_id || '';
+      document.getElementById('edit_role').value = user.role;
+      document.getElementById('edit_status').value = user.status;
+      document.getElementById('edit_password').value = ''; // Clear password field
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+      document.querySelector('#editModal form').reset();
+    }
+
+    function confirmDelete(userId, userName) {
+      document.getElementById('delete_user_id').value = userId;
+      document.getElementById('delete_user_name').textContent = userName;
+      document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.add('hidden');
+    }
+
+    // Close modals on outside click
+    document.getElementById('addModal').addEventListener('click', function(e) {
+      if (e.target === this) closeAddModal();
+    });
+
+    document.getElementById('editModal').addEventListener('click', function(e) {
+      if (e.target === this) closeEditModal();
+    });
+
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+      if (e.target === this) closeDeleteModal();
+    });
+
+    // ESC key to close modals
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeAddModal();
+        closeEditModal();
+        closeDeleteModal();
+      }
+    });
+
+    // Auto-hide success/error messages
+    setTimeout(function() {
+      const successMsg = document.getElementById('successMessage');
+      const errorMsg = document.getElementById('errorMessage');
+      if (successMsg) successMsg.style.display = 'none';
+      if (errorMsg) errorMsg.style.display = 'none';
+    }, 5000);
   </script>
 </body>
 

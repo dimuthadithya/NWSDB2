@@ -106,8 +106,70 @@ class DbHelper
 
         $users = self::$db->select('users');
 
-        return $users ? $users : false;
+        if (!$users) {
+            return [];
+        }
+
+        // Get water supply schemes
+        $schemes = self::$db->select('water_supply_schemes', ['wss_id', 'wss_name']);
+        $schemeMap = [];
+        if ($schemes) {
+            foreach ($schemes as $scheme) {
+                $schemeMap[$scheme['wss_id']] = $scheme['wss_name'];
+            }
+        }
+
+        // Add wss_name to users
+        foreach ($users as &$user) {
+            $user['wss_name'] = isset($user['wss_id']) && isset($schemeMap[$user['wss_id']])
+                ? $schemeMap[$user['wss_id']]
+                : 'N/A';
+        }
+
+        return $users;
     }
+
+    /**
+     * Update a user
+     * @param int $user_id User ID
+     * @param array $data Data to update
+     * @return bool Returns true on success, false on failure
+     */
+    public static function updateUser($user_id, $data)
+    {
+        self::init();
+
+        if (!is_numeric($user_id)) {
+            return false;
+        }
+
+        // If password is being updated, hash it
+        if (isset($data['password']) && !empty($data['password'])) {
+            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        } else {
+            // Remove password from update if it's empty
+            unset($data['password']);
+        }
+
+        return self::$db->update('users', $data, ['user_id' => $user_id]);
+    }
+
+    /**
+     * Delete a user
+     * @param int $user_id User ID
+     * @return bool Returns true on success, false on failure
+     */
+    public static function deleteUser($user_id)
+    {
+        self::init();
+
+        if (!is_numeric($user_id)) {
+            return false;
+        }
+
+        return self::$db->delete('users', ['user_id' => $user_id]);
+    }
+
     public static function getAllBranches()
     {
         self::init();

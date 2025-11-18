@@ -17,12 +17,14 @@ CREATE TABLE users (
   mobile_number VARCHAR(15) UNIQUE,
   gender VARCHAR(10),
   password VARCHAR(255) NOT NULL,
-  site_office VARCHAR(100),
+  wss_id INT DEFAULT NULL,
   role ENUM('admin','user') NOT NULL DEFAULT 'user',
   status ENUM('active','inactive','suspended') DEFAULT 'active',
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  last_login DATETIME DEFAULT NULL
+  last_login DATETIME DEFAULT NULL,
+  CONSTRAINT fk_users_wss FOREIGN KEY (wss_id)
+    REFERENCES water_supply_schemes(wss_id) ON DELETE SET NULL
 );
 
 -- ===============================================================
