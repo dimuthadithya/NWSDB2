@@ -12,13 +12,13 @@ $successMessage = '';
 $errorMessage = '';
 
 if (isset($_SESSION['success_message'])) {
-    $successMessage = $_SESSION['success_message'];
-    unset($_SESSION['success_message']);
+  $successMessage = $_SESSION['success_message'];
+  unset($_SESSION['success_message']);
 }
 
 if (isset($_SESSION['error_message'])) {
-    $errorMessage = $_SESSION['error_message'];
-    unset($_SESSION['error_message']);
+  $errorMessage = $_SESSION['error_message'];
+  unset($_SESSION['error_message']);
 }
 
 // Fetch areas data
@@ -152,21 +152,21 @@ $regions = DbHelper::getAllRegions(); // For dropdown in modal
 
       <!-- Success/Error Messages -->
       <?php if ($successMessage): ?>
-      <div id="successMessage" class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg shadow-sm animate-fade-up">
-        <div class="flex items-center">
-          <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
-          <p class="text-green-700 font-medium"><?php echo htmlspecialchars($successMessage); ?></p>
+        <div id="successMessage" class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg shadow-sm animate-fade-up">
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
+            <p class="text-green-700 font-medium"><?php echo htmlspecialchars($successMessage); ?></p>
+          </div>
         </div>
-      </div>
       <?php endif; ?>
 
       <?php if ($errorMessage): ?>
-      <div id="errorMessage" class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm animate-fade-up">
-        <div class="flex items-center">
-          <i class="fas fa-exclamation-circle text-red-500 text-xl mr-3"></i>
-          <p class="text-red-700 font-medium"><?php echo htmlspecialchars($errorMessage); ?></p>
+        <div id="errorMessage" class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm animate-fade-up">
+          <div class="flex items-center">
+            <i class="fas fa-exclamation-circle text-red-500 text-xl mr-3"></i>
+            <p class="text-red-700 font-medium"><?php echo htmlspecialchars($errorMessage); ?></p>
+          </div>
         </div>
-      </div>
       <?php endif; ?>
 
       <!-- Quick Actions -->
@@ -271,15 +271,15 @@ $regions = DbHelper::getAllRegions(); // For dropdown in modal
                       <?php echo date('M d, Y', strtotime($area['created_at'])); ?>
                     </td>
                     <td class="px-6 py-4 text-right space-x-2">
-                      <button 
-                        onclick='openEditModal(<?php echo json_encode($area); ?>)' 
-                        class="p-2 text-green-600 hover:bg-green-50 rounded-lg" 
+                      <button
+                        onclick='openEditModal(<?php echo json_encode($area); ?>)'
+                        class="p-2 text-green-600 hover:bg-green-50 rounded-lg"
                         title="Edit">
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button 
-                        onclick="confirmDelete(<?php echo $area['area_id']; ?>, '<?php echo htmlspecialchars($area['area_name']); ?>')" 
-                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg" 
+                      <button
+                        onclick="confirmDelete(<?php echo $area['area_id']; ?>, '<?php echo htmlspecialchars($area['area_name']); ?>')"
+                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg"
                         title="Delete">
                         <i class="fas fa-trash"></i>
                       </button>
@@ -443,7 +443,7 @@ $regions = DbHelper::getAllRegions(); // For dropdown in modal
       <form id="editAreaForm" method="POST" action="handlers/area-handler.php" class="p-6">
         <input type="hidden" name="action" value="update">
         <input type="hidden" name="area_id" id="edit_area_id">
-        
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -530,11 +530,11 @@ $regions = DbHelper::getAllRegions(); // For dropdown in modal
           <i class="fas fa-exclamation-triangle mr-2"></i>Confirm Delete
         </h3>
       </div>
-      
+
       <form id="deleteAreaForm" method="POST" action="handlers/area-handler.php" class="p-6">
         <input type="hidden" name="action" value="delete">
         <input type="hidden" name="area_id" id="delete_area_id">
-        
+
         <div class="mb-6">
           <p class="text-gray-700 mb-2">Are you sure you want to delete this area?</p>
           <p class="text-lg font-semibold text-gray-900" id="delete_area_name"></p>

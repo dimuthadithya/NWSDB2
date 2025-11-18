@@ -29,7 +29,7 @@ try {
         } else {
             // Create area
             $result = DbHelper::createArea($region_id, $area_code, $area_name, $status);
-            
+
             if ($result) {
                 $response['success'] = true;
                 $response['message'] = 'Area created successfully';
@@ -39,7 +39,7 @@ try {
             }
         }
     }
-    
+
     // UPDATE - Update existing area
     elseif (isset($_POST['action']) && $_POST['action'] === 'update') {
         $area_id = intval($_POST['area_id'] ?? 0);
@@ -64,9 +64,9 @@ try {
                 'area_name' => $area_name,
                 'status' => $status
             ];
-            
+
             $result = DbHelper::updateArea($area_id, $updateData);
-            
+
             if ($result) {
                 $response['success'] = true;
                 $response['message'] = 'Area updated successfully';
@@ -76,7 +76,7 @@ try {
             }
         }
     }
-    
+
     // DELETE - Delete area
     elseif (isset($_POST['action']) && $_POST['action'] === 'delete') {
         $area_id = intval($_POST['area_id'] ?? 0);
@@ -85,7 +85,7 @@ try {
             $response['message'] = 'Invalid area ID';
         } else {
             $result = DbHelper::deleteArea($area_id);
-            
+
             if ($result) {
                 $response['success'] = true;
                 $response['message'] = 'Area deleted successfully';
@@ -94,12 +94,9 @@ try {
                 $response['message'] = 'Failed to delete area. It may be linked to water supply schemes.';
             }
         }
-    }
-    
-    else {
+    } else {
         $response['message'] = 'Invalid action';
     }
-    
 } catch (Exception $e) {
     $response['message'] = 'Error: ' . $e->getMessage();
 }

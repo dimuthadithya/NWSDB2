@@ -617,14 +617,14 @@ class DbHelper
     public static function createArea($region_id, $area_code, $area_name, $status = 'active')
     {
         self::init();
-        
+
         $areaData = [
             'region_id' => $region_id,
             'area_code' => $area_code,
             'area_name' => $area_name,
             'status' => $status
         ];
-        
+
         return self::$db->insert('areas', $areaData);
     }
 
@@ -637,11 +637,11 @@ class DbHelper
     public static function updateArea($area_id, $data)
     {
         self::init();
-        
+
         if (!is_numeric($area_id)) {
             return false;
         }
-        
+
         return self::$db->update('areas', $data, ['area_id' => $area_id]);
     }
 
@@ -653,11 +653,11 @@ class DbHelper
     public static function deleteArea($area_id)
     {
         self::init();
-        
+
         if (!is_numeric($area_id)) {
             return false;
         }
-        
+
         return self::$db->delete('areas', ['area_id' => $area_id]);
     }
 
