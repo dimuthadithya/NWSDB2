@@ -7,6 +7,20 @@ requireLogin();
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
+// Handle success/error messages
+$successMessage = '';
+$errorMessage = '';
+
+if (isset($_SESSION['success_message'])) {
+  $successMessage = $_SESSION['success_message'];
+  unset($_SESSION['success_message']);
+}
+
+if (isset($_SESSION['error_message'])) {
+  $errorMessage = $_SESSION['error_message'];
+  unset($_SESSION['error_message']);
+}
+
 // Fetch water supply schemes data
 $schemes = DbHelper::getAllWaterSupplySchemes();
 $totalSchemes = DbHelper::getWaterSupplySchemeCount();
@@ -138,6 +152,25 @@ $areas = DbHelper::getAllAreas(); // For dropdown in modal
         </div>
       </div>
 
+      <!-- Success/Error Messages -->
+      <?php if ($successMessage): ?>
+        <div id="successMessage" class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg shadow-sm animate-fade-up">
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
+            <p class="text-green-700 font-medium"><?php echo htmlspecialchars($successMessage); ?></p>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <?php if ($errorMessage): ?>
+        <div id="errorMessage" class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm animate-fade-up">
+          <div class="flex items-center">
+            <i class="fas fa-exclamation-circle text-red-500 text-xl mr-3"></i>
+            <p class="text-red-700 font-medium"><?php echo htmlspecialchars($errorMessage); ?></p>
+          </div>
+        </div>
+      <?php endif; ?>
+
       <!-- Quick Actions -->
       <div class="flex flex-wrap gap-3">
         <button
@@ -259,13 +292,16 @@ $areas = DbHelper::getAllAreas(); // For dropdown in modal
                       <?php echo date('M d, Y', strtotime($scheme['created_at'])); ?>
                     </td>
                     <td class="px-6 py-4 text-right space-x-2">
-                      <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="View">
-                        <i class="fas fa-eye"></i>
-                      </button>
-                      <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Edit">
+                      <button
+                        onclick='openEditModal(<?php echo json_encode($scheme); ?>)'
+                        class="p-2 text-green-600 hover:bg-green-50 rounded-lg"
+                        title="Edit">
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button class="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Delete">
+                      <button
+                        onclick="confirmDelete(<?php echo $scheme['wss_id']; ?>, '<?php echo htmlspecialchars($scheme['wss_name']); ?>')"
+                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                        title="Delete">
                         <i class="fas fa-trash"></i>
                       </button>
                     </td>
@@ -337,7 +373,8 @@ $areas = DbHelper::getAllAreas(); // For dropdown in modal
         </div>
       </div>
 
-      <form class="p-6">
+      <form method="POST" action="handlers/wss-handler.php" class="p-6">
+        <input type="hidden" name="action" value="create">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -362,6 +399,7 @@ $areas = DbHelper::getAllAreas(); // For dropdown in modal
             </label>
             <input
               type="text"
+              name="wss_code"
               required
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="e.g., WSS001" />
@@ -373,6 +411,7 @@ $areas = DbHelper::getAllAreas(); // For dropdown in modal
             </label>
             <input
               type="text"
+              name="wss_name"
               required
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="e.g., Colombo City Water Supply" />
@@ -383,6 +422,7 @@ $areas = DbHelper::getAllAreas(); // For dropdown in modal
               Status
             </label>
             <select
+              name="status"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
@@ -408,6 +448,166 @@ $areas = DbHelper::getAllAreas(); // For dropdown in modal
     </div>
   </div>
 
+  <!-- Edit Water Scheme Modal -->
+  <div
+    id="editModal"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div
+      class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div
+        class="sticky top-0 bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4 rounded-t-2xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-bold text-white">
+            <i class="fas fa-edit mr-2"></i>Edit Water Supply Scheme
+          </h3>
+          <button
+            onclick="closeEditModal()"
+            class="text-white hover:text-gray-200 transition-colors">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <form method="POST" action="handlers/wss-handler.php" class="p-6">
+        <input type="hidden" name="action" value="update">
+        <input type="hidden" name="wss_id" id="edit_wss_id">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Area <span class="text-red-500">*</span>
+            </label>
+            <select
+              name="area_id"
+              id="edit_area_id"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="">Select Area</option>
+              <?php foreach ($areas as $area): ?>
+                <option value="<?php echo $area['area_id']; ?>">
+                  <?php echo htmlspecialchars($area['area_name']); ?> - <?php echo htmlspecialchars($area['region_name'] ?? ''); ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              WSS Code <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="wss_code"
+              id="edit_wss_code"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              placeholder="e.g., WSS001" />
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              WSS Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="wss_name"
+              id="edit_wss_name"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              placeholder="e.g., Colombo City Water Supply" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Status
+            </label>
+            <select
+              name="status"
+              id="edit_status"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="maintenance">Maintenance</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-6 flex gap-3 justify-end">
+          <button
+            type="button"
+            onclick="closeEditModal()"
+            class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            <i class="fas fa-times mr-2"></i>Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-6 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all">
+            <i class="fas fa-save mr-2"></i>Update Scheme
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div
+    id="deleteModal"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+      <div
+        class="bg-gradient-to-r from-red-600 to-rose-600 px-6 py-4 rounded-t-2xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-bold text-white">
+            <i class="fas fa-exclamation-triangle mr-2"></i>Confirm Deletion
+          </h3>
+          <button
+            onclick="closeDeleteModal()"
+            class="text-white hover:text-gray-200 transition-colors">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <form method="POST" action="handlers/wss-handler.php" class="p-6">
+        <input type="hidden" name="action" value="delete">
+        <input type="hidden" name="wss_id" id="delete_wss_id">
+
+        <div class="mb-6">
+          <p class="text-gray-700 mb-4">
+            Are you sure you want to delete the water supply scheme
+            <strong class="text-red-600" id="delete_wss_name"></strong>?
+          </p>
+          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-yellow-700">
+                  <strong>Warning:</strong> This action cannot be undone.
+                  It will also delete all sections associated with this scheme.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-3 justify-end">
+          <button
+            type="button"
+            onclick="closeDeleteModal()"
+            class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            <i class="fas fa-times mr-2"></i>Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-6 py-2 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-lg hover:from-red-700 hover:to-rose-700 transition-all">
+            <i class="fas fa-trash mr-2"></i>Delete
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     // Mobile menu toggle
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
@@ -424,16 +624,62 @@ $areas = DbHelper::getAllAreas(); // For dropdown in modal
 
     function closeAddModal() {
       document.getElementById('addModal').classList.add('hidden');
+      document.querySelector('#addModal form').reset();
     }
 
-    // Close modal on outside click
-    document
-      .getElementById('addModal')
-      .addEventListener('click', function(e) {
-        if (e.target === this) {
-          closeAddModal();
-        }
-      });
+    function openEditModal(scheme) {
+      document.getElementById('edit_wss_id').value = scheme.wss_id;
+      document.getElementById('edit_area_id').value = scheme.area_id;
+      document.getElementById('edit_wss_code').value = scheme.wss_code;
+      document.getElementById('edit_wss_name').value = scheme.wss_name;
+      document.getElementById('edit_status').value = scheme.status;
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+      document.querySelector('#editModal form').reset();
+    }
+
+    function confirmDelete(wssId, wssName) {
+      document.getElementById('delete_wss_id').value = wssId;
+      document.getElementById('delete_wss_name').textContent = wssName;
+      document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.add('hidden');
+    }
+
+    // Close modals on outside click
+    document.getElementById('addModal').addEventListener('click', function(e) {
+      if (e.target === this) closeAddModal();
+    });
+
+    document.getElementById('editModal').addEventListener('click', function(e) {
+      if (e.target === this) closeEditModal();
+    });
+
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+      if (e.target === this) closeDeleteModal();
+    });
+
+    // ESC key to close modals
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeAddModal();
+        closeEditModal();
+        closeDeleteModal();
+      }
+    });
+
+    // Auto-hide success/error messages
+    setTimeout(function() {
+      const successMsg = document.getElementById('successMessage');
+      const errorMsg = document.getElementById('errorMessage');
+      if (successMsg) successMsg.style.display = 'none';
+      if (errorMsg) errorMsg.style.display = 'none';
+    }, 5000);
   </script>
 </body>
 

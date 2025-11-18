@@ -784,4 +784,59 @@ class DbHelper
         $result = self::$db->count('water_supply_schemes', ['status' => 'maintenance']);
         return $result ? $result : 0;
     }
+
+    /**
+     * Create a new water supply scheme
+     * @param int $area_id Area ID
+     * @param string $wss_code Scheme code
+     * @param string $wss_name Scheme name
+     * @param string $status Scheme status (active/inactive/maintenance)
+     * @return bool|int Returns scheme ID on success, false on failure
+     */
+    public static function createWaterSupplyScheme($area_id, $wss_code, $wss_name, $status = 'active')
+    {
+        self::init();
+
+        $schemeData = [
+            'area_id' => $area_id,
+            'wss_code' => $wss_code,
+            'wss_name' => $wss_name,
+            'status' => $status
+        ];
+
+        return self::$db->insert('water_supply_schemes', $schemeData);
+    }
+
+    /**
+     * Update a water supply scheme
+     * @param int $wss_id Scheme ID
+     * @param array $data Data to update
+     * @return bool Returns true on success, false on failure
+     */
+    public static function updateWaterSupplyScheme($wss_id, $data)
+    {
+        self::init();
+
+        if (!is_numeric($wss_id)) {
+            return false;
+        }
+
+        return self::$db->update('water_supply_schemes', $data, ['wss_id' => $wss_id]);
+    }
+
+    /**
+     * Delete a water supply scheme
+     * @param int $wss_id Scheme ID
+     * @return bool Returns true on success, false on failure
+     */
+    public static function deleteWaterSupplyScheme($wss_id)
+    {
+        self::init();
+
+        if (!is_numeric($wss_id)) {
+            return false;
+        }
+
+        return self::$db->delete('water_supply_schemes', ['wss_id' => $wss_id]);
+    }
 }

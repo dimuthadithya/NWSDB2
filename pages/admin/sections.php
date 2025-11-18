@@ -107,7 +107,7 @@ $waterSchemes = DbHelper::getAllWaterSupplySchemes(); // For dropdown
           onclick="openAddComputerModal()"
           class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all">
           <i class="fas fa-plus mr-2"></i>
-          Add New Computer
+          Add New Sections
         </button>
         <button
           class="inline-flex items-center px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm border border-gray-200 transition-all">
