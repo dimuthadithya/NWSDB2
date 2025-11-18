@@ -323,9 +323,28 @@ class DbHelper
 
         $fingerId = self::$db->getId('device_categories', 'category_name', 'Fingerprint Device', 'category_id');
 
-        $fingerDevices = self::$db->select('devices', ['*'], ['category_id' => $fingerId]);
+        $sql = "SELECT d.*, s.section_name, w.wss_name 
+                FROM devices d 
+                LEFT JOIN sections s ON d.section_id = s.section_id
+                LEFT JOIN water_supply_schemes w ON d.wss_id = w.wss_id
+                WHERE d.category_id = ?
+                ORDER BY d.created_at DESC";
 
-        return $fingerDevices ? $fingerDevices : false;
+        try {
+            $db = Database::getInstance();
+            $conn = new PDO(
+                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
+                DB_USERNAME,
+                DB_PASSWORD
+            );
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$fingerId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('getAllFingerDevices failed: ' . $e->getMessage());
+            return [];
+        }
     }
 
     public static function createBranch($branch_name, $branch_location)
