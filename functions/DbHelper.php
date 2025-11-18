@@ -469,6 +469,59 @@ class DbHelper
         return $result ? $result : 0;
     }
 
+    /**
+     * Create a new region
+     * @param string $region_code Region code
+     * @param string $region_name Region name
+     * @param string $status Region status (active/inactive)
+     * @return bool|int Returns region ID on success, false on failure
+     */
+    public static function createRegion($region_code, $region_name, $status = 'active')
+    {
+        self::init();
+
+        $regionData = [
+            'region_code' => $region_code,
+            'region_name' => $region_name,
+            'status' => $status
+        ];
+
+        return self::$db->insert('regions', $regionData);
+    }
+
+    /**
+     * Update a region
+     * @param int $region_id Region ID
+     * @param array $data Data to update
+     * @return bool Returns true on success, false on failure
+     */
+    public static function updateRegion($region_id, $data)
+    {
+        self::init();
+
+        if (!is_numeric($region_id)) {
+            return false;
+        }
+
+        return self::$db->update('regions', $data, ['region_id' => $region_id]);
+    }
+
+    /**
+     * Delete a region
+     * @param int $region_id Region ID
+     * @return bool Returns true on success, false on failure
+     */
+    public static function deleteRegion($region_id)
+    {
+        self::init();
+
+        if (!is_numeric($region_id)) {
+            return false;
+        }
+
+        return self::$db->delete('regions', ['region_id' => $region_id]);
+    }
+
     // ============================================
     // AREAS Functions
     // ============================================

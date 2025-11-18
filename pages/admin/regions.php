@@ -7,6 +7,20 @@ requireLogin();
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
+// Handle success/error messages
+$successMessage = '';
+$errorMessage = '';
+
+if (isset($_SESSION['success_message'])) {
+  $successMessage = $_SESSION['success_message'];
+  unset($_SESSION['success_message']);
+}
+
+if (isset($_SESSION['error_message'])) {
+  $errorMessage = $_SESSION['error_message'];
+  unset($_SESSION['error_message']);
+}
+
 // Fetch regions data
 $regions = DbHelper::getAllRegions();
 $totalRegions = DbHelper::getRegionCount();
@@ -132,6 +146,25 @@ include '../../includes/sidemenu.php';
       </div>
     </div>
 
+    <!-- Success/Error Messages -->
+    <?php if ($successMessage): ?>
+      <div id="successMessage" class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg shadow-sm animate-fade-up">
+        <div class="flex items-center">
+          <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
+          <p class="text-green-700 font-medium"><?php echo htmlspecialchars($successMessage); ?></p>
+        </div>
+      </div>
+    <?php endif; ?>
+
+    <?php if ($errorMessage): ?>
+      <div id="errorMessage" class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm animate-fade-up">
+        <div class="flex items-center">
+          <i class="fas fa-exclamation-circle text-red-500 text-xl mr-3"></i>
+          <p class="text-red-700 font-medium"><?php echo htmlspecialchars($errorMessage); ?></p>
+        </div>
+      </div>
+    <?php endif; ?>
+
     <!-- Quick Actions -->
     <div class="flex flex-wrap gap-3">
       <button
@@ -233,13 +266,16 @@ include '../../includes/sidemenu.php';
                     <?php echo date('M d, Y', strtotime($region['created_at'])); ?>
                   </td>
                   <td class="px-6 py-4 text-right space-x-2">
-                    <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="View">
-                      <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Edit">
+                    <button
+                      onclick='openEditModal(<?php echo json_encode($region); ?>)'
+                      class="p-2 text-green-600 hover:bg-green-50 rounded-lg"
+                      title="Edit">
                       <i class="fas fa-edit"></i>
                     </button>
-                    <button class="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Delete">
+                    <button
+                      onclick="confirmDelete(<?php echo $region['region_id']; ?>, '<?php echo htmlspecialchars($region['region_name']); ?>')"
+                      class="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                      title="Delete">
                       <i class="fas fa-trash"></i>
                     </button>
                   </td>
@@ -301,7 +337,8 @@ include '../../includes/sidemenu.php';
       </div>
     </div>
 
-    <form class="p-6">
+    <form id="addRegionForm" method="POST" action="handlers/region-handler.php" class="p-6">
+      <input type="hidden" name="action" value="create">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -309,6 +346,7 @@ include '../../includes/sidemenu.php';
           </label>
           <input
             type="text"
+            name="region_code"
             required
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             placeholder="e.g., WR001" />
@@ -320,6 +358,7 @@ include '../../includes/sidemenu.php';
           </label>
           <input
             type="text"
+            name="region_name"
             required
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             placeholder="e.g., Western Region" />
@@ -330,6 +369,7 @@ include '../../includes/sidemenu.php';
             Status
           </label>
           <select
+            name="status"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -354,7 +394,146 @@ include '../../includes/sidemenu.php';
   </div>
 </div>
 
+<!-- Edit Region Modal -->
+<div
+  id="editModal"
+  class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div
+    class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div
+      class="sticky top-0 bg-gradient-to-r from-green-600 to-teal-600 px-6 py-4 rounded-t-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xl font-bold text-white">
+          <i class="fas fa-edit mr-2"></i>Edit Region
+        </h3>
+        <button
+          onclick="closeEditModal()"
+          class="text-white hover:text-gray-200 transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+    </div>
+
+    <form id="editRegionForm" method="POST" action="handlers/region-handler.php" class="p-6">
+      <input type="hidden" name="action" value="update">
+      <input type="hidden" name="region_id" id="edit_region_id">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Region Code <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            name="region_code"
+            id="edit_region_code"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            placeholder="e.g., WR001" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Region Name <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            name="region_name"
+            id="edit_region_name"
+            required
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            placeholder="e.g., Western Region" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Status
+          </label>
+          <select
+            name="status"
+            id="edit_status"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-6 flex gap-3 justify-end">
+        <button
+          type="button"
+          onclick="closeEditModal()"
+          class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+          <i class="fas fa-times mr-2"></i>Cancel
+        </button>
+        <button
+          type="submit"
+          class="px-6 py-2 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg hover:from-green-700 hover:to-teal-700 transition-all">
+          <i class="fas fa-save mr-2"></i>Update Region
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div
+  id="deleteModal"
+  class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+    <div class="bg-gradient-to-r from-red-600 to-pink-600 px-6 py-4 rounded-t-2xl">
+      <h3 class="text-xl font-bold text-white">
+        <i class="fas fa-exclamation-triangle mr-2"></i>Confirm Delete
+      </h3>
+    </div>
+
+    <form id="deleteRegionForm" method="POST" action="handlers/region-handler.php" class="p-6">
+      <input type="hidden" name="action" value="delete">
+      <input type="hidden" name="region_id" id="delete_region_id">
+
+      <div class="mb-6">
+        <p class="text-gray-700 mb-2">Are you sure you want to delete this region?</p>
+        <p class="text-lg font-semibold text-gray-900" id="delete_region_name"></p>
+        <p class="text-sm text-red-600 mt-2">
+          <i class="fas fa-exclamation-circle mr-1"></i>
+          This action cannot be undone. All associated areas will be affected.
+        </p>
+      </div>
+
+      <div class="flex gap-3 justify-end">
+        <button
+          type="button"
+          onclick="closeDeleteModal()"
+          class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+          <i class="fas fa-times mr-2"></i>Cancel
+        </button>
+        <button
+          type="submit"
+          class="px-6 py-2 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg hover:from-red-700 hover:to-pink-700 transition-all">
+          <i class="fas fa-trash mr-2"></i>Delete Region
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
+  // Auto-hide success/error messages after 5 seconds
+  setTimeout(() => {
+    const successMsg = document.getElementById('successMessage');
+    const errorMsg = document.getElementById('errorMessage');
+    if (successMsg) {
+      successMsg.style.transition = 'opacity 0.5s';
+      successMsg.style.opacity = '0';
+      setTimeout(() => successMsg.remove(), 500);
+    }
+    if (errorMsg) {
+      errorMsg.style.transition = 'opacity 0.5s';
+      errorMsg.style.opacity = '0';
+      setTimeout(() => errorMsg.remove(), 500);
+    }
+  }, 5000);
+
   // Mobile menu toggle
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
   const sidebar = document.getElementById('sidebar');
@@ -363,19 +542,66 @@ include '../../includes/sidemenu.php';
     sidebar.classList.toggle('-translate-x-full');
   });
 
-  // Modal functions
+  // Add Modal functions
   function openAddModal() {
     document.getElementById('addModal').classList.remove('hidden');
   }
 
   function closeAddModal() {
     document.getElementById('addModal').classList.add('hidden');
+    document.getElementById('addRegionForm').reset();
   }
 
-  // Close modal on outside click
+  // Edit Modal functions
+  function openEditModal(region) {
+    document.getElementById('edit_region_id').value = region.region_id;
+    document.getElementById('edit_region_code').value = region.region_code;
+    document.getElementById('edit_region_name').value = region.region_name;
+    document.getElementById('edit_status').value = region.status;
+    document.getElementById('editModal').classList.remove('hidden');
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModal').classList.add('hidden');
+    document.getElementById('editRegionForm').reset();
+  }
+
+  // Delete Modal functions
+  function confirmDelete(regionId, regionName) {
+    document.getElementById('delete_region_id').value = regionId;
+    document.getElementById('delete_region_name').textContent = regionName;
+    document.getElementById('deleteModal').classList.remove('hidden');
+  }
+
+  function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+  }
+
+  // Close modals on outside click
   document.getElementById('addModal').addEventListener('click', function(e) {
     if (e.target === this) {
       closeAddModal();
+    }
+  });
+
+  document.getElementById('editModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeEditModal();
+    }
+  });
+
+  document.getElementById('deleteModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeDeleteModal();
+    }
+  });
+
+  // Close modals on ESC key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeAddModal();
+      closeEditModal();
+      closeDeleteModal();
     }
   });
 </script>
