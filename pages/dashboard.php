@@ -20,6 +20,7 @@ $totalUsers = DbHelper::getRowCount('users');
 
 $adminUsers = DbHelper::getRowCountWithCondition('users', ['role' => 'admin']);
 $activeUsers = DbHelper::getRowCountWithCondition('users', ['status' => 'active']);
+$regularUsers = $totalUsers - $adminUsers;
 $activeDevices = DbHelper::getRowCountWithCondition('devices', ['status' => 'active']);
 $repairDevices = DbHelper::getRowCountWithCondition('devices', ['status' => 'under_repair']);
 $laptopsCount = DbHelper::getRowCountWithCondition('devices', ['category_id' => $laptopCatId]);
@@ -30,6 +31,16 @@ $otherDevicesCount = $totalDevices - ($laptopsCount + $printersCount + $computer
 // Get top 3 sections by device count
 $topSections = DbHelper::getSectionsByDeviceCount();
 $top3Sections = $topSections ? array_slice($topSections, 0, 3) : [];
+
+// Get issue priority counts
+$issuePriorityCounts = DbHelper::getIssuePriorityCounts();
+$highPriorityIssues = $issuePriorityCounts['high'];
+$mediumPriorityIssues = $issuePriorityCounts['medium'];
+$lowPriorityIssues = $issuePriorityCounts['low'];
+$totalPriorityIssues = $highPriorityIssues + $mediumPriorityIssues + $lowPriorityIssues;
+
+// Get recent activities
+$recentActivities = DbHelper::getRecentActivities(4);
 
 ?>
 
@@ -302,67 +313,39 @@ $top3Sections = $topSections ? array_slice($topSections, 0, 3) : [];
             Recent Activity
           </h3>
           <div class="space-y-4">
-            <div
-              class="activity-item flex items-start space-x-3 p-3 rounded-xl">
-              <div
-                class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <i class="fas fa-plus text-blue-600"></i>
+            <?php if (!empty($recentActivities)): ?>
+              <?php foreach ($recentActivities as $activity): ?>
+                <div class="activity-item flex items-start space-x-3 p-3 rounded-xl">
+                  <div class="w-10 h-10 bg-<?php echo $activity['color']; ?>-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas <?php echo $activity['icon']; ?> text-<?php echo $activity['color']; ?>-600"></i>
+                  </div>
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-800">
+                      <?php echo htmlspecialchars($activity['title']); ?>
+                    </p>
+                    <p class="text-xs text-gray-500"><?php echo htmlspecialchars($activity['description']); ?></p>
+                    <p class="text-xs text-gray-400 mt-1">
+                      <?php
+                      $time = strtotime($activity['time']);
+                      $diff = time() - $time;
+                      if ($diff < 3600) {
+                        echo floor($diff / 60) . ' minutes ago';
+                      } elseif ($diff < 86400) {
+                        echo floor($diff / 3600) . ' hours ago';
+                      } else {
+                        echo floor($diff / 86400) . ' days ago';
+                      }
+                      ?>
+                    </p>
+                  </div>
+                </div>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                <p class="text-sm">No recent activity</p>
               </div>
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-800">
-                  New Device Added
-                </p>
-                <p class="text-xs text-gray-500">Desktop PC - Engineering</p>
-                <p class="text-xs text-gray-400 mt-1">2 hours ago</p>
-              </div>
-            </div>
-
-            <div
-              class="activity-item flex items-start space-x-3 p-3 rounded-xl">
-              <div
-                class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <i class="fas fa-wrench text-orange-600"></i>
-              </div>
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-800">
-                  Repair Started
-                </p>
-                <p class="text-xs text-gray-500">Printer - Admin Office</p>
-                <p class="text-xs text-gray-400 mt-1">5 hours ago</p>
-              </div>
-            </div>
-
-            <div
-              class="activity-item flex items-start space-x-3 p-3 rounded-xl">
-              <div
-                class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <i class="fas fa-check-circle text-green-600"></i>
-              </div>
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-800">
-                  Issue Resolved
-                </p>
-                <p class="text-xs text-gray-500">Laptop #24 Network Issue</p>
-                <p class="text-xs text-gray-400 mt-1">1 day ago</p>
-              </div>
-            </div>
-
-            <div
-              class="activity-item flex items-start space-x-3 p-3 rounded-xl">
-              <div
-                class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <i class="fas fa-exclamation-triangle text-red-600"></i>
-              </div>
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-800">
-                  New Issue Reported
-                </p>
-                <p class="text-xs text-gray-500">
-                  Desktop - Slow Performance
-                </p>
-                <p class="text-xs text-gray-400 mt-1">1 day ago</p>
-              </div>
-            </div>
+            <?php endif; ?>
           </div>
         </div>
       </div>
@@ -431,9 +414,9 @@ $top3Sections = $topSections ? array_slice($topSections, 0, 3) : [];
                 <div class="w-32 bg-gray-200 rounded-full h-2">
                   <div
                     class="bg-red-500 h-2 rounded-full"
-                    style="width: 38%"></div>
+                    style="width: <?php echo $totalPriorityIssues > 0 ? ($highPriorityIssues / $totalPriorityIssues * 100) : 0; ?>%"></div>
                 </div>
-                <span class="font-semibold text-gray-800 w-8">3</span>
+                <span class="font-semibold text-gray-800 w-8"><?php echo $highPriorityIssues; ?></span>
               </div>
             </div>
 
@@ -446,9 +429,9 @@ $top3Sections = $topSections ? array_slice($topSections, 0, 3) : [];
                 <div class="w-32 bg-gray-200 rounded-full h-2">
                   <div
                     class="bg-orange-500 h-2 rounded-full"
-                    style="width: 50%"></div>
+                    style="width: <?php echo $totalPriorityIssues > 0 ? ($mediumPriorityIssues / $totalPriorityIssues * 100) : 0; ?>%"></div>
                 </div>
-                <span class="font-semibold text-gray-800 w-8">4</span>
+                <span class="font-semibold text-gray-800 w-8"><?php echo $mediumPriorityIssues; ?></span>
               </div>
             </div>
 
@@ -461,9 +444,9 @@ $top3Sections = $topSections ? array_slice($topSections, 0, 3) : [];
                 <div class="w-32 bg-gray-200 rounded-full h-2">
                   <div
                     class="bg-yellow-500 h-2 rounded-full"
-                    style="width: 12%"></div>
+                    style="width: <?php echo $totalPriorityIssues > 0 ? ($lowPriorityIssues / $totalPriorityIssues * 100) : 0; ?>%"></div>
                 </div>
-                <span class="font-semibold text-gray-800 w-8">1</span>
+                <span class="font-semibold text-gray-800 w-8"><?php echo $lowPriorityIssues; ?></span>
               </div>
             </div>
           </div>
@@ -498,10 +481,10 @@ $top3Sections = $topSections ? array_slice($topSections, 0, 3) : [];
               </h4>
               <p class="text-sm text-gray-600">Admins</p>
             </div>
-            <div class="p-4 bg-orange-50 rounded-xl text-center">
-              <i class="fas fa-clock text-orange-600 text-2xl mb-2"></i>
-              <h4 class="text-2xl font-bold text-gray-800">12</h4>
-              <p class="text-sm text-gray-600">Online Now</p>
+            <div class="p-4 bg-indigo-50 rounded-xl text-center">
+              <i class="fas fa-user text-indigo-600 text-2xl mb-2"></i>
+              <h4 class="text-2xl font-bold text-gray-800"><?php echo $regularUsers; ?></h4>
+              <p class="text-sm text-gray-600">Regular Users</p>
             </div>
           </div>
         </div>

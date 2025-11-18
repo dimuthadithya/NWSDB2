@@ -735,6 +735,131 @@ class DbHelper
         return $categoryId ? $categoryId : null;
     }
 
+    /**
+     * Get issue counts by priority
+     * @return array Returns array with counts for each priority
+     */
+    public static function getIssuePriorityCounts()
+    {
+        self::init();
+
+        $highPriority = self::$db->count('device_issues', ['priority' => 'high', 'status !=' => 'closed']);
+        $mediumPriority = self::$db->count('device_issues', ['priority' => 'medium', 'status !=' => 'closed']);
+        $lowPriority = self::$db->count('device_issues', ['priority' => 'low', 'status !=' => 'closed']);
+
+        return [
+            'high' => $highPriority ? $highPriority : 0,
+            'medium' => $mediumPriority ? $mediumPriority : 0,
+            'low' => $lowPriority ? $lowPriority : 0
+        ];
+    }
+
+    /**
+     * Get recent activities (issues, repairs, devices)
+     * @param int $limit Number of activities to fetch
+     * @return array|bool Returns array of activities or false
+     */
+    public static function getRecentActivities($limit = 10)
+    {
+        self::init();
+
+        $activities = [];
+
+        try {
+            // Get recent devices
+            $recentDevices = self::$db->rawQuery("
+                SELECT 
+                    d.device_id,
+                    d.device_name,
+                    d.created_at,
+                    dc.category_name,
+                    'device' as type
+                FROM devices d
+                LEFT JOIN device_categories dc ON d.category_id = dc.category_id
+                ORDER BY d.created_at DESC
+                LIMIT 3
+            ");
+
+            if ($recentDevices) {
+                foreach ($recentDevices as $device) {
+                    $activities[] = [
+                        'type' => 'device',
+                        'title' => 'New Device Added',
+                        'description' => $device['device_name'] . ' - ' . $device['category_name'],
+                        'time' => $device['created_at'],
+                        'icon' => 'fa-plus',
+                        'color' => 'blue'
+                    ];
+                }
+            }
+
+            // Get recent repairs
+            $recentRepairs = self::$db->rawQuery("
+                SELECT 
+                    r.repair_id,
+                    d.device_name,
+                    r.created_at,
+                    r.status
+                FROM repairs r
+                LEFT JOIN devices d ON r.device_id = d.device_id
+                WHERE r.status = 'in_progress' OR r.status = 'completed'
+                ORDER BY r.created_at DESC
+                LIMIT 3
+            ");
+
+            if ($recentRepairs) {
+                foreach ($recentRepairs as $repair) {
+                    $activities[] = [
+                        'type' => 'repair',
+                        'title' => $repair['status'] === 'completed' ? 'Repair Completed' : 'Repair Started',
+                        'description' => $repair['device_name'],
+                        'time' => $repair['created_at'],
+                        'icon' => $repair['status'] === 'completed' ? 'fa-check-circle' : 'fa-wrench',
+                        'color' => $repair['status'] === 'completed' ? 'green' : 'orange'
+                    ];
+                }
+            }
+
+            // Get recent issues
+            $recentIssues = self::$db->rawQuery("
+                SELECT 
+                    i.issue_id,
+                    d.device_name,
+                    i.issue_title,
+                    i.created_at,
+                    i.status,
+                    i.resolved_at
+                FROM device_issues i
+                LEFT JOIN devices d ON i.device_id = d.device_id
+                ORDER BY i.created_at DESC
+                LIMIT 3
+            ");
+
+            if ($recentIssues) {
+                foreach ($recentIssues as $issue) {
+                    $isResolved = in_array($issue['status'], ['resolved', 'closed']);
+                    $activities[] = [
+                        'type' => 'issue',
+                        'title' => $isResolved ? 'Issue Resolved' : 'New Issue Reported',
+                        'description' => $issue['device_name'] . ' - ' . $issue['issue_title'],
+                        'time' => $isResolved ? $issue['resolved_at'] : $issue['created_at'],
+                        'icon' => $isResolved ? 'fa-check-circle' : 'fa-exclamation-triangle',
+                        'color' => $isResolved ? 'green' : 'red'
+                    ];
+                }
+            }
+
+            // Sort all activities by time
+            usort($activities, function ($a, $b) {
+                return strtotime($b['time']) - strtotime($a['time']);
+            });
+
+            return array_slice($activities, 0, $limit);
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
     // ============================================
     // REGIONS Functions
     // ============================================
