@@ -551,7 +551,7 @@ $issuePriorityCounts = DbHelper::getIssuePriorityCounts();
               total: {
                 show: true,
                 label: 'Total Devices',
-                formatter: function (w) {
+                formatter: function(w) {
                   return <?php echo $totalDevices; ?>;
                 }
               }
@@ -589,10 +589,10 @@ $issuePriorityCounts = DbHelper::getIssuePriorityCounts();
       colors: ['#3B82F6'],
       xaxis: {
         categories: [
-          <?php 
+          <?php
           if (!empty($top7Sections)) {
-            echo "'" . implode("', '", array_map(function($s) { 
-              return addslashes($s['section_name']); 
+            echo "'" . implode("', '", array_map(function ($s) {
+              return addslashes($s['section_name']);
             }, $top7Sections)) . "'";
           } else {
             echo "'No Data'";
