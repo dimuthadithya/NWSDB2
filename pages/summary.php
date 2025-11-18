@@ -7,6 +7,52 @@ requireLogin();
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
+// Get all device and system statistics
+$totalDevices = DbHelper::getRowCount('devices');
+$activeDevices = DbHelper::getRowCountWithCondition('devices', ['status' => 'active']);
+$repairDevices = DbHelper::getRowCountWithCondition('devices', ['status' => 'under_repair']);
+$retiredDevices = DbHelper::getRowCountWithCondition('devices', ['status' => 'retired']);
+$lostDevices = DbHelper::getRowCountWithCondition('devices', ['status' => 'lost']);
+
+// Calculate uptime percentage
+$uptimeRate = $totalDevices > 0 ? round(($activeDevices / $totalDevices) * 100, 1) : 0;
+
+// Get category counts
+$laptopCatId = DbHelper::getCategoryId('laptop');
+$desktopCatId = DbHelper::getCategoryId('Desktop Computer');
+$printerId = DbHelper::getCategoryId('printer');
+$otherId = DbHelper::getCategoryId('other');
+
+$laptopsCount = DbHelper::getRowCountWithCondition('devices', ['category_id' => $laptopCatId]);
+$computersCount = DbHelper::getRowCountWithCondition('devices', ['category_id' => $desktopCatId]);
+$printersCount = DbHelper::getRowCountWithCondition('devices', ['category_id' => $printerId]);
+$otherDevicesCount = $totalDevices - ($laptopsCount + $printersCount + $computersCount);
+
+// Get user statistics
+$totalUsers = DbHelper::getRowCount('users');
+$activeUsers = DbHelper::getRowCountWithCondition('users', ['status' => 'active']);
+
+// Get issue statistics
+$totalIssues = DbHelper::getRowCount('device_issues');
+$openIssues = DbHelper::getRowCountWithCondition('device_issues', ['status' => 'open']);
+$inProgressIssues = DbHelper::getRowCountWithCondition('device_issues', ['status' => 'in_progress']);
+$activeIssues = $openIssues + $inProgressIssues;
+
+// Get repair statistics
+$totalRepairs = DbHelper::getRowCount('repairs');
+$pendingRepairs = DbHelper::getRowCountWithCondition('repairs', ['status' => 'pending']);
+$completedRepairs = DbHelper::getRowCountWithCondition('repairs', ['status' => 'completed']);
+
+// Get top sections by device count
+$topSections = DbHelper::getSectionsByDeviceCount();
+$top7Sections = $topSections ? array_slice($topSections, 0, 7) : [];
+
+// Get recent activities
+$recentActivities = DbHelper::getRecentActivities(10);
+
+// Get issue priority counts
+$issuePriorityCounts = DbHelper::getIssuePriorityCounts();
+
 ?>
 
 
@@ -110,6 +156,46 @@ $name = $_SESSION['user']['name'];
           </button>
         </div>
       </div>
+
+      <!-- System Health Overview -->
+      <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-lg p-6 mb-8 text-white">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div class="text-center">
+            <div class="text-4xl font-bold mb-2"><?php echo number_format($totalDevices); ?></div>
+            <div class="text-blue-100 text-sm">Total Devices</div>
+          </div>
+          <div class="text-center">
+            <div class="text-4xl font-bold mb-2"><?php echo $uptimeRate; ?>%</div>
+            <div class="text-blue-100 text-sm">System Uptime</div>
+            <div class="mt-2">
+              <div class="bg-white/20 rounded-full h-2">
+                <div class="bg-green-400 h-2 rounded-full" style="width: <?php echo $uptimeRate; ?>%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="text-center">
+            <div class="text-4xl font-bold mb-2"><?php echo $activeIssues; ?></div>
+            <div class="text-blue-100 text-sm">Active Issues</div>
+            <?php if ($activeIssues > 0): ?>
+              <div class="text-xs mt-1 text-yellow-200">
+                <i class="fas fa-exclamation-triangle"></i> Requires attention
+              </div>
+            <?php else: ?>
+              <div class="text-xs mt-1 text-green-200">
+                <i class="fas fa-check-circle"></i> All clear
+              </div>
+            <?php endif; ?>
+          </div>
+          <div class="text-center">
+            <div class="text-4xl font-bold mb-2"><?php echo $activeUsers; ?></div>
+            <div class="text-blue-100 text-sm">Active Users</div>
+            <div class="text-xs mt-1 text-blue-200">
+              <?php echo $totalUsers - $activeUsers; ?> inactive
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Quick Stats Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div class="stat-card bg-white p-6 rounded-2xl shadow-sm">
@@ -121,27 +207,27 @@ $name = $_SESSION['user']['name'];
             <span
               class="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">Devices</span>
           </div>
-          <h3 class="text-2xl font-bold text-gray-800 mb-1">2,547</h3>
+          <h3 class="text-2xl font-bold text-gray-800 mb-1"><?php echo number_format($totalDevices); ?></h3>
           <p class="text-gray-500 text-sm">Total Devices</p>
-          <div class="mt-4 flex items-center text-green-600">
-            <i class="fas fa-arrow-up text-xs mr-1"></i>
-            <span class="text-xs">12% from last month</span>
+          <div class="mt-4 flex items-center text-blue-600">
+            <i class="fas fa-check-circle text-xs mr-1"></i>
+            <span class="text-xs"><?php echo $activeDevices; ?> Active</span>
           </div>
         </div>
         <div class="stat-card bg-white p-6 rounded-2xl shadow-sm">
           <div class="flex items-center justify-between mb-4">
             <div
               class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
-              <i class="fas fa-tools text-red-600 text-xl"></i>
+              <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
             </div>
             <span
               class="text-sm font-medium text-red-600 bg-red-50 px-2 py-1 rounded-lg">Issues</span>
           </div>
-          <h3 class="text-2xl font-bold text-gray-800 mb-1">48</h3>
+          <h3 class="text-2xl font-bold text-gray-800 mb-1"><?php echo $activeIssues; ?></h3>
           <p class="text-gray-500 text-sm">Active Issues</p>
-          <div class="mt-4 flex items-center text-red-600">
-            <i class="fas fa-arrow-down text-xs mr-1"></i>
-            <span class="text-xs">8% from last week</span>
+          <div class="mt-4 flex items-center text-gray-600">
+            <i class="fas fa-list text-xs mr-1"></i>
+            <span class="text-xs"><?php echo $totalIssues; ?> Total</span>
           </div>
         </div>
         <div class="stat-card bg-white p-6 rounded-2xl shadow-sm">
@@ -153,11 +239,11 @@ $name = $_SESSION['user']['name'];
             <span
               class="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-lg">Active</span>
           </div>
-          <h3 class="text-2xl font-bold text-gray-800 mb-1">95.8%</h3>
-          <p class="text-gray-500 text-sm">Uptime Rate</p>
+          <h3 class="text-2xl font-bold text-gray-800 mb-1"><?php echo $uptimeRate; ?>%</h3>
+          <p class="text-gray-500 text-sm">Device Uptime</p>
           <div class="mt-4 flex items-center text-green-600">
             <i class="fas fa-arrow-up text-xs mr-1"></i>
-            <span class="text-xs">2.3% improvement</span>
+            <span class="text-xs"><?php echo $activeDevices; ?> / <?php echo $totalDevices; ?> operational</span>
           </div>
         </div>
         <div class="stat-card bg-white p-6 rounded-2xl shadow-sm">
@@ -169,14 +255,78 @@ $name = $_SESSION['user']['name'];
             <span
               class="text-sm font-medium text-purple-600 bg-purple-50 px-2 py-1 rounded-lg">Users</span>
           </div>
-          <h3 class="text-2xl font-bold text-gray-800 mb-1">342</h3>
+          <h3 class="text-2xl font-bold text-gray-800 mb-1"><?php echo $activeUsers; ?></h3>
           <p class="text-gray-500 text-sm">Active Users</p>
-          <div class="mt-4 flex items-center text-green-600">
-            <i class="fas fa-arrow-up text-xs mr-1"></i>
-            <span class="text-xs">5% new users</span>
+          <div class="mt-4 flex items-center text-purple-600">
+            <i class="fas fa-user-check text-xs mr-1"></i>
+            <span class="text-xs"><?php echo $totalUsers; ?> Total Users</span>
           </div>
         </div>
       </div>
+
+      <!-- Additional Statistics Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Repairs -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-orange-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Total Repairs</p>
+              <h4 class="text-2xl font-bold text-gray-800"><?php echo $totalRepairs; ?></h4>
+              <p class="text-xs text-gray-500 mt-1"><?php echo $pendingRepairs; ?> pending</p>
+            </div>
+            <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+              <i class="fas fa-wrench text-orange-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Completed Repairs -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-green-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Completed Repairs</p>
+              <h4 class="text-2xl font-bold text-gray-800"><?php echo $completedRepairs; ?></h4>
+              <p class="text-xs text-gray-500 mt-1">
+                <?php echo $totalRepairs > 0 ? round(($completedRepairs / $totalRepairs) * 100, 1) : 0; ?>% completion rate
+              </p>
+            </div>
+            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+              <i class="fas fa-check-double text-green-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Under Repair -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-yellow-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Under Repair</p>
+              <h4 class="text-2xl font-bold text-gray-800"><?php echo $repairDevices; ?></h4>
+              <p class="text-xs text-gray-500 mt-1">
+                <?php echo $totalDevices > 0 ? round(($repairDevices / $totalDevices) * 100, 1) : 0; ?>% of devices
+              </p>
+            </div>
+            <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+              <i class="fas fa-tools text-yellow-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue Statistics -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-red-500">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">High Priority Issues</p>
+              <h4 class="text-2xl font-bold text-gray-800"><?php echo $issuePriorityCounts['high']; ?></h4>
+              <p class="text-xs text-gray-500 mt-1">Requires immediate attention</p>
+            </div>
+            <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+              <i class="fas fa-exclamation-circle text-red-600 text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Charts Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <!-- Device Distribution Chart -->
@@ -188,10 +338,10 @@ $name = $_SESSION['user']['name'];
             <canvas id="deviceDistributionChart"></canvas>
           </div>
         </div>
-        <!-- Monthly Issues Chart -->
+        <!-- Issue Status Overview Chart -->
         <div class="chart-container bg-white p-6 rounded-2xl shadow-sm">
           <h3 class="text-lg font-bold text-gray-800 mb-4">
-            Monthly Issues Trend
+            Issue Status Overview
           </h3>
           <div class="h-80">
             <canvas id="monthlyIssuesChart"></canvas>
@@ -207,10 +357,10 @@ $name = $_SESSION['user']['name'];
           </h3>
           <div class="h-80" id="deviceStatusChart"></div>
         </div>
-        <!-- Branch Distribution -->
+        <!-- Section Distribution -->
         <div class="chart-container bg-white p-6 rounded-2xl shadow-sm">
           <h3 class="text-lg font-bold text-gray-800 mb-4">
-            Branch Distribution
+            Section Distribution (Top 7)
           </h3>
           <div class="h-80" id="branchDistributionChart"></div>
         </div>
@@ -219,9 +369,7 @@ $name = $_SESSION['user']['name'];
       <div class="bg-white rounded-2xl shadow-sm p-6">
         <div class="flex justify-between items-center mb-6">
           <h3 class="text-lg font-bold text-gray-800">Recent Activity</h3>
-          <a
-            href="#"
-            class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</a>
+          <span class="text-sm text-gray-500"><?php echo count($recentActivities); ?> recent activities</span>
         </div>
         <div class="overflow-x-auto">
           <table class="min-w-full">
@@ -229,19 +377,15 @@ $name = $_SESSION['user']['name'];
               <tr class="border-b border-gray-100">
                 <th
                   class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
+                  Date/Time
                 </th>
                 <th
                   class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Activity
+                  Activity Type
                 </th>
                 <th
                   class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Device
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  User
+                  Description
                 </th>
                 <th
                   class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -250,21 +394,38 @@ $name = $_SESSION['user']['name'];
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-              <tr class="table-row">
-                <td class="px-6 py-4 text-sm text-gray-600">2025-10-31</td>
-                <td class="px-6 py-4 text-sm text-gray-900">
-                  Device Registration
-                </td>
-                <td class="px-6 py-4 text-sm text-gray-600">
-                  HP ProBook 450 G8
-                </td>
-                <td class="px-6 py-4 text-sm text-gray-600">John Doe</td>
-                <td class="px-6 py-4">
-                  <span
-                    class="px-2 py-1 text-xs font-medium bg-green-50 text-green-600 rounded-lg">Completed</span>
-                </td>
-              </tr>
-              <!-- Add more rows as needed -->
+              <?php if (!empty($recentActivities)): ?>
+                <?php foreach ($recentActivities as $activity): ?>
+                  <tr class="table-row">
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                      <?php echo date('Y-m-d H:i', strtotime($activity['time'])); ?>
+                    </td>
+                    <td class="px-6 py-4 text-sm">
+                      <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-<?php echo $activity['color']; ?>-100 rounded-lg flex items-center justify-center">
+                          <i class="fas <?php echo $activity['icon']; ?> text-<?php echo $activity['color']; ?>-600 text-xs"></i>
+                        </div>
+                        <span class="font-medium text-gray-900"><?php echo htmlspecialchars($activity['title']); ?></span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                      <?php echo htmlspecialchars($activity['description']); ?>
+                    </td>
+                    <td class="px-6 py-4">
+                      <span class="px-2 py-1 text-xs font-medium bg-<?php echo $activity['color']; ?>-50 text-<?php echo $activity['color']; ?>-600 rounded-lg">
+                        <?php echo ucfirst($activity['type']); ?>
+                      </span>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                    <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                    <p>No recent activities</p>
+                  </td>
+                </tr>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>
@@ -290,7 +451,7 @@ $name = $_SESSION['user']['name'];
       data: {
         labels: ['Computers', 'Laptops', 'Printers', 'Other Devices'],
         datasets: [{
-          data: [45, 25, 20, 10],
+          data: [<?php echo $computersCount; ?>, <?php echo $laptopsCount; ?>, <?php echo $printersCount; ?>, <?php echo $otherDevicesCount; ?>],
           backgroundColor: [
             'rgba(59, 130, 246, 0.8)',
             'rgba(16, 185, 129, 0.8)',
@@ -306,26 +467,50 @@ $name = $_SESSION['user']['name'];
           legend: {
             position: 'bottom',
           },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                let label = context.label || '';
+                let value = context.parsed || 0;
+                let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                let percentage = ((value / total) * 100).toFixed(1);
+                return label + ': ' + value + ' (' + percentage + '%)';
+              }
+            }
+          }
         },
       },
     });
 
-    // Monthly Issues Chart
+    // Issue Status Overview Chart
     const issuesCtx = document
       .getElementById('monthlyIssuesChart')
       .getContext('2d');
     new Chart(issuesCtx, {
-      type: 'line',
+      type: 'bar',
       data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        labels: ['High Priority', 'Medium Priority', 'Low Priority', 'Open', 'In Progress', 'Resolved', 'Closed'],
         datasets: [{
-          label: 'Issues Reported',
-          data: [65, 59, 80, 81, 56, 55],
-          borderColor: 'rgba(59, 130, 246, 1)',
-          tension: 0.4,
-          fill: true,
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-        }, ],
+          label: 'Issues Count',
+          data: [
+            <?php echo $issuePriorityCounts['high']; ?>,
+            <?php echo $issuePriorityCounts['medium']; ?>,
+            <?php echo $issuePriorityCounts['low']; ?>,
+            <?php echo $openIssues; ?>,
+            <?php echo $inProgressIssues; ?>,
+            <?php echo DbHelper::getRowCountWithCondition('device_issues', ['status' => 'resolved']); ?>,
+            <?php echo DbHelper::getRowCountWithCondition('device_issues', ['status' => 'closed']); ?>
+          ],
+          backgroundColor: [
+            'rgba(239, 68, 68, 0.8)',
+            'rgba(251, 146, 60, 0.8)',
+            'rgba(234, 179, 8, 0.8)',
+            'rgba(234, 179, 8, 0.8)',
+            'rgba(59, 130, 246, 0.8)',
+            'rgba(34, 197, 94, 0.8)',
+            'rgba(107, 114, 128, 0.8)'
+          ],
+        }],
       },
       options: {
         responsive: true,
@@ -338,6 +523,9 @@ $name = $_SESSION['user']['name'];
         scales: {
           y: {
             beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
           },
         },
       },
@@ -345,7 +533,7 @@ $name = $_SESSION['user']['name'];
 
     // Device Status Chart (ApexCharts)
     const deviceStatusOptions = {
-      series: [44, 55, 13, 43],
+      series: [<?php echo $activeDevices; ?>, <?php echo $repairDevices; ?>, <?php echo $retiredDevices; ?>, <?php echo $lostDevices; ?>],
       chart: {
         type: 'donut',
         height: 320,
@@ -355,6 +543,22 @@ $name = $_SESSION['user']['name'];
       legend: {
         position: 'bottom',
       },
+      plotOptions: {
+        pie: {
+          donut: {
+            labels: {
+              show: true,
+              total: {
+                show: true,
+                label: 'Total Devices',
+                formatter: function (w) {
+                  return <?php echo $totalDevices; ?>;
+                }
+              }
+            }
+          }
+        }
+      }
     };
     const deviceStatusChart = new ApexCharts(
       document.querySelector('#deviceStatusChart'),
@@ -362,12 +566,12 @@ $name = $_SESSION['user']['name'];
     );
     deviceStatusChart.render();
 
-    // Branch Distribution Chart (ApexCharts)
+    // Section Distribution Chart (ApexCharts)
     const branchDistributionOptions = {
       series: [{
         name: 'Devices',
-        data: [44, 55, 57, 56, 61, 58, 63],
-      }, ],
+        data: [<?php echo !empty($top7Sections) ? implode(', ', array_column($top7Sections, 'total_devices')) : '0'; ?>],
+      }],
       chart: {
         type: 'bar',
         height: 320,
@@ -376,23 +580,30 @@ $name = $_SESSION['user']['name'];
         bar: {
           borderRadius: 4,
           horizontal: true,
+          distributed: false,
         },
       },
       dataLabels: {
-        enabled: false,
+        enabled: true,
       },
       colors: ['#3B82F6'],
       xaxis: {
         categories: [
-          'Main Office',
-          'Branch A',
-          'Branch B',
-          'Branch C',
-          'Branch D',
-          'Branch E',
-          'Branch F',
+          <?php 
+          if (!empty($top7Sections)) {
+            echo "'" . implode("', '", array_map(function($s) { 
+              return addslashes($s['section_name']); 
+            }, $top7Sections)) . "'";
+          } else {
+            echo "'No Data'";
+          }
+          ?>
         ],
       },
+      title: {
+        text: 'Top Sections by Device Count',
+        align: 'left'
+      }
     };
     const branchDistributionChart = new ApexCharts(
       document.querySelector('#branchDistributionChart'),
@@ -406,8 +617,8 @@ $name = $_SESSION['user']['name'];
       .addEventListener('click', function() {
         this.classList.add('animate-spin');
         setTimeout(() => {
-          this.classList.remove('animate-spin');
-        }, 1000);
+          location.reload();
+        }, 500);
       });
   </script>
 </body>
