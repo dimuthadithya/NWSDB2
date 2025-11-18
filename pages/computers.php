@@ -9,6 +9,19 @@ $name = $_SESSION['user']['name'];
 
 // Fetch computers data
 $computers = DbHelper::getAllComputers();
+$sections = DbHelper::getAllSections();
+$waterSupplySchemes = DbHelper::getAllWaterSupplySchemes();
+$categories = DbHelper::getAllDeviceCategories();
+
+// Get computer category ID
+$computerCategoryId = null;
+foreach ($categories as $category) {
+  if ($category['category_name'] === 'Desktop Computer') {
+    $computerCategoryId = $category['category_id'];
+    break;
+  }
+}
+
 $totalComputers = $computers ? count($computers) : 0;
 $activeComputers = $computers ? count(array_filter($computers, fn($c) => $c['status'] === 'active')) : 0;
 $repairComputers = $computers ? count(array_filter($computers, fn($c) => $c['status'] === 'under_repair')) : 0;
@@ -88,6 +101,27 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
 
     <!-- Content -->
     <div class="p-6 space-y-6">
+      <!-- Success/Error Messages -->
+      <?php if (isset($_SESSION['success_message'])): ?>
+        <div id="successMessage" class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg shadow-md animate-fade-up">
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
+            <p class="text-green-700 font-medium"><?= htmlspecialchars($_SESSION['success_message']) ?></p>
+          </div>
+        </div>
+        <?php unset($_SESSION['success_message']); ?>
+      <?php endif; ?>
+
+      <?php if (isset($_SESSION['error_message'])): ?>
+        <div id="errorMessage" class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-md animate-fade-up">
+          <div class="flex items-center">
+            <i class="fas fa-exclamation-circle text-red-500 text-xl mr-3"></i>
+            <p class="text-red-700 font-medium"><?= htmlspecialchars($_SESSION['error_message']) ?></p>
+          </div>
+        </div>
+        <?php unset($_SESSION['error_message']); ?>
+      <?php endif; ?>
+
       <!-- Summary Stats -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div
@@ -397,7 +431,7 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
                     </td>
                     <td class="px-6 py-4">
                       <div class="text-sm mb-2">
-                        <div class="font-medium text-gray-900"><?= htmlspecialchars($computer['section_id'] ?? 'Unassigned') ?></div>
+                        <div class="font-medium text-gray-900"><?= htmlspecialchars($computer['section_name'] ?? 'Unassigned') ?></div>
                         <div class="text-gray-600 text-xs"><?= htmlspecialchars($computer['assigned_to'] ?? 'Not assigned') ?></div>
                       </div>
                       <?php
@@ -427,16 +461,13 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
                     <td class="px-6 py-4 text-right">
                       <div class="flex items-center justify-end space-x-2">
                         <button
-                          class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="View Details">
-                          <i class="fas fa-eye"></i>
-                        </button>
-                        <button
+                          onclick="openEditModal(<?= htmlspecialchars(json_encode($computer)) ?>)"
                           class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                           title="Edit">
                           <i class="fas fa-edit"></i>
                         </button>
                         <button
+                          onclick="confirmDelete(<?= $computer['device_id'] ?>, '<?= htmlspecialchars($computer['device_name'], ENT_QUOTES) ?>')"
                           class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title="Delete">
                           <i class="fas fa-trash"></i>
@@ -522,7 +553,10 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
 
       <!-- Modal Body -->
       <div class="flex-1 overflow-y-auto p-6">
-        <form id="addComputerForm" class="space-y-6">
+        <form id="addComputerForm" method="POST" action="admin/handlers/computer-handler.php" class="space-y-6">
+          <input type="hidden" name="action" value="create">
+          <input type="hidden" name="category_id" value="<?= $computerCategoryId ?>">
+
           <!-- Basic Information -->
           <div>
             <h4
@@ -567,27 +601,39 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
             </h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">WSS *</label>
+                <select
+                  name="wss_id"
+                  required
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all">
+                  <option value="">Select WSS</option>
+                  <?php if ($waterSupplySchemes): ?>
+                    <?php foreach ($waterSupplySchemes as $wss): ?>
+                      <option value="<?= $wss['wss_id'] ?>"><?= htmlspecialchars($wss['wss_name']) ?></option>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
+                </select>
+              </div>
+              <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Section</label>
                 <select
                   name="section_id"
                   class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all">
                   <option value="">Select Section</option>
-                  <option value="1">IT Department</option>
-                  <option value="2">HR Department</option>
-                  <option value="3">Finance</option>
-                  <option value="4">Operations</option>
+                  <?php if ($sections): ?>
+                    <?php foreach ($sections as $section): ?>
+                      <option value="<?= $section['section_id'] ?>"><?= htmlspecialchars($section['section_name']) ?></option>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
                 </select>
               </div>
-              <div>
+              <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Assigned To</label>
-                <select
+                <input
+                  type="text"
                   name="assigned_to"
-                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all">
-                  <option value="">Select User</option>
-                  <option value="1">John Smith</option>
-                  <option value="2">Jane Doe</option>
-                  <option value="3">Michael Johnson</option>
-                </select>
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                  placeholder="Enter user name" />
               </div>
             </div>
           </div>
@@ -755,10 +801,12 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
         class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
         <button
           onclick="closeAddComputerModal()"
+          type="button"
           class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
           <i class="fas fa-times mr-2"></i>Cancel
         </button>
         <button
+          type="button"
           onclick="document.getElementById('addComputerForm').reset()"
           class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
           <i class="fas fa-refresh mr-2"></i>Reset
@@ -773,7 +821,262 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
     </div>
   </div>
 
+  <!-- Edit Computer Modal -->
+  <div id="editComputerModal" class="hidden fixed inset-0 overflow-y-auto h-full w-full z-50 backdrop-blur-sm bg-black/30 flex items-center justify-center p-4">
+    <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-hidden flex flex-col" onclick="event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-green-50 to-emerald-50">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center">
+            <i class="fas fa-edit text-white text-xl"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-gray-900">Edit Computer</h3>
+            <p class="text-sm text-gray-600">Update computer details and specifications</p>
+          </div>
+        </div>
+        <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+          <i class="fas fa-times text-2xl"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="flex-1 overflow-y-auto p-6">
+        <form id="editComputerForm" method="POST" action="admin/handlers/computer-handler.php" class="space-y-6">
+          <input type="hidden" name="action" value="update">
+          <input type="hidden" name="device_id" id="edit_device_id">
+          <input type="hidden" name="category_id" value="<?= $computerCategoryId ?>">
+
+          <!-- Basic Information -->
+          <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-info-circle text-green-600 mr-2"></i>
+              Basic Information
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Device Name *</label>
+                <input type="text" name="device_name" id="edit_device_name" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Model</label>
+                <input type="text" name="model" id="edit_model" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Purchase Date</label>
+                <input type="date" name="purchase_date" id="edit_purchase_date" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Assignment Information -->
+          <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-users text-green-600 mr-2"></i>
+              Assignment Information
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">WSS *</label>
+                <select name="wss_id" id="edit_wss_id" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all">
+                  <option value="">Select WSS</option>
+                  <?php if ($waterSupplySchemes): ?>
+                    <?php foreach ($waterSupplySchemes as $wss): ?>
+                      <option value="<?= $wss['wss_id'] ?>"><?= htmlspecialchars($wss['wss_name']) ?></option>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Section</label>
+                <select name="section_id" id="edit_section_id" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all">
+                  <option value="">Select Section</option>
+                  <?php if ($sections): ?>
+                    <?php foreach ($sections as $section): ?>
+                      <option value="<?= $section['section_id'] ?>"><?= htmlspecialchars($section['section_name']) ?></option>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
+                </select>
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Assigned To</label>
+                <input type="text" name="assigned_to" id="edit_assigned_to" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" placeholder="Enter user name" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Hardware Specifications -->
+          <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-microchip text-green-600 mr-2"></i>
+              Hardware Specifications
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Operating System</label>
+                <input type="text" name="operating_system" id="edit_operating_system" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Processor</label>
+                <input type="text" name="processor" id="edit_processor" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">RAM</label>
+                <input type="text" name="ram" id="edit_ram" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Storage</label>
+                <input type="text" name="hard_drive_capacity" id="edit_hard_drive_capacity" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Keyboard</label>
+                <input type="text" name="keyboard" id="edit_keyboard" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Mouse</label>
+                <input type="text" name="mouse" id="edit_mouse" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Network & Connectivity -->
+          <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-network-wired text-green-600 mr-2"></i>
+              Network & Connectivity
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">IP Address</label>
+                <input type="text" name="ip_address" id="edit_ip_address" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Network Connectivity</label>
+                <input type="text" name="network_connectivity" id="edit_network_connectivity" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Printer Connectivity</label>
+                <input type="text" name="printer_connectivity" id="edit_printer_connectivity" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Virus Guard</label>
+                <input type="text" name="virus_guard" id="edit_virus_guard" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Info -->
+          <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-clipboard-list text-green-600 mr-2"></i>
+              Additional Information
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Monitor Info</label>
+                <input type="text" name="monitor_info" id="edit_monitor_info" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">UPS Serial</label>
+                <input type="text" name="ups_serial" id="edit_ups_serial" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">System Unit Serial Number</label>
+                <input type="text" name="system_unit_serial" id="edit_system_unit_serial" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                <select name="status" id="edit_status" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all">
+                  <option value="active">Active</option>
+                  <option value="under_repair">Under Repair</option>
+                  <option value="retired">Retired</option>
+                  <option value="lost">Lost</option>
+                </select>
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                <textarea name="notes" id="edit_notes" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all"></textarea>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
+        <button onclick="closeEditModal()" type="button" class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
+          <i class="fas fa-times mr-2"></i>Cancel
+        </button>
+        <button type="submit" form="editComputerForm" class="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg">
+          <i class="fas fa-save mr-2"></i>Update Computer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteComputerModal" class="hidden fixed inset-0 overflow-y-auto h-full w-full z-50 backdrop-blur-sm bg-black/30 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-red-50 to-pink-50">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center">
+            <i class="fas fa-trash text-white text-xl"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-gray-900">Delete Computer</h3>
+          </div>
+        </div>
+        <button onclick="closeDeleteModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+          <i class="fas fa-times text-2xl"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6">
+        <div class="mb-6">
+          <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+            <div class="flex">
+              <i class="fas fa-exclamation-triangle text-red-500 mt-1 mr-3"></i>
+              <div>
+                <h4 class="text-red-800 font-medium mb-1">Warning: This action cannot be undone</h4>
+                <p class="text-red-700 text-sm">Are you sure you want to delete this computer?</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form id="deleteComputerForm" method="POST" action="admin/handlers/computer-handler.php">
+          <input type="hidden" name="action" value="delete">
+          <input type="hidden" name="device_id" id="delete_device_id">
+
+          <div class="bg-gray-50 rounded-lg p-4 mb-6">
+            <p class="text-sm text-gray-600 mb-2">Computer Name:</p>
+            <p class="font-semibold text-gray-900" id="delete_computer_name"></p>
+          </div>
+
+          <div class="flex items-center justify-end gap-3">
+            <button type="button" onclick="closeDeleteModal()" class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
+              <i class="fas fa-times mr-2"></i>Cancel
+            </button>
+            <button type="submit" class="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-lg hover:from-red-700 hover:to-pink-700 transition-all shadow-lg">
+              <i class="fas fa-trash mr-2"></i>Delete Computer
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // Auto-hide messages after 5 seconds
+    setTimeout(() => {
+      const successMessage = document.getElementById('successMessage');
+      const errorMessage = document.getElementById('errorMessage');
+      if (successMessage) successMessage.style.display = 'none';
+      if (errorMessage) errorMessage.style.display = 'none';
+    }, 5000);
+
     // Mobile menu toggle
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
@@ -793,7 +1096,7 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
       }
     });
 
-    // Modal functions
+    // Add Computer Modal functions
     function openAddComputerModal() {
       document.getElementById('addComputerModal').classList.remove('hidden');
       document.body.style.overflow = 'hidden';
@@ -801,6 +1104,55 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
 
     function closeAddComputerModal() {
       document.getElementById('addComputerModal').classList.add('hidden');
+      document.getElementById('addComputerForm').reset();
+      document.body.style.overflow = 'auto';
+    }
+
+    // Edit Computer Modal functions
+    function openEditModal(computer) {
+      document.getElementById('edit_device_id').value = computer.device_id;
+      document.getElementById('edit_device_name').value = computer.device_name || '';
+      document.getElementById('edit_model').value = computer.model || '';
+      document.getElementById('edit_purchase_date').value = computer.purchase_date || '';
+      document.getElementById('edit_wss_id').value = computer.wss_id || '';
+      document.getElementById('edit_section_id').value = computer.section_id || '';
+      document.getElementById('edit_assigned_to').value = computer.assigned_to || '';
+      document.getElementById('edit_operating_system').value = computer.operating_system || '';
+      document.getElementById('edit_processor').value = computer.processor || '';
+      document.getElementById('edit_ram').value = computer.ram || '';
+      document.getElementById('edit_hard_drive_capacity').value = computer.hard_drive_capacity || '';
+      document.getElementById('edit_keyboard').value = computer.keyboard || '';
+      document.getElementById('edit_mouse').value = computer.mouse || '';
+      document.getElementById('edit_ip_address').value = computer.ip_address || '';
+      document.getElementById('edit_network_connectivity').value = computer.network_connectivity || '';
+      document.getElementById('edit_printer_connectivity').value = computer.printer_connectivity || '';
+      document.getElementById('edit_virus_guard').value = computer.virus_guard || '';
+      document.getElementById('edit_monitor_info').value = computer.monitor_info || '';
+      document.getElementById('edit_ups_serial').value = computer.ups_serial || '';
+      document.getElementById('edit_system_unit_serial').value = computer.system_unit_serial || '';
+      document.getElementById('edit_status').value = computer.status || 'active';
+      document.getElementById('edit_notes').value = computer.notes || '';
+
+      document.getElementById('editComputerModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editComputerModal').classList.add('hidden');
+      document.getElementById('editComputerForm').reset();
+      document.body.style.overflow = 'auto';
+    }
+
+    // Delete Computer Modal functions
+    function confirmDelete(deviceId, deviceName) {
+      document.getElementById('delete_device_id').value = deviceId;
+      document.getElementById('delete_computer_name').textContent = deviceName;
+      document.getElementById('deleteComputerModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteComputerModal').classList.add('hidden');
       document.body.style.overflow = 'auto';
     }
 
@@ -814,24 +1166,27 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
       });
     }
 
-    // Close modal on background click
-    document
-      .getElementById('addComputerModal')
-      .addEventListener('click', (e) => {
-        if (e.target.id === 'addComputerModal') {
-          closeAddComputerModal();
-        }
-      });
+    // Close modals on background click
+    document.getElementById('addComputerModal').addEventListener('click', (e) => {
+      if (e.target.id === 'addComputerModal') closeAddComputerModal();
+    });
 
-    // Form submission
-    document
-      .getElementById('addComputerForm')
-      .addEventListener('submit', (e) => {
-        e.preventDefault();
-        alert('Computer added successfully!');
+    document.getElementById('editComputerModal').addEventListener('click', (e) => {
+      if (e.target.id === 'editComputerModal') closeEditModal();
+    });
+
+    document.getElementById('deleteComputerModal').addEventListener('click', (e) => {
+      if (e.target.id === 'deleteComputerModal') closeDeleteModal();
+    });
+
+    // Close modals on ESC key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
         closeAddComputerModal();
-        document.getElementById('addComputerForm').reset();
-      });
+        closeEditModal();
+        closeDeleteModal();
+      }
+    });
   </script>
 </body>
 

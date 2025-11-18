@@ -212,9 +212,28 @@ class DbHelper
 
         $computerId = self::$db->getId('device_categories', 'category_name', 'Desktop Computer', 'category_id');
 
-        $computers = self::$db->select('devices', ['*'], ['category_id' => $computerId]);
+        $sql = "SELECT d.*, s.section_name, w.wss_name 
+                FROM devices d 
+                LEFT JOIN sections s ON d.section_id = s.section_id
+                LEFT JOIN water_supply_schemes w ON d.wss_id = w.wss_id
+                WHERE d.category_id = ?
+                ORDER BY d.created_at DESC";
 
-        return $computers ? $computers : false;
+        try {
+            $db = Database::getInstance();
+            $conn = new PDO(
+                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
+                DB_USERNAME,
+                DB_PASSWORD
+            );
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$computerId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('getAllComputers failed: ' . $e->getMessage());
+            return [];
+        }
     }
 
     public static function getAllLaptops()
@@ -312,56 +331,16 @@ class DbHelper
         return self::$db->update('device_categories', $data, ['category_id' => $category_id]);
     }
 
-    public static function createDevice(
-        $deviceName,
-        $model,
-        $madeIn,
-        $categoryId,
-        $sectionId,
-        $assignedTo,
-        $operatingSystem,
-        $processor,
-        $ram,
-        $hardDriveCapacity,
-        $keyboard,
-        $mouse,
-        $networkConnectivity,
-        $printerConnectivity,
-        $ipAddress,
-        $virusGuard,
-        $monitorInfo,
-        $cpuSerial,
-        $purchaseDate,
-        $status,
-        $notes
-    ) {
+    public static function createDevice($data)
+    {
         self::init();
 
-        // Implementation for creating a device goes here
-        $deviceData = [
-            'device_name' => $deviceName,
-            'model' => $model,
-            'made_in' => $madeIn,
-            'category_id' => $categoryId,
-            'section_id' => $sectionId,
-            'assigned_to' => $assignedTo,
-            'operating_system' => $operatingSystem,
-            'processor' => $processor,
-            'ram' => $ram,
-            'hard_drive_capacity' => $hardDriveCapacity,
-            'keyboard' => $keyboard,
-            'mouse' => $mouse,
-            'network_connectivity' => $networkConnectivity,
-            'printer_connectivity' => $printerConnectivity,
-            'ip_address' => $ipAddress,
-            'virus_guard' => $virusGuard,
-            'monitor_info' => $monitorInfo,
-            'cpu_serial' => $cpuSerial,
-            'purchase_date' => $purchaseDate,
-            'status' => $status,
-            'notes' => $notes
-        ];
-        return self::$db->insert('devices', $deviceData);
+        // Validate required fields
+        if (empty($data['device_name']) || empty($data['category_id']) || empty($data['wss_id'])) {
+            return false;
+        }
+
+        return self::$db->insert('devices', $data);
     }
 
     public static function createSection($section_name, $wss_id)
@@ -427,6 +406,17 @@ class DbHelper
 
         $where = ['section_id' => $section_id];
         return self::$db->delete('sections', $where);
+    }
+
+    public static function updateDevice($device_id, $data)
+    {
+        self::init();
+
+        if (!is_numeric($device_id)) {
+            return false;
+        }
+
+        return self::$db->update('devices', $data, ['device_id' => $device_id]);
     }
 
     public static function deleteDevice($device_id)
