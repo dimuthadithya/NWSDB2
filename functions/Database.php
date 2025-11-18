@@ -259,6 +259,23 @@ class Database
         return $error[2];
     }
 
+    /**
+     * Execute a raw SQL query (for custom queries)
+     * @param string $query SQL query
+     * @param array $params Parameters for the query
+     * @return array|false Array of records or false on failure
+     */
+    public function rawQuery($query, $params = [])
+    {
+        try {
+            $stmt = $this->executeQuery($query, $params);
+            return $stmt ? $stmt->fetchAll() : false;
+        } catch (PDOException $e) {
+            error_log("Raw query failed: " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function getSectionsByDeviceCount()
     {
         try {

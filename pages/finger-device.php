@@ -25,6 +25,22 @@ $approvedDevices = count(array_filter($fingerDevices, function ($device) {
 $locations = array_unique(array_column($fingerDevices, 'location_name'));
 $totalLocations = count(array_filter($locations));
 
+// Fetch data for dropdowns
+$sections = DbHelper::getAllSections();
+$waterSupplySchemes = DbHelper::getAllWaterSupplySchemes();
+$categories = DbHelper::getAllDeviceCategories();
+
+// Get the fingerprint device category ID
+$fingerDeviceCategoryId = null;
+if ($categories) {
+  foreach ($categories as $category) {
+    if ($category['category_name'] === 'Fingerprint Device') {
+      $fingerDeviceCategoryId = $category['category_id'];
+      break;
+    }
+  }
+}
+
 ?>
 
 
@@ -100,6 +116,27 @@ $totalLocations = count(array_filter($locations));
 
     <!-- Content -->
     <div class="p-6 space-y-6">
+      <!-- Session Messages -->
+      <?php if (isset($_SESSION['success'])): ?>
+        <div id="successMessage" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg shadow-md animate-fade-up">
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-xl mr-3"></i>
+            <p class="font-medium"><?= $_SESSION['success'];
+                                    unset($_SESSION['success']); ?></p>
+          </div>
+        </div>
+      <?php endif; ?>
+
+      <?php if (isset($_SESSION['error'])): ?>
+        <div id="errorMessage" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-md animate-fade-up">
+          <div class="flex items-center">
+            <i class="fas fa-exclamation-circle text-xl mr-3"></i>
+            <p class="font-medium"><?= $_SESSION['error'];
+                                    unset($_SESSION['error']); ?></p>
+          </div>
+        </div>
+      <?php endif; ?>
+
       <!-- Summary Stats -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div
@@ -350,10 +387,16 @@ $totalLocations = count(array_filter($locations));
                       <span class="px-2 py-1 text-xs font-medium <?= $statusClass ?> rounded-full"><?= $statusText ?></span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button class="text-blue-600 hover:text-blue-900 mr-3" title="Edit">
+                      <button
+                        onclick='openEditModal(<?= json_encode($device) ?>)'
+                        class="text-blue-600 hover:text-blue-900 mr-3"
+                        title="Edit">
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button class="text-red-600 hover:text-red-900" title="Delete">
+                      <button
+                        onclick="confirmDelete(<?= $device['device_id'] ?>, '<?= htmlspecialchars($device['location_name'] ?? 'Device', ENT_QUOTES) ?>')"
+                        class="text-red-600 hover:text-red-900"
+                        title="Delete">
                         <i class="fas fa-trash"></i>
                       </button>
                     </td>
@@ -419,12 +462,47 @@ $totalLocations = count(array_filter($locations));
         </div>
       </div>
 
-      <form class="p-6">
+      <form action="./admin/handlers/finger-device-handler.php" method="POST" class="p-6">
+        <input type="hidden" name="action" value="create">
+        <input type="hidden" name="category_id" value="<?= htmlspecialchars($fingerDeviceCategoryId) ?>">
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- WSS (Water Supply Scheme) -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Location Name</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">WSS Code <span class="text-red-500">*</span></label>
+            <select
+              name="wss_id"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required>
+              <option value="">Select WSS</option>
+              <?php foreach ($waterSupplySchemes as $wss): ?>
+                <option value="<?= htmlspecialchars($wss['wss_id']) ?>">
+                  <?= htmlspecialchars($wss['wss_code']) ?> - <?= htmlspecialchars($wss['wss_name']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+          <!-- Section -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Section</label>
+            <select
+              name="section_id"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="">Select Section</option>
+              <?php foreach ($sections as $section): ?>
+                <option value="<?= htmlspecialchars($section['section_id']) ?>">
+                  <?= htmlspecialchars($section['section_name']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Location Name <span class="text-red-500">*</span></label>
             <input
               type="text"
+              name="location_name"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required />
           </div>
@@ -433,28 +511,32 @@ $totalLocations = count(array_filter($locations));
             <label class="block text-sm font-medium text-gray-700 mb-2">Sub Location</label>
             <input
               type="text"
+              name="sub_location"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Make</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Make <span class="text-red-500">*</span></label>
             <input
               type="text"
+              name="make"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Model</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Model <span class="text-red-500">*</span></label>
             <input
               type="text"
+              name="model"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Device Type</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Device Type <span class="text-red-500">*</span></label>
             <select
+              name="device_type"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required>
               <option value="">Select Type</option>
@@ -465,17 +547,19 @@ $totalLocations = count(array_filter($locations));
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Device No</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Device No <span class="text-red-500">*</span></label>
             <input
               type="text"
+              name="device_number"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Identification Code (Serial No)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Identification Code (Serial No) <span class="text-red-500">*</span></label>
             <input
               type="text"
+              name="identification_code"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required />
           </div>
@@ -484,6 +568,7 @@ $totalLocations = count(array_filter($locations));
             <label class="block text-sm font-medium text-gray-700 mb-2">IP Address / ADSL</label>
             <input
               type="text"
+              name="ip_address_adsl"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
@@ -491,6 +576,7 @@ $totalLocations = count(array_filter($locations));
             <label class="block text-sm font-medium text-gray-700 mb-2">Installed Date</label>
             <input
               type="date"
+              name="installed_date"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
@@ -498,6 +584,7 @@ $totalLocations = count(array_filter($locations));
             <label class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
             <input
               type="text"
+              name="company_name"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
@@ -506,13 +593,16 @@ $totalLocations = count(array_filter($locations));
             <input
               type="number"
               step="0.01"
+              name="device_cost"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Warranty Period (yrs)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Warranty Period</label>
             <input
-              type="number"
+              type="text"
+              name="warranty_period"
+              placeholder="e.g., 2 years"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
@@ -520,6 +610,7 @@ $totalLocations = count(array_filter($locations));
             <label class="block text-sm font-medium text-gray-700 mb-2">Port No</label>
             <input
               type="text"
+              name="port_number"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
@@ -527,22 +618,25 @@ $totalLocations = count(array_filter($locations));
             <label class="block text-sm font-medium text-gray-700 mb-2">Managed By</label>
             <input
               type="text"
+              name="managed_by"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">User</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Assigned To</label>
             <input
               type="text"
+              name="assigned_to"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Approve</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Approval Status</label>
             <select
+              name="approval_status"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="pending" selected>Pending</option>
               <option value="approved">Approved</option>
-              <option value="pending">Pending</option>
               <option value="rejected">Rejected</option>
             </select>
           </div>
@@ -550,8 +644,20 @@ $totalLocations = count(array_filter($locations));
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-2">Remark</label>
             <textarea
+              name="remark"
               rows="3"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select
+              name="status"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="active" selected>Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="under_repair">Under Repair</option>
+            </select>
           </div>
         </div>
 
@@ -566,6 +672,308 @@ $totalLocations = count(array_filter($locations));
             type="submit"
             class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all">
             <i class="fas fa-save mr-2"></i>Save Device
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Finger Device Modal -->
+  <div
+    id="editModal"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div
+      class="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+      <div
+        class="sticky top-0 bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4 rounded-t-2xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-bold text-white">Edit Finger Device</h3>
+          <button
+            onclick="closeEditModal()"
+            class="text-white hover:text-gray-200 transition-colors">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <form action="./admin/handlers/finger-device-handler.php" method="POST" class="p-6">
+        <input type="hidden" name="action" value="update">
+        <input type="hidden" name="device_id" id="edit_device_id">
+        <input type="hidden" name="category_id" value="<?= htmlspecialchars($fingerDeviceCategoryId) ?>">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- WSS (Water Supply Scheme) -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">WSS Code <span class="text-red-500">*</span></label>
+            <select
+              name="wss_id"
+              id="edit_wss_id"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              required>
+              <option value="">Select WSS</option>
+              <?php foreach ($waterSupplySchemes as $wss): ?>
+                <option value="<?= htmlspecialchars($wss['wss_id']) ?>">
+                  <?= htmlspecialchars($wss['wss_code']) ?> - <?= htmlspecialchars($wss['wss_name']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+          <!-- Section -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Section</label>
+            <select
+              name="section_id"
+              id="edit_section_id"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="">Select Section</option>
+              <?php foreach ($sections as $section): ?>
+                <option value="<?= htmlspecialchars($section['section_id']) ?>">
+                  <?= htmlspecialchars($section['section_name']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Location Name <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              name="location_name"
+              id="edit_location_name"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              required />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Sub Location</label>
+            <input
+              type="text"
+              name="sub_location"
+              id="edit_sub_location"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Make <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              name="make"
+              id="edit_make"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              required />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Model <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              name="model"
+              id="edit_model"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              required />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Device Type <span class="text-red-500">*</span></label>
+            <select
+              name="device_type"
+              id="edit_device_type"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              required>
+              <option value="">Select Type</option>
+              <option value="finger">Finger</option>
+              <option value="finger_palm">Finger, Palm</option>
+              <option value="finger_face">Finger, Face</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Device No <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              name="device_number"
+              id="edit_device_number"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              required />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Identification Code (Serial No) <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              name="identification_code"
+              id="edit_identification_code"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              required />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">IP Address / ADSL</label>
+            <input
+              type="text"
+              name="ip_address_adsl"
+              id="edit_ip_address_adsl"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Installed Date</label>
+            <input
+              type="date"
+              name="installed_date"
+              id="edit_installed_date"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+            <input
+              type="text"
+              name="company_name"
+              id="edit_company_name"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Device Cost</label>
+            <input
+              type="number"
+              step="0.01"
+              name="device_cost"
+              id="edit_device_cost"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Warranty Period</label>
+            <input
+              type="text"
+              name="warranty_period"
+              id="edit_warranty_period"
+              placeholder="e.g., 2 years"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Port No</label>
+            <input
+              type="text"
+              name="port_number"
+              id="edit_port_number"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Managed By</label>
+            <input
+              type="text"
+              name="managed_by"
+              id="edit_managed_by"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Assigned To</label>
+            <input
+              type="text"
+              name="assigned_to"
+              id="edit_assigned_to"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Approval Status</label>
+            <select
+              name="approval_status"
+              id="edit_approval_status"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+
+          <div class="md:col-span-3">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Remark</label>
+            <textarea
+              name="remark"
+              id="edit_remark"
+              rows="3"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select
+              name="status"
+              id="edit_status"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="under_repair">Under Repair</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-6 flex gap-3 justify-end">
+          <button
+            type="button"
+            onclick="closeEditModal()"
+            class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-6 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all">
+            <i class="fas fa-save mr-2"></i>Update Device
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div
+    id="deleteModal"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+      <div
+        class="bg-gradient-to-r from-red-600 to-rose-600 px-6 py-4 rounded-t-2xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-bold text-white">Confirm Deletion</h3>
+          <button
+            onclick="closeDeleteModal()"
+            class="text-white hover:text-gray-200 transition-colors">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <form action="./admin/handlers/finger-device-handler.php" method="POST" class="p-6">
+        <input type="hidden" name="action" value="delete">
+        <input type="hidden" name="device_id" id="delete_device_id">
+
+        <div class="text-center mb-6">
+          <div class="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+            <i class="fas fa-exclamation-triangle text-3xl text-red-600"></i>
+          </div>
+          <p class="text-lg text-gray-700 mb-2">Are you sure you want to delete this device?</p>
+          <p class="text-gray-600"><strong id="delete_device_name"></strong></p>
+          <p class="text-sm text-red-600 mt-2">This action cannot be undone.</p>
+        </div>
+
+        <div class="flex gap-3 justify-end">
+          <button
+            type="button"
+            onclick="closeDeleteModal()"
+            class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-6 py-2 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-lg hover:from-red-700 hover:to-rose-700 transition-all">
+            <i class="fas fa-trash mr-2"></i>Delete Device
           </button>
         </div>
       </form>
@@ -590,14 +998,87 @@ $totalLocations = count(array_filter($locations));
       document.getElementById('addModal').classList.add('hidden');
     }
 
+    function openEditModal(device) {
+      // Populate form fields
+      document.getElementById('edit_device_id').value = device.device_id;
+      document.getElementById('edit_wss_id').value = device.wss_id || '';
+      document.getElementById('edit_section_id').value = device.section_id || '';
+      document.getElementById('edit_location_name').value = device.location_name || '';
+      document.getElementById('edit_sub_location').value = device.sub_location || '';
+      document.getElementById('edit_make').value = device.make || '';
+      document.getElementById('edit_model').value = device.model || '';
+      document.getElementById('edit_device_type').value = device.device_type || '';
+      document.getElementById('edit_device_number').value = device.device_number || '';
+      document.getElementById('edit_identification_code').value = device.identification_code || '';
+      document.getElementById('edit_ip_address_adsl').value = device.ip_address_adsl || '';
+      document.getElementById('edit_installed_date').value = device.installed_date || '';
+      document.getElementById('edit_company_name').value = device.company_name || '';
+      document.getElementById('edit_device_cost').value = device.device_cost || '';
+      document.getElementById('edit_warranty_period').value = device.warranty_period || '';
+      document.getElementById('edit_port_number').value = device.port_number || '';
+      document.getElementById('edit_managed_by').value = device.managed_by || '';
+      document.getElementById('edit_assigned_to').value = device.assigned_to || '';
+      document.getElementById('edit_approval_status').value = device.approval_status || 'pending';
+      document.getElementById('edit_remark').value = device.remark || '';
+      document.getElementById('edit_status').value = device.status || 'active';
+
+      // Show modal
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+    }
+
+    function confirmDelete(deviceId, deviceName) {
+      document.getElementById('delete_device_id').value = deviceId;
+      document.getElementById('delete_device_name').textContent = deviceName;
+      document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.add('hidden');
+    }
+
     // Close modal on outside click
-    document
-      .getElementById('addModal')
-      .addEventListener('click', function(e) {
-        if (e.target === this) {
-          closeAddModal();
-        }
-      });
+    document.getElementById('addModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeAddModal();
+      }
+    });
+
+    document.getElementById('editModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeEditModal();
+      }
+    });
+
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeDeleteModal();
+      }
+    });
+
+    // Close modals on ESC key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeAddModal();
+        closeEditModal();
+        closeDeleteModal();
+      }
+    });
+
+    // Auto-hide messages after 5 seconds
+    setTimeout(function() {
+      const successMessage = document.getElementById('successMessage');
+      const errorMessage = document.getElementById('errorMessage');
+      if (successMessage) {
+        successMessage.style.display = 'none';
+      }
+      if (errorMessage) {
+        errorMessage.style.display = 'none';
+      }
+    }, 5000);
   </script>
 </body>
 

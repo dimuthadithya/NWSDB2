@@ -7,6 +7,20 @@ requireLogin();
 $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
+// Handle success/error messages
+$successMessage = '';
+$errorMessage = '';
+
+if (isset($_SESSION['success_message'])) {
+  $successMessage = $_SESSION['success_message'];
+  unset($_SESSION['success_message']);
+}
+
+if (isset($_SESSION['error_message'])) {
+  $errorMessage = $_SESSION['error_message'];
+  unset($_SESSION['error_message']);
+}
+
 // Fetch categories data
 $categories = DbHelper::getAllDeviceCategories();
 $totalCategories = count($categories);
@@ -148,6 +162,22 @@ $totalCategories = count($categories);
         </div>
       </div>
 
+      <!-- Success Message -->
+      <?php if (!empty($successMessage)): ?>
+        <div id="successMessage" class="mb-4 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded-lg flex items-center">
+          <i class="fas fa-check-circle text-green-500 mr-3"></i>
+          <span><?php echo htmlspecialchars($successMessage); ?></span>
+        </div>
+      <?php endif; ?>
+
+      <!-- Error Message -->
+      <?php if (!empty($errorMessage)): ?>
+        <div id="errorMessage" class="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg flex items-center">
+          <i class="fas fa-exclamation-circle text-red-500 mr-3"></i>
+          <span><?php echo htmlspecialchars($errorMessage); ?></span>
+        </div>
+      <?php endif; ?>
+
       <!-- Quick Actions -->
       <div class="flex flex-wrap gap-3">
         <button
@@ -206,10 +236,10 @@ $totalCategories = count($categories);
                   <i class="fas <?php echo $icon; ?> text-white text-2xl"></i>
                 </div>
                 <div class="flex gap-2">
-                  <button class="text-blue-600 hover:text-blue-800" title="Edit">
+                  <button onclick='openEditModal(<?php echo json_encode($category); ?>)' class="text-green-600 hover:text-green-800" title="Edit">
                     <i class="fas fa-edit"></i>
                   </button>
-                  <button class="text-red-600 hover:text-red-800" title="Delete">
+                  <button onclick="confirmDelete(<?php echo $category['category_id']; ?>, '<?php echo htmlspecialchars($categoryName); ?>')" class="text-red-600 hover:text-red-800" title="Delete">
                     <i class="fas fa-trash"></i>
                   </button>
                 </div>
@@ -253,12 +283,14 @@ $totalCategories = count($categories);
         </div>
       </div>
 
-      <form class="p-6">
+      <form method="POST" action="handlers/category-handler.php" class="p-6">
+        <input type="hidden" name="action" value="create">
         <div class="space-y-6">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Category Name</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Category Name <span class="text-red-500">*</span></label>
             <input
               type="text"
+              name="category_name"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="e.g., Computer, Printer, Scanner"
               required />
@@ -267,39 +299,10 @@ $totalCategories = count($categories);
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
             <textarea
+              name="description"
               rows="4"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter category description..."></textarea>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Icon</label>
-            <select
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-              <option value="desktop">Desktop (Computer)</option>
-              <option value="print">Print (Printer)</option>
-              <option value="laptop">Laptop</option>
-              <option value="network-wired">Network Wired (RVPN)</option>
-              <option value="fingerprint">Fingerprint</option>
-              <option value="scanner">Scanner</option>
-              <option value="battery-full">Battery (UPS)</option>
-              <option value="microchip">Microchip (Other)</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Color</label>
-            <select
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-              <option value="blue">Blue</option>
-              <option value="green">Green</option>
-              <option value="purple">Purple</option>
-              <option value="orange">Orange</option>
-              <option value="cyan">Cyan</option>
-              <option value="pink">Pink</option>
-              <option value="yellow">Yellow</option>
-              <option value="gray">Gray</option>
-            </select>
           </div>
         </div>
 
@@ -308,12 +311,135 @@ $totalCategories = count($categories);
             type="button"
             onclick="closeAddModal()"
             class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-            Cancel
+            <i class="fas fa-times mr-2"></i>Cancel
           </button>
           <button
             type="submit"
             class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all">
             <i class="fas fa-save mr-2"></i>Save Category
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Category Modal -->
+  <div
+    id="editModal"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div
+      class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div
+        class="sticky top-0 bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4 rounded-t-2xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-bold text-white">
+            <i class="fas fa-edit mr-2"></i>Edit Category
+          </h3>
+          <button
+            onclick="closeEditModal()"
+            class="text-white hover:text-gray-200 transition-colors">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <form method="POST" action="handlers/category-handler.php" class="p-6">
+        <input type="hidden" name="action" value="update">
+        <input type="hidden" name="category_id" id="edit_category_id">
+        <div class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Category Name <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              name="category_name"
+              id="edit_category_name"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              placeholder="e.g., Computer, Printer, Scanner"
+              required />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+            <textarea
+              name="description"
+              id="edit_description"
+              rows="4"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              placeholder="Enter category description..."></textarea>
+          </div>
+        </div>
+
+        <div class="mt-6 flex gap-3 justify-end">
+          <button
+            type="button"
+            onclick="closeEditModal()"
+            class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            <i class="fas fa-times mr-2"></i>Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-6 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all">
+            <i class="fas fa-save mr-2"></i>Update Category
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div
+    id="deleteModal"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+      <div
+        class="bg-gradient-to-r from-red-600 to-rose-600 px-6 py-4 rounded-t-2xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-bold text-white">
+            <i class="fas fa-exclamation-triangle mr-2"></i>Confirm Deletion
+          </h3>
+          <button
+            onclick="closeDeleteModal()"
+            class="text-white hover:text-gray-200 transition-colors">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <form method="POST" action="handlers/category-handler.php" class="p-6">
+        <input type="hidden" name="action" value="delete">
+        <input type="hidden" name="category_id" id="delete_category_id">
+
+        <div class="mb-6">
+          <p class="text-gray-700 mb-4">
+            Are you sure you want to delete the category
+            <strong class="text-red-600" id="delete_category_name"></strong>?
+          </p>
+          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-yellow-700">
+                  <strong>Warning:</strong> This action cannot be undone.
+                  It will also affect all devices associated with this category.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-3 justify-end">
+          <button
+            type="button"
+            onclick="closeDeleteModal()"
+            class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            <i class="fas fa-times mr-2"></i>Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-6 py-2 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-lg hover:from-red-700 hover:to-rose-700 transition-all">
+            <i class="fas fa-trash mr-2"></i>Delete
           </button>
         </div>
       </form>
@@ -336,16 +462,60 @@ $totalCategories = count($categories);
 
     function closeAddModal() {
       document.getElementById('addModal').classList.add('hidden');
+      document.querySelector('#addModal form').reset();
     }
 
-    // Close modal on outside click
-    document
-      .getElementById('addModal')
-      .addEventListener('click', function(e) {
-        if (e.target === this) {
-          closeAddModal();
-        }
-      });
+    function openEditModal(category) {
+      document.getElementById('edit_category_id').value = category.category_id;
+      document.getElementById('edit_category_name').value = category.category_name;
+      document.getElementById('edit_description').value = category.description || '';
+      document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+      document.querySelector('#editModal form').reset();
+    }
+
+    function confirmDelete(categoryId, categoryName) {
+      document.getElementById('delete_category_id').value = categoryId;
+      document.getElementById('delete_category_name').textContent = categoryName;
+      document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.add('hidden');
+    }
+
+    // Close modals on outside click
+    document.getElementById('addModal').addEventListener('click', function(e) {
+      if (e.target === this) closeAddModal();
+    });
+
+    document.getElementById('editModal').addEventListener('click', function(e) {
+      if (e.target === this) closeEditModal();
+    });
+
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+      if (e.target === this) closeDeleteModal();
+    });
+
+    // ESC key to close modals
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeAddModal();
+        closeEditModal();
+        closeDeleteModal();
+      }
+    });
+
+    // Auto-hide success/error messages
+    setTimeout(function() {
+      const successMsg = document.getElementById('successMessage');
+      const errorMsg = document.getElementById('errorMessage');
+      if (successMsg) successMsg.style.display = 'none';
+      if (errorMsg) errorMsg.style.display = 'none';
+    }, 5000);
   </script>
 </body>
 

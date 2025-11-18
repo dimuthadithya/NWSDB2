@@ -1,32 +1,12 @@
 -- ===============================================================
--- DEVICE RECORD SYSTEM (UPDATED: Sections belong to WSS)
+-- DEVICE RECORD SYSTEM (CORRECTED ORDER)
 -- ===============================================================
 
 CREATE DATABASE IF NOT EXISTS devicerecordsystem;
 USE devicerecordsystem;
 
 -- ===============================================================
--- 1. USERS TABLE
--- ===============================================================
-CREATE TABLE users (
-  user_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  first_name VARCHAR(100) NOT NULL,
-  last_name VARCHAR(100) NOT NULL,
-  username VARCHAR(50) UNIQUE,
-  email VARCHAR(150) NOT NULL UNIQUE,
-  mobile_number VARCHAR(15) UNIQUE,
-  gender VARCHAR(10),
-  password VARCHAR(255) NOT NULL,
-  site_office VARCHAR(100),
-  role ENUM('admin','user') NOT NULL DEFAULT 'user',
-  status ENUM('active','inactive','suspended') DEFAULT 'active',
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  last_login DATETIME DEFAULT NULL
-);
-
--- ===============================================================
--- 2. DEVICE CATEGORIES
+-- 1. DEVICE CATEGORIES (NO DEPENDENCIES)
 -- ===============================================================
 CREATE TABLE device_categories (
   category_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -39,7 +19,7 @@ CREATE TABLE device_categories (
 );
 
 -- ===============================================================
--- 3. REGIONS
+-- 2. REGIONS (NO DEPENDENCIES)
 -- ===============================================================
 CREATE TABLE regions (
   region_id INT NOT NULL AUTO_INCREMENT,
@@ -53,7 +33,7 @@ CREATE TABLE regions (
 );
 
 -- ===============================================================
--- 4. AREAS (UNDER REGIONS)
+-- 3. AREAS (DEPENDS ON REGIONS)
 -- ===============================================================
 CREATE TABLE areas (
   area_id INT NOT NULL AUTO_INCREMENT,
@@ -70,7 +50,7 @@ CREATE TABLE areas (
 );
 
 -- ===============================================================
--- 5. WATER SUPPLY SCHEMES (WSS) UNDER AREAS
+-- 4. WATER SUPPLY SCHEMES (DEPENDS ON AREAS)
 -- ===============================================================
 CREATE TABLE water_supply_schemes (
   wss_id INT NOT NULL AUTO_INCREMENT,
@@ -87,12 +67,34 @@ CREATE TABLE water_supply_schemes (
 );
 
 -- ===============================================================
--- 6. SECTIONS BELONG TO WSS  <<< UPDATED
+-- 5. USERS (DEPENDS ON WSS)
+-- ===============================================================
+CREATE TABLE users (
+  user_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  first_name VARCHAR(100) NOT NULL,
+  last_name VARCHAR(100) NOT NULL,
+  username VARCHAR(50) UNIQUE,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  mobile_number VARCHAR(15) UNIQUE,
+  gender VARCHAR(10),
+  password VARCHAR(255) NOT NULL,
+  wss_id INT DEFAULT NULL,
+  role ENUM('admin','user') NOT NULL DEFAULT 'user',
+  status ENUM('active','inactive','suspended') DEFAULT 'active',
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  last_login DATETIME DEFAULT NULL,
+  CONSTRAINT fk_users_wss FOREIGN KEY (wss_id)
+    REFERENCES water_supply_schemes(wss_id) ON DELETE SET NULL
+);
+
+-- ===============================================================
+-- 6. SECTIONS (DEPENDS ON WSS)
 -- ===============================================================
 CREATE TABLE sections (
   section_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   section_name VARCHAR(150) NOT NULL,
-  wss_id INT NOT NULL,  -- UPDATED: SECTION BELONGS TO WSS  
+  wss_id INT NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (section_id),
@@ -103,16 +105,16 @@ CREATE TABLE sections (
 );
 
 -- ===============================================================
--- 7. DEVICES (BELONG TO WSS + SECTION + USER)
+-- 7. DEVICES (DEPENDS ON CATEGORIES, WSS, SECTIONS)
 -- ===============================================================
 CREATE TABLE devices (
   device_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   device_name VARCHAR(150) NOT NULL,
   model VARCHAR(100),
   category_id INT UNSIGNED NOT NULL,
-  wss_id INT NOT NULL,              -- new: device directly belongs to WSS
-  section_id INT UNSIGNED NULL,     -- optional section under WSS
-  assigned_to INT UNSIGNED NULL,    -- user assigned
+  wss_id INT NOT NULL,
+  section_id INT UNSIGNED NULL,
+  assigned_to VARCHAR(150) NULL,
   
   -- Common fields
   operating_system VARCHAR(100),
@@ -171,30 +173,29 @@ CREATE TABLE devices (
     REFERENCES water_supply_schemes(wss_id),
 
   CONSTRAINT fk_device_section FOREIGN KEY (section_id)
-    REFERENCES sections(section_id) ON DELETE SET NULL,
-
-  CONSTRAINT fk_device_user FOREIGN KEY (assigned_to)
-    REFERENCES users(user_id) ON DELETE SET NULL
+    REFERENCES sections(section_id) ON DELETE SET NULL
 );
 
 -- ===============================================================
--- 8. REPAIRS
+-- 8. REPAIRS (DEPENDS ON DEVICES)
 -- ===============================================================
 CREATE TABLE repairs (
   repair_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   device_id INT UNSIGNED NOT NULL,
-  technician_id INT UNSIGNED NULL,
   repair_details TEXT,
   cost DECIMAL(10,2),
   repair_date DATE,
-  status ENUM('pending','completed') DEFAULT 'pending',
+  status ENUM('pending','in_progress','completed','cancelled') DEFAULT 'pending',
+  notes TEXT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (repair_id),
-  CONSTRAINT fk_repairs_device FOREIGN KEY (device_id) REFERENCES devices(device_id) ON DELETE CASCADE,
-  CONSTRAINT fk_repairs_technician FOREIGN KEY (technician_id) REFERENCES users(user_id) ON DELETE SET NULL
+  CONSTRAINT fk_repairs_device FOREIGN KEY (device_id) 
+    REFERENCES devices(device_id) ON DELETE CASCADE
 );
 
 -- ===============================================================
--- 9. DEVICE ISSUES
+-- 9. DEVICE ISSUES (DEPENDS ON DEVICES, USERS)
 -- ===============================================================
 CREATE TABLE device_issues (
   issue_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -207,6 +208,8 @@ CREATE TABLE device_issues (
   reported_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   resolved_at DATETIME NULL,
   PRIMARY KEY (issue_id),
-  CONSTRAINT fk_issue_device FOREIGN KEY (device_id) REFERENCES devices(device_id) ON DELETE CASCADE,
-  CONSTRAINT fk_issue_user FOREIGN KEY (reported_by) REFERENCES users(user_id) ON DELETE SET NULL
+  CONSTRAINT fk_issue_device FOREIGN KEY (device_id) 
+    REFERENCES devices(device_id) ON DELETE CASCADE,
+  CONSTRAINT fk_issue_user FOREIGN KEY (reported_by) 
+    REFERENCES users(user_id) ON DELETE SET NULL
 );

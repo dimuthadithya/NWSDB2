@@ -106,8 +106,70 @@ class DbHelper
 
         $users = self::$db->select('users');
 
-        return $users ? $users : false;
+        if (!$users) {
+            return [];
+        }
+
+        // Get water supply schemes
+        $schemes = self::$db->select('water_supply_schemes', ['wss_id', 'wss_name']);
+        $schemeMap = [];
+        if ($schemes) {
+            foreach ($schemes as $scheme) {
+                $schemeMap[$scheme['wss_id']] = $scheme['wss_name'];
+            }
+        }
+
+        // Add wss_name to users
+        foreach ($users as &$user) {
+            $user['wss_name'] = isset($user['wss_id']) && isset($schemeMap[$user['wss_id']])
+                ? $schemeMap[$user['wss_id']]
+                : 'N/A';
+        }
+
+        return $users;
     }
+
+    /**
+     * Update a user
+     * @param int $user_id User ID
+     * @param array $data Data to update
+     * @return bool Returns true on success, false on failure
+     */
+    public static function updateUser($user_id, $data)
+    {
+        self::init();
+
+        if (!is_numeric($user_id)) {
+            return false;
+        }
+
+        // If password is being updated, hash it
+        if (isset($data['password']) && !empty($data['password'])) {
+            $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        } else {
+            // Remove password from update if it's empty
+            unset($data['password']);
+        }
+
+        return self::$db->update('users', $data, ['user_id' => $user_id]);
+    }
+
+    /**
+     * Delete a user
+     * @param int $user_id User ID
+     * @return bool Returns true on success, false on failure
+     */
+    public static function deleteUser($user_id)
+    {
+        self::init();
+
+        if (!is_numeric($user_id)) {
+            return false;
+        }
+
+        return self::$db->delete('users', ['user_id' => $user_id]);
+    }
+
     public static function getAllBranches()
     {
         self::init();
@@ -123,7 +185,25 @@ class DbHelper
 
         $sections = self::$db->select('sections');
 
-        return $sections ? $sections : false;
+        if (!$sections) {
+            return [];
+        }
+
+        // Get water supply schemes
+        $schemes = self::$db->select('water_supply_schemes', ['wss_id', 'wss_name']);
+        $schemeMap = [];
+        if ($schemes) {
+            foreach ($schemes as $scheme) {
+                $schemeMap[$scheme['wss_id']] = $scheme['wss_name'];
+            }
+        }
+
+        // Add wss_name to sections
+        foreach ($sections as &$section) {
+            $section['wss_name'] = $schemeMap[$section['wss_id']] ?? 'N/A';
+        }
+
+        return $sections;
     }
 
     public static function getAllComputers()
@@ -132,9 +212,28 @@ class DbHelper
 
         $computerId = self::$db->getId('device_categories', 'category_name', 'Desktop Computer', 'category_id');
 
-        $computers = self::$db->select('devices', ['*'], ['category_id' => $computerId]);
+        $sql = "SELECT d.*, s.section_name, w.wss_name 
+                FROM devices d 
+                LEFT JOIN sections s ON d.section_id = s.section_id
+                LEFT JOIN water_supply_schemes w ON d.wss_id = w.wss_id
+                WHERE d.category_id = ?
+                ORDER BY d.created_at DESC";
 
-        return $computers ? $computers : false;
+        try {
+            $db = Database::getInstance();
+            $conn = new PDO(
+                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
+                DB_USERNAME,
+                DB_PASSWORD
+            );
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$computerId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('getAllComputers failed: ' . $e->getMessage());
+            return [];
+        }
     }
 
     public static function getAllLaptops()
@@ -164,20 +263,58 @@ class DbHelper
 
         $printerId = self::$db->getId('device_categories', 'category_name', 'Printer', 'category_id');
 
-        $printers = self::$db->select('devices', ['*'], ['category_id' => $printerId]);
+        $sql = "SELECT d.*, s.section_name, w.wss_name 
+                FROM devices d 
+                LEFT JOIN sections s ON d.section_id = s.section_id
+                LEFT JOIN water_supply_schemes w ON d.wss_id = w.wss_id
+                WHERE d.category_id = ?
+                ORDER BY d.created_at DESC";
 
-        return $printers ? $printers : false;
+        try {
+            $db = Database::getInstance();
+            $conn = new PDO(
+                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
+                DB_USERNAME,
+                DB_PASSWORD
+            );
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$printerId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('getAllPrinters failed: ' . $e->getMessage());
+            return [];
+        }
     }
 
     public static function getAllRVPNConnections()
     {
         self::init();
 
-        $rvpnId = self::$db->getId('device_categories', 'category_name', 'RVPN Connection', 'category_id');
+        $rvpnId = self::$db->getId('device_categories', 'category_name', 'RVPN Device', 'category_id');
 
-        $rvpnConnections = self::$db->select('devices', ['*'], ['category_id' => $rvpnId]);
+        $sql = "SELECT d.*, s.section_name, w.wss_name 
+                FROM devices d 
+                LEFT JOIN sections s ON d.section_id = s.section_id
+                LEFT JOIN water_supply_schemes w ON d.wss_id = w.wss_id
+                WHERE d.category_id = ?
+                ORDER BY d.created_at DESC";
 
-        return $rvpnConnections ? $rvpnConnections : false;
+        try {
+            $db = Database::getInstance();
+            $conn = new PDO(
+                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
+                DB_USERNAME,
+                DB_PASSWORD
+            );
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$rvpnId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('getAllRVPNConnections failed: ' . $e->getMessage());
+            return [];
+        }
     }
 
     public static function getAllFingerDevices()
@@ -186,9 +323,185 @@ class DbHelper
 
         $fingerId = self::$db->getId('device_categories', 'category_name', 'Fingerprint Device', 'category_id');
 
-        $fingerDevices = self::$db->select('devices', ['*'], ['category_id' => $fingerId]);
+        $sql = "SELECT d.*, s.section_name, w.wss_name 
+                FROM devices d 
+                LEFT JOIN sections s ON d.section_id = s.section_id
+                LEFT JOIN water_supply_schemes w ON d.wss_id = w.wss_id
+                WHERE d.category_id = ?
+                ORDER BY d.created_at DESC";
 
-        return $fingerDevices ? $fingerDevices : false;
+        try {
+            $db = Database::getInstance();
+            $conn = new PDO(
+                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
+                DB_USERNAME,
+                DB_PASSWORD
+            );
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$fingerId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('getAllFingerDevices failed: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public static function getAllRepairs()
+    {
+        self::init();
+
+        $sql = "SELECT r.*, d.device_name, d.model, c.category_name, w.wss_name 
+                FROM repairs r 
+                INNER JOIN devices d ON r.device_id = d.device_id
+                INNER JOIN device_categories c ON d.category_id = c.category_id
+                INNER JOIN water_supply_schemes w ON d.wss_id = w.wss_id
+                ORDER BY r.repair_date DESC, r.created_at DESC";
+
+        try {
+            $db = Database::getInstance();
+            $conn = new PDO(
+                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
+                DB_USERNAME,
+                DB_PASSWORD
+            );
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('getAllRepairs failed: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public static function getAllDevices()
+    {
+        self::init();
+
+        $sql = "SELECT d.device_id, d.device_name, d.model, c.category_name, w.wss_name 
+                FROM devices d 
+                INNER JOIN device_categories c ON d.category_id = c.category_id
+                INNER JOIN water_supply_schemes w ON d.wss_id = w.wss_id
+                ORDER BY d.device_name ASC";
+
+        try {
+            $db = Database::getInstance();
+            $conn = new PDO(
+                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
+                DB_USERNAME,
+                DB_PASSWORD
+            );
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('getAllDevices failed: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public static function createRepair($data)
+    {
+        self::init();
+
+        // Validate required fields
+        if (empty($data['device_id']) || empty($data['repair_details'])) {
+            return false;
+        }
+
+        return self::$db->insert('repairs', $data);
+    }
+
+    public static function getAllIssues()
+    {
+        self::init();
+
+        $sql = "SELECT i.*, d.device_name, d.model, c.category_name, w.wss_name,
+                u.first_name, u.last_name
+                FROM device_issues i 
+                INNER JOIN devices d ON i.device_id = d.device_id
+                INNER JOIN device_categories c ON d.category_id = c.category_id
+                INNER JOIN water_supply_schemes w ON d.wss_id = w.wss_id
+                LEFT JOIN users u ON i.reported_by = u.user_id
+                ORDER BY i.reported_at DESC";
+
+        try {
+            $db = Database::getInstance();
+            $conn = new PDO(
+                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
+                DB_USERNAME,
+                DB_PASSWORD
+            );
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('getAllIssues failed: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public static function createIssue($data)
+    {
+        self::init();
+
+        // Validate required fields
+        if (empty($data['device_id']) || empty($data['issue_title'])) {
+            return false;
+        }
+
+        return self::$db->insert('device_issues', $data);
+    }
+
+    public static function updateIssue($issue_id, $data)
+    {
+        self::init();
+
+        if (!is_numeric($issue_id)) {
+            return false;
+        }
+
+        $where = ['issue_id' => $issue_id];
+        return self::$db->update('device_issues', $data, $where);
+    }
+
+    public static function deleteIssue($issue_id)
+    {
+        self::init();
+
+        if (!is_numeric($issue_id)) {
+            return false;
+        }
+
+        $where = ['issue_id' => $issue_id];
+        return self::$db->delete('device_issues', $where);
+    }
+
+    public static function updateRepair($repair_id, $data)
+    {
+        self::init();
+
+        if (!is_numeric($repair_id)) {
+            return false;
+        }
+
+        $where = ['repair_id' => $repair_id];
+        return self::$db->update('repairs', $data, $where);
+    }
+
+    public static function deleteRepair($repair_id)
+    {
+        self::init();
+
+        if (!is_numeric($repair_id)) {
+            return false;
+        }
+
+        $where = ['repair_id' => $repair_id];
+        return self::$db->delete('repairs', $where);
     }
 
     public static function createBranch($branch_name, $branch_location)
@@ -215,65 +528,42 @@ class DbHelper
         return self::$db->insert('device_categories', $categoryData);
     }
 
-    public static function createDevice(
-        $deviceName,
-        $model,
-        $madeIn,
-        $categoryId,
-        $sectionId,
-        $assignedTo,
-        $operatingSystem,
-        $processor,
-        $ram,
-        $hardDriveCapacity,
-        $keyboard,
-        $mouse,
-        $networkConnectivity,
-        $printerConnectivity,
-        $ipAddress,
-        $virusGuard,
-        $monitorInfo,
-        $cpuSerial,
-        $purchaseDate,
-        $status,
-        $notes
-    ) {
+    /**
+     * Update a device category
+     * @param int $category_id Category ID
+     * @param array $data Data to update
+     * @return bool Returns true on success, false on failure
+     */
+    public static function updateDeviceCategory($category_id, $data)
+    {
         self::init();
 
-        // Implementation for creating a device goes here
-        $deviceData = [
-            'device_name' => $deviceName,
-            'model' => $model,
-            'made_in' => $madeIn,
-            'category_id' => $categoryId,
-            'section_id' => $sectionId,
-            'assigned_to' => $assignedTo,
-            'operating_system' => $operatingSystem,
-            'processor' => $processor,
-            'ram' => $ram,
-            'hard_drive_capacity' => $hardDriveCapacity,
-            'keyboard' => $keyboard,
-            'mouse' => $mouse,
-            'network_connectivity' => $networkConnectivity,
-            'printer_connectivity' => $printerConnectivity,
-            'ip_address' => $ipAddress,
-            'virus_guard' => $virusGuard,
-            'monitor_info' => $monitorInfo,
-            'cpu_serial' => $cpuSerial,
-            'purchase_date' => $purchaseDate,
-            'status' => $status,
-            'notes' => $notes
-        ];
-        return self::$db->insert('devices', $deviceData);
+        if (!is_numeric($category_id)) {
+            return false;
+        }
+
+        return self::$db->update('device_categories', $data, ['category_id' => $category_id]);
     }
 
-    public static function createSection($section_name, $branch_id)
+    public static function createDevice($data)
+    {
+        self::init();
+
+        // Validate required fields
+        if (empty($data['device_name']) || empty($data['category_id']) || empty($data['wss_id'])) {
+            return false;
+        }
+
+        return self::$db->insert('devices', $data);
+    }
+
+    public static function createSection($section_name, $wss_id)
     {
         self::init();
 
         $sectionData = [
             'section_name' => $section_name,
-            'branch_id' => $branch_id
+            'wss_id' => $wss_id
         ];
 
         return self::$db->insert('sections', $sectionData);
@@ -303,6 +593,23 @@ class DbHelper
         return self::$db->delete('device_categories', $where);
     }
 
+    /**
+     * Update a section
+     * @param int $section_id Section ID
+     * @param array $data Data to update
+     * @return bool Returns true on success, false on failure
+     */
+    public static function updateSection($section_id, $data)
+    {
+        self::init();
+
+        if (!is_numeric($section_id)) {
+            return false;
+        }
+
+        return self::$db->update('sections', $data, ['section_id' => $section_id]);
+    }
+
     public static function deleteSection($section_id)
     {
         self::init();
@@ -313,6 +620,17 @@ class DbHelper
 
         $where = ['section_id' => $section_id];
         return self::$db->delete('sections', $where);
+    }
+
+    public static function updateDevice($device_id, $data)
+    {
+        self::init();
+
+        if (!is_numeric($device_id)) {
+            return false;
+        }
+
+        return self::$db->update('devices', $data, ['device_id' => $device_id]);
     }
 
     public static function deleteDevice($device_id)
@@ -417,6 +735,131 @@ class DbHelper
         return $categoryId ? $categoryId : null;
     }
 
+    /**
+     * Get issue counts by priority
+     * @return array Returns array with counts for each priority
+     */
+    public static function getIssuePriorityCounts()
+    {
+        self::init();
+
+        $highPriority = self::$db->count('device_issues', ['priority' => 'high', 'status !=' => 'closed']);
+        $mediumPriority = self::$db->count('device_issues', ['priority' => 'medium', 'status !=' => 'closed']);
+        $lowPriority = self::$db->count('device_issues', ['priority' => 'low', 'status !=' => 'closed']);
+
+        return [
+            'high' => $highPriority ? $highPriority : 0,
+            'medium' => $mediumPriority ? $mediumPriority : 0,
+            'low' => $lowPriority ? $lowPriority : 0
+        ];
+    }
+
+    /**
+     * Get recent activities (issues, repairs, devices)
+     * @param int $limit Number of activities to fetch
+     * @return array|bool Returns array of activities or false
+     */
+    public static function getRecentActivities($limit = 10)
+    {
+        self::init();
+
+        $activities = [];
+
+        try {
+            // Get recent devices
+            $recentDevices = self::$db->rawQuery("
+                SELECT 
+                    d.device_id,
+                    d.device_name,
+                    d.created_at,
+                    dc.category_name,
+                    'device' as type
+                FROM devices d
+                LEFT JOIN device_categories dc ON d.category_id = dc.category_id
+                ORDER BY d.created_at DESC
+                LIMIT 3
+            ");
+
+            if ($recentDevices) {
+                foreach ($recentDevices as $device) {
+                    $activities[] = [
+                        'type' => 'device',
+                        'title' => 'New Device Added',
+                        'description' => $device['device_name'] . ' - ' . $device['category_name'],
+                        'time' => $device['created_at'],
+                        'icon' => 'fa-plus',
+                        'color' => 'blue'
+                    ];
+                }
+            }
+
+            // Get recent repairs
+            $recentRepairs = self::$db->rawQuery("
+                SELECT 
+                    r.repair_id,
+                    d.device_name,
+                    r.created_at,
+                    r.status
+                FROM repairs r
+                LEFT JOIN devices d ON r.device_id = d.device_id
+                WHERE r.status = 'in_progress' OR r.status = 'completed'
+                ORDER BY r.created_at DESC
+                LIMIT 3
+            ");
+
+            if ($recentRepairs) {
+                foreach ($recentRepairs as $repair) {
+                    $activities[] = [
+                        'type' => 'repair',
+                        'title' => $repair['status'] === 'completed' ? 'Repair Completed' : 'Repair Started',
+                        'description' => $repair['device_name'],
+                        'time' => $repair['created_at'],
+                        'icon' => $repair['status'] === 'completed' ? 'fa-check-circle' : 'fa-wrench',
+                        'color' => $repair['status'] === 'completed' ? 'green' : 'orange'
+                    ];
+                }
+            }
+
+            // Get recent issues
+            $recentIssues = self::$db->rawQuery("
+                SELECT 
+                    i.issue_id,
+                    d.device_name,
+                    i.issue_title,
+                    i.created_at,
+                    i.status,
+                    i.resolved_at
+                FROM device_issues i
+                LEFT JOIN devices d ON i.device_id = d.device_id
+                ORDER BY i.created_at DESC
+                LIMIT 3
+            ");
+
+            if ($recentIssues) {
+                foreach ($recentIssues as $issue) {
+                    $isResolved = in_array($issue['status'], ['resolved', 'closed']);
+                    $activities[] = [
+                        'type' => 'issue',
+                        'title' => $isResolved ? 'Issue Resolved' : 'New Issue Reported',
+                        'description' => $issue['device_name'] . ' - ' . $issue['issue_title'],
+                        'time' => $isResolved ? $issue['resolved_at'] : $issue['created_at'],
+                        'icon' => $isResolved ? 'fa-check-circle' : 'fa-exclamation-triangle',
+                        'color' => $isResolved ? 'green' : 'red'
+                    ];
+                }
+            }
+
+            // Sort all activities by time
+            usort($activities, function ($a, $b) {
+                return strtotime($b['time']) - strtotime($a['time']);
+            });
+
+            return array_slice($activities, 0, $limit);
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
     // ============================================
     // REGIONS Functions
     // ============================================
@@ -467,6 +910,59 @@ class DbHelper
         self::init();
         $result = self::$db->count('regions', ['status' => 'active']);
         return $result ? $result : 0;
+    }
+
+    /**
+     * Create a new region
+     * @param string $region_code Region code
+     * @param string $region_name Region name
+     * @param string $status Region status (active/inactive)
+     * @return bool|int Returns region ID on success, false on failure
+     */
+    public static function createRegion($region_code, $region_name, $status = 'active')
+    {
+        self::init();
+
+        $regionData = [
+            'region_code' => $region_code,
+            'region_name' => $region_name,
+            'status' => $status
+        ];
+
+        return self::$db->insert('regions', $regionData);
+    }
+
+    /**
+     * Update a region
+     * @param int $region_id Region ID
+     * @param array $data Data to update
+     * @return bool Returns true on success, false on failure
+     */
+    public static function updateRegion($region_id, $data)
+    {
+        self::init();
+
+        if (!is_numeric($region_id)) {
+            return false;
+        }
+
+        return self::$db->update('regions', $data, ['region_id' => $region_id]);
+    }
+
+    /**
+     * Delete a region
+     * @param int $region_id Region ID
+     * @return bool Returns true on success, false on failure
+     */
+    public static function deleteRegion($region_id)
+    {
+        self::init();
+
+        if (!is_numeric($region_id)) {
+            return false;
+        }
+
+        return self::$db->delete('regions', ['region_id' => $region_id]);
     }
 
     // ============================================
@@ -551,6 +1047,61 @@ class DbHelper
         self::init();
         $result = self::$db->count('areas', ['status' => 'active']);
         return $result ? $result : 0;
+    }
+
+    /**
+     * Create a new area
+     * @param int $region_id Region ID
+     * @param string $area_code Area code
+     * @param string $area_name Area name
+     * @param string $status Area status (active/inactive)
+     * @return bool|int Returns area ID on success, false on failure
+     */
+    public static function createArea($region_id, $area_code, $area_name, $status = 'active')
+    {
+        self::init();
+
+        $areaData = [
+            'region_id' => $region_id,
+            'area_code' => $area_code,
+            'area_name' => $area_name,
+            'status' => $status
+        ];
+
+        return self::$db->insert('areas', $areaData);
+    }
+
+    /**
+     * Update an area
+     * @param int $area_id Area ID
+     * @param array $data Data to update
+     * @return bool Returns true on success, false on failure
+     */
+    public static function updateArea($area_id, $data)
+    {
+        self::init();
+
+        if (!is_numeric($area_id)) {
+            return false;
+        }
+
+        return self::$db->update('areas', $data, ['area_id' => $area_id]);
+    }
+
+    /**
+     * Delete an area
+     * @param int $area_id Area ID
+     * @return bool Returns true on success, false on failure
+     */
+    public static function deleteArea($area_id)
+    {
+        self::init();
+
+        if (!is_numeric($area_id)) {
+            return false;
+        }
+
+        return self::$db->delete('areas', ['area_id' => $area_id]);
     }
 
     // ============================================
@@ -675,5 +1226,60 @@ class DbHelper
         self::init();
         $result = self::$db->count('water_supply_schemes', ['status' => 'maintenance']);
         return $result ? $result : 0;
+    }
+
+    /**
+     * Create a new water supply scheme
+     * @param int $area_id Area ID
+     * @param string $wss_code Scheme code
+     * @param string $wss_name Scheme name
+     * @param string $status Scheme status (active/inactive/maintenance)
+     * @return bool|int Returns scheme ID on success, false on failure
+     */
+    public static function createWaterSupplyScheme($area_id, $wss_code, $wss_name, $status = 'active')
+    {
+        self::init();
+
+        $schemeData = [
+            'area_id' => $area_id,
+            'wss_code' => $wss_code,
+            'wss_name' => $wss_name,
+            'status' => $status
+        ];
+
+        return self::$db->insert('water_supply_schemes', $schemeData);
+    }
+
+    /**
+     * Update a water supply scheme
+     * @param int $wss_id Scheme ID
+     * @param array $data Data to update
+     * @return bool Returns true on success, false on failure
+     */
+    public static function updateWaterSupplyScheme($wss_id, $data)
+    {
+        self::init();
+
+        if (!is_numeric($wss_id)) {
+            return false;
+        }
+
+        return self::$db->update('water_supply_schemes', $data, ['wss_id' => $wss_id]);
+    }
+
+    /**
+     * Delete a water supply scheme
+     * @param int $wss_id Scheme ID
+     * @return bool Returns true on success, false on failure
+     */
+    public static function deleteWaterSupplyScheme($wss_id)
+    {
+        self::init();
+
+        if (!is_numeric($wss_id)) {
+            return false;
+        }
+
+        return self::$db->delete('water_supply_schemes', ['wss_id' => $wss_id]);
     }
 }
