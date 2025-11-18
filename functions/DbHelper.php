@@ -606,6 +606,61 @@ class DbHelper
         return $result ? $result : 0;
     }
 
+    /**
+     * Create a new area
+     * @param int $region_id Region ID
+     * @param string $area_code Area code
+     * @param string $area_name Area name
+     * @param string $status Area status (active/inactive)
+     * @return bool|int Returns area ID on success, false on failure
+     */
+    public static function createArea($region_id, $area_code, $area_name, $status = 'active')
+    {
+        self::init();
+        
+        $areaData = [
+            'region_id' => $region_id,
+            'area_code' => $area_code,
+            'area_name' => $area_name,
+            'status' => $status
+        ];
+        
+        return self::$db->insert('areas', $areaData);
+    }
+
+    /**
+     * Update an area
+     * @param int $area_id Area ID
+     * @param array $data Data to update
+     * @return bool Returns true on success, false on failure
+     */
+    public static function updateArea($area_id, $data)
+    {
+        self::init();
+        
+        if (!is_numeric($area_id)) {
+            return false;
+        }
+        
+        return self::$db->update('areas', $data, ['area_id' => $area_id]);
+    }
+
+    /**
+     * Delete an area
+     * @param int $area_id Area ID
+     * @return bool Returns true on success, false on failure
+     */
+    public static function deleteArea($area_id)
+    {
+        self::init();
+        
+        if (!is_numeric($area_id)) {
+            return false;
+        }
+        
+        return self::$db->delete('areas', ['area_id' => $area_id]);
+    }
+
     // ============================================
     // WATER SUPPLY SCHEMES Functions
     // ============================================
