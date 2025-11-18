@@ -414,6 +414,72 @@ class DbHelper
         return self::$db->insert('repairs', $data);
     }
 
+    public static function getAllIssues()
+    {
+        self::init();
+
+        $sql = "SELECT i.*, d.device_name, d.model, c.category_name, w.wss_name,
+                u.first_name, u.last_name
+                FROM device_issues i 
+                INNER JOIN devices d ON i.device_id = d.device_id
+                INNER JOIN device_categories c ON d.category_id = c.category_id
+                INNER JOIN water_supply_schemes w ON d.wss_id = w.wss_id
+                LEFT JOIN users u ON i.reported_by = u.user_id
+                ORDER BY i.reported_at DESC";
+
+        try {
+            $db = Database::getInstance();
+            $conn = new PDO(
+                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
+                DB_USERNAME,
+                DB_PASSWORD
+            );
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('getAllIssues failed: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public static function createIssue($data)
+    {
+        self::init();
+
+        // Validate required fields
+        if (empty($data['device_id']) || empty($data['issue_title'])) {
+            return false;
+        }
+
+        return self::$db->insert('device_issues', $data);
+    }
+
+    public static function updateIssue($issue_id, $data)
+    {
+        self::init();
+
+        if (!is_numeric($issue_id)) {
+            return false;
+        }
+
+        $where = ['issue_id' => $issue_id];
+        return self::$db->update('device_issues', $data, $where);
+    }
+
+    public static function deleteIssue($issue_id)
+    {
+        self::init();
+
+        if (!is_numeric($issue_id)) {
+            return false;
+        }
+
+        $where = ['issue_id' => $issue_id];
+        return self::$db->delete('device_issues', $where);
+    }
+
     public static function updateRepair($repair_id, $data)
     {
         self::init();
