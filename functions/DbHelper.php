@@ -295,6 +295,23 @@ class DbHelper
         return self::$db->insert('device_categories', $categoryData);
     }
 
+    /**
+     * Update a device category
+     * @param int $category_id Category ID
+     * @param array $data Data to update
+     * @return bool Returns true on success, false on failure
+     */
+    public static function updateDeviceCategory($category_id, $data)
+    {
+        self::init();
+
+        if (!is_numeric($category_id)) {
+            return false;
+        }
+
+        return self::$db->update('device_categories', $data, ['category_id' => $category_id]);
+    }
+
     public static function createDevice(
         $deviceName,
         $model,
