@@ -123,7 +123,25 @@ class DbHelper
 
         $sections = self::$db->select('sections');
 
-        return $sections ? $sections : false;
+        if (!$sections) {
+            return [];
+        }
+
+        // Get water supply schemes
+        $schemes = self::$db->select('water_supply_schemes', ['wss_id', 'wss_name']);
+        $schemeMap = [];
+        if ($schemes) {
+            foreach ($schemes as $scheme) {
+                $schemeMap[$scheme['wss_id']] = $scheme['wss_name'];
+            }
+        }
+
+        // Add wss_name to sections
+        foreach ($sections as &$section) {
+            $section['wss_name'] = $schemeMap[$section['wss_id']] ?? 'N/A';
+        }
+
+        return $sections;
     }
 
     public static function getAllComputers()
@@ -267,13 +285,13 @@ class DbHelper
         return self::$db->insert('devices', $deviceData);
     }
 
-    public static function createSection($section_name, $branch_id)
+    public static function createSection($section_name, $wss_id)
     {
         self::init();
 
         $sectionData = [
             'section_name' => $section_name,
-            'branch_id' => $branch_id
+            'wss_id' => $wss_id
         ];
 
         return self::$db->insert('sections', $sectionData);
@@ -301,6 +319,23 @@ class DbHelper
 
         $where = ['category_id' => $category_id];
         return self::$db->delete('device_categories', $where);
+    }
+
+    /**
+     * Update a section
+     * @param int $section_id Section ID
+     * @param array $data Data to update
+     * @return bool Returns true on success, false on failure
+     */
+    public static function updateSection($section_id, $data)
+    {
+        self::init();
+
+        if (!is_numeric($section_id)) {
+            return false;
+        }
+
+        return self::$db->update('sections', $data, ['section_id' => $section_id]);
     }
 
     public static function deleteSection($section_id)
