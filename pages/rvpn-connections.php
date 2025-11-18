@@ -9,8 +9,21 @@ $name = $_SESSION['user']['name'];
 
 // Fetch RVPN connections from database
 $rvpnConnections = DbHelper::getAllRVPNConnections();
+$sections = DbHelper::getAllSections();
+$waterSupplySchemes = DbHelper::getAllWaterSupplySchemes();
+$categories = DbHelper::getAllDeviceCategories();
+
 if (!$rvpnConnections) {
   $rvpnConnections = [];
+}
+
+// Get RVPN category ID
+$rvpnCategoryId = null;
+foreach ($categories as $category) {
+  if ($category['category_name'] === 'RVPN Device') {
+    $rvpnCategoryId = $category['category_id'];
+    break;
+  }
 }
 
 // Calculate statistics
@@ -93,9 +106,28 @@ $totalUsers = $totalConnections; // Each connection represents a user
     <!-- Header -->
     <?php include_once __DIR__ . '/../includes/header.php'; ?>
 
-
     <!-- Content -->
     <div class="p-6 space-y-6">
+      <!-- Success/Error Messages -->
+      <?php if (isset($_SESSION['success_message'])): ?>
+        <div id="successMessage" class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg shadow-md animate-fade-up">
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
+            <p class="text-green-700 font-medium"><?= htmlspecialchars($_SESSION['success_message']) ?></p>
+          </div>
+        </div>
+        <?php unset($_SESSION['success_message']); ?>
+      <?php endif; ?>
+
+      <?php if (isset($_SESSION['error_message'])): ?>
+        <div id="errorMessage" class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-md animate-fade-up">
+          <div class="flex items-center">
+            <i class="fas fa-exclamation-circle text-red-500 text-xl mr-3"></i>
+            <p class="text-red-700 font-medium"><?= htmlspecialchars($_SESSION['error_message']) ?></p>
+          </div>
+        </div>
+        <?php unset($_SESSION['error_message']); ?>
+      <?php endif; ?>
       <!-- Summary Stats -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div
@@ -306,10 +338,10 @@ $totalUsers = $totalConnections; // Each connection represents a user
                       <span class="px-2 py-1 text-xs font-medium <?= $badgeClass ?> rounded-full"><?= $badgeText ?></span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button class="text-blue-600 hover:text-blue-900 mr-3" title="Edit">
+                      <button onclick="openEditModal(<?= htmlspecialchars(json_encode($conn)) ?>)" class="text-green-600 hover:text-green-900 mr-3" title="Edit">
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button class="text-red-600 hover:text-red-900" title="Delete">
+                      <button onclick="confirmDelete(<?= $conn['device_id'] ?>, '<?= htmlspecialchars($conn['device_name'], ENT_QUOTES) ?>')" class="text-red-600 hover:text-red-900" title="Delete">
                         <i class="fas fa-trash"></i>
                       </button>
                     </td>
@@ -358,109 +390,115 @@ $totalUsers = $totalConnections; // Each connection represents a user
   </main>
 
   <!-- Add RVPN Connection Modal -->
-  <div
-    id="addModal"
-    class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div
-      class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-      <div
-        class="sticky top-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 rounded-t-2xl">
+  <div id="addModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+      <div class="sticky top-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 rounded-t-2xl">
         <div class="flex items-center justify-between">
-          <h3 class="text-xl font-bold text-white">
-            Add New RVPN Connection
-          </h3>
-          <button
-            onclick="closeAddModal()"
-            class="text-white hover:text-gray-200 transition-colors">
+          <h3 class="text-xl font-bold text-white">Add New RVPN Connection</h3>
+          <button onclick="closeAddModal()" class="text-white hover:text-gray-200 transition-colors">
             <i class="fas fa-times text-xl"></i>
           </button>
         </div>
       </div>
 
-      <form class="p-6">
+      <form id="addRvpnForm" method="POST" action="admin/handlers/rvpn-handler.php" class="p-6">
+        <input type="hidden" name="action" value="create">
+        <input type="hidden" name="category_id" value="<?= $rvpnCategoryId ?>">
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Name of RVPN User</label>
-            <input
-              type="text"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required />
+            <label class="block text-sm font-medium text-gray-700 mb-2">Name of RVPN User *</label>
+            <input type="text" name="device_name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Employee Number</label>
-            <input
-              type="text"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required />
+            <label class="block text-sm font-medium text-gray-700 mb-2">Employee Number *</label>
+            <input type="text" name="employee_number" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Designation</label>
-            <input
-              type="text"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required />
+            <label class="block text-sm font-medium text-gray-700 mb-2">Designation *</label>
+            <input type="text" name="designation" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Working Location</label>
-            <input
-              type="text"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required />
+            <label class="block text-sm font-medium text-gray-700 mb-2">Working Location *</label>
+            <input type="text" name="working_location" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Cost Code</label>
-            <input
-              type="text"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+            <input type="text" name="cost_code" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Serial Number of RVPN Connection</label>
-            <input
-              type="text"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required />
+            <label class="block text-sm font-medium text-gray-700 mb-2">Serial Number *</label>
+            <input type="text" name="rvpn_serial_number" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Username of RVPN Connection</label>
-            <input
-              type="text"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required />
+            <label class="block text-sm font-medium text-gray-700 mb-2">Username *</label>
+            <input type="text" name="rvpn_username" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Pin No.</label>
-            <input
-              type="text"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+            <input type="text" name="pin_number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">WSS *</label>
+            <select name="wss_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="">Select WSS</option>
+              <?php if ($waterSupplySchemes): ?>
+                <?php foreach ($waterSupplySchemes as $wss): ?>
+                  <option value="<?= $wss['wss_id'] ?>"><?= htmlspecialchars($wss['wss_name']) ?></option>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Section</label>
+            <select name="section_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="">Select Section</option>
+              <?php if ($sections): ?>
+                <?php foreach ($sections as $section): ?>
+                  <option value="<?= $section['section_id'] ?>"><?= htmlspecialchars($section['section_name']) ?></option>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </select>
           </div>
 
           <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Whether the connection is required or not</label>
-            <select
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Required Status</label>
+            <select name="connection_required" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
               <option value="required">Required</option>
               <option value="not_required">Not Required</option>
             </select>
           </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="active">Active</option>
+              <option value="under_repair">Under Repair</option>
+              <option value="retired">Retired</option>
+              <option value="lost">Lost</option>
+            </select>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+            <textarea name="notes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+          </div>
         </div>
 
         <div class="mt-6 flex gap-3 justify-end">
-          <button
-            type="button"
-            onclick="closeAddModal()"
-            class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+          <button type="button" onclick="closeAddModal()" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
             Cancel
           </button>
-          <button
-            type="submit"
-            class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all">
+          <button type="submit" class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all">
             <i class="fas fa-save mr-2"></i>Save Connection
           </button>
         </div>
@@ -468,7 +506,180 @@ $totalUsers = $totalConnections; // Each connection represents a user
     </div>
   </div>
 
+  <!-- Edit RVPN Connection Modal -->
+  <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+      <div class="sticky top-0 bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4 rounded-t-2xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-bold text-white">Edit RVPN Connection</h3>
+          <button onclick="closeEditModal()" class="text-white hover:text-gray-200 transition-colors">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <form id="editRvpnForm" method="POST" action="admin/handlers/rvpn-handler.php" class="p-6">
+        <input type="hidden" name="action" value="update">
+        <input type="hidden" name="device_id" id="edit_device_id">
+        <input type="hidden" name="category_id" value="<?= $rvpnCategoryId ?>">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Name of RVPN User *</label>
+            <input type="text" name="device_name" id="edit_device_name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Employee Number *</label>
+            <input type="text" name="employee_number" id="edit_employee_number" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Designation *</label>
+            <input type="text" name="designation" id="edit_designation" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Working Location *</label>
+            <input type="text" name="working_location" id="edit_working_location" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Cost Code</label>
+            <input type="text" name="cost_code" id="edit_cost_code" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Serial Number *</label>
+            <input type="text" name="rvpn_serial_number" id="edit_rvpn_serial_number" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Username *</label>
+            <input type="text" name="rvpn_username" id="edit_rvpn_username" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Pin No.</label>
+            <input type="text" name="pin_number" id="edit_pin_number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">WSS *</label>
+            <select name="wss_id" id="edit_wss_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="">Select WSS</option>
+              <?php if ($waterSupplySchemes): ?>
+                <?php foreach ($waterSupplySchemes as $wss): ?>
+                  <option value="<?= $wss['wss_id'] ?>"><?= htmlspecialchars($wss['wss_name']) ?></option>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Section</label>
+            <select name="section_id" id="edit_section_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="">Select Section</option>
+              <?php if ($sections): ?>
+                <?php foreach ($sections as $section): ?>
+                  <option value="<?= $section['section_id'] ?>"><?= htmlspecialchars($section['section_name']) ?></option>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </select>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Required Status</label>
+            <select name="connection_required" id="edit_connection_required" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="required">Required</option>
+              <option value="not_required">Not Required</option>
+            </select>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select name="status" id="edit_status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="active">Active</option>
+              <option value="under_repair">Under Repair</option>
+              <option value="retired">Retired</option>
+              <option value="lost">Lost</option>
+            </select>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+            <textarea name="notes" id="edit_notes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"></textarea>
+          </div>
+        </div>
+
+        <div class="mt-6 flex gap-3 justify-end">
+          <button type="button" onclick="closeEditModal()" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            Cancel
+          </button>
+          <button type="submit" class="px-6 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all">
+            <i class="fas fa-save mr-2"></i>Update Connection
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full" onclick="event.stopPropagation()">
+      <div class="bg-gradient-to-r from-red-600 to-pink-600 px-6 py-4 rounded-t-2xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-bold text-white">Delete RVPN Connection</h3>
+          <button onclick="closeDeleteModal()" class="text-white hover:text-gray-200 transition-colors">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <div class="mb-6">
+          <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+            <div class="flex">
+              <i class="fas fa-exclamation-triangle text-red-500 mt-1 mr-3"></i>
+              <div>
+                <h4 class="text-red-800 font-medium mb-1">Warning: This action cannot be undone</h4>
+                <p class="text-red-700 text-sm">Are you sure you want to delete this RVPN connection?</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form id="deleteRvpnForm" method="POST" action="admin/handlers/rvpn-handler.php">
+          <input type="hidden" name="action" value="delete">
+          <input type="hidden" name="device_id" id="delete_device_id">
+
+          <div class="bg-gray-50 rounded-lg p-4 mb-6">
+            <p class="text-sm text-gray-600 mb-2">User Name:</p>
+            <p class="font-semibold text-gray-900" id="delete_user_name"></p>
+          </div>
+
+          <div class="flex items-center justify-end gap-3">
+            <button type="button" onclick="closeDeleteModal()" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+              <i class="fas fa-times mr-2"></i>Cancel
+            </button>
+            <button type="submit" class="px-6 py-2 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg hover:from-red-700 hover:to-pink-700 transition-all">
+              <i class="fas fa-trash mr-2"></i>Delete Connection
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // Auto-hide messages after 5 seconds
+    setTimeout(() => {
+      const successMessage = document.getElementById('successMessage');
+      const errorMessage = document.getElementById('errorMessage');
+      if (successMessage) successMessage.style.display = 'none';
+      if (errorMessage) errorMessage.style.display = 'none';
+    }, 5000);
+
     // Mobile menu toggle
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
@@ -477,23 +688,85 @@ $totalUsers = $totalConnections; // Each connection represents a user
       sidebar.classList.toggle('-translate-x-full');
     });
 
-    // Modal functions
+    // Add Modal functions
     function openAddModal() {
       document.getElementById('addModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
     }
 
     function closeAddModal() {
       document.getElementById('addModal').classList.add('hidden');
+      document.getElementById('addRvpnForm').reset();
+      document.body.style.overflow = 'auto';
     }
 
-    // Close modal on outside click
-    document
-      .getElementById('addModal')
-      .addEventListener('click', function(e) {
-        if (e.target === this) {
-          closeAddModal();
-        }
-      });
+    // Edit Modal functions
+    function openEditModal(conn) {
+      document.getElementById('edit_device_id').value = conn.device_id;
+      document.getElementById('edit_device_name').value = conn.device_name || '';
+      document.getElementById('edit_employee_number').value = conn.employee_number || '';
+      document.getElementById('edit_designation').value = conn.designation || '';
+      document.getElementById('edit_working_location').value = conn.working_location || '';
+      document.getElementById('edit_cost_code').value = conn.cost_code || '';
+      document.getElementById('edit_rvpn_serial_number').value = conn.rvpn_serial_number || '';
+      document.getElementById('edit_rvpn_username').value = conn.rvpn_username || '';
+      document.getElementById('edit_pin_number').value = conn.pin_number || '';
+      document.getElementById('edit_wss_id').value = conn.wss_id || '';
+      document.getElementById('edit_section_id').value = conn.section_id || '';
+      document.getElementById('edit_connection_required').value = conn.connection_required || 'not_required';
+      document.getElementById('edit_status').value = conn.status || 'active';
+      document.getElementById('edit_notes').value = conn.notes || '';
+
+      document.getElementById('editModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.add('hidden');
+      document.getElementById('editRvpnForm').reset();
+      document.body.style.overflow = 'auto';
+    }
+
+    // Delete Modal functions
+    function confirmDelete(deviceId, deviceName) {
+      document.getElementById('delete_device_id').value = deviceId;
+      document.getElementById('delete_user_name').textContent = deviceName;
+      document.getElementById('deleteModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+
+    // Close modals on background click
+    document.getElementById('addModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeAddModal();
+      }
+    });
+
+    document.getElementById('editModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeEditModal();
+      }
+    });
+
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeDeleteModal();
+      }
+    });
+
+    // Close modals on ESC key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeAddModal();
+        closeEditModal();
+        closeDeleteModal();
+      }
+    });
   </script>
 </body>
 
