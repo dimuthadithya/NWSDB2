@@ -177,21 +177,21 @@ CREATE TABLE devices (
 );
 
 -- ===============================================================
--- 8. REPAIRS (DEPENDS ON DEVICES, USERS)
+-- 8. REPAIRS (DEPENDS ON DEVICES)
 -- ===============================================================
 CREATE TABLE repairs (
   repair_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   device_id INT UNSIGNED NOT NULL,
-  technician_id INT UNSIGNED NULL,
   repair_details TEXT,
   cost DECIMAL(10,2),
   repair_date DATE,
-  status ENUM('pending','completed') DEFAULT 'pending',
+  status ENUM('pending','in_progress','completed','cancelled') DEFAULT 'pending',
+  notes TEXT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (repair_id),
   CONSTRAINT fk_repairs_device FOREIGN KEY (device_id) 
-    REFERENCES devices(device_id) ON DELETE CASCADE,
-  CONSTRAINT fk_repairs_technician FOREIGN KEY (technician_id) 
-    REFERENCES users(user_id) ON DELETE SET NULL
+    REFERENCES devices(device_id) ON DELETE CASCADE
 );
 
 -- ===============================================================

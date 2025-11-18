@@ -347,6 +347,97 @@ class DbHelper
         }
     }
 
+    public static function getAllRepairs()
+    {
+        self::init();
+
+        $sql = "SELECT r.*, d.device_name, d.model, c.category_name, w.wss_name 
+                FROM repairs r 
+                INNER JOIN devices d ON r.device_id = d.device_id
+                INNER JOIN device_categories c ON d.category_id = c.category_id
+                INNER JOIN water_supply_schemes w ON d.wss_id = w.wss_id
+                ORDER BY r.repair_date DESC, r.created_at DESC";
+
+        try {
+            $db = Database::getInstance();
+            $conn = new PDO(
+                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
+                DB_USERNAME,
+                DB_PASSWORD
+            );
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('getAllRepairs failed: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public static function getAllDevices()
+    {
+        self::init();
+
+        $sql = "SELECT d.device_id, d.device_name, d.model, c.category_name, w.wss_name 
+                FROM devices d 
+                INNER JOIN device_categories c ON d.category_id = c.category_id
+                INNER JOIN water_supply_schemes w ON d.wss_id = w.wss_id
+                ORDER BY d.device_name ASC";
+
+        try {
+            $db = Database::getInstance();
+            $conn = new PDO(
+                "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
+                DB_USERNAME,
+                DB_PASSWORD
+            );
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('getAllDevices failed: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public static function createRepair($data)
+    {
+        self::init();
+
+        // Validate required fields
+        if (empty($data['device_id']) || empty($data['repair_details'])) {
+            return false;
+        }
+
+        return self::$db->insert('repairs', $data);
+    }
+
+    public static function updateRepair($repair_id, $data)
+    {
+        self::init();
+
+        if (!is_numeric($repair_id)) {
+            return false;
+        }
+
+        $where = ['repair_id' => $repair_id];
+        return self::$db->update('repairs', $data, $where);
+    }
+
+    public static function deleteRepair($repair_id)
+    {
+        self::init();
+
+        if (!is_numeric($repair_id)) {
+            return false;
+        }
+
+        $where = ['repair_id' => $repair_id];
+        return self::$db->delete('repairs', $where);
+    }
+
     public static function createBranch($branch_name, $branch_location)
     {
         self::init();
