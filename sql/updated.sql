@@ -2,8 +2,8 @@
 -- DEVICE RECORD SYSTEM (CORRECTED ORDER)
 -- ===============================================================
 
-CREATE DATABASE IF NOT EXISTS devicerecordsystem;
-USE devicerecordsystem;
+CREATE DATABASE IF NOT EXISTS devicerecordsystem4;
+USE devicerecordsystem4;
 
 -- ===============================================================
 -- 1. DEVICE CATEGORIES (NO DEPENDENCIES)
