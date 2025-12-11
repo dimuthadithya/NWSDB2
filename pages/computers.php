@@ -1185,9 +1185,6 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
       document.getElementById('edit_status').value = computer.status || 'active';
       document.getElementById('edit_notes').value = computer.notes || '';
 
-      // Debug to check data
-      console.log('Editing computer:', computer);
-
       document.getElementById('edit_has_speaker').checked = (computer.has_speaker == 1 || computer.has_speaker === '1');
       document.getElementById('edit_has_camera').checked = (computer.has_camera == 1 || computer.has_camera === '1');
       document.getElementById('edit_has_mouse').checked = (computer.has_mouse == 1 || computer.has_mouse === '1');

@@ -70,7 +70,7 @@ try {
             if ($result) {
                 $_SESSION['success_message'] = 'Computer created successfully!';
             } else {
-                $_SESSION['error_message'] = 'Failed to create computer. Error: ' . DbHelper::getLastError();
+                $_SESSION['error_message'] = 'Failed to create computer.';
             }
 
             header('Location: ../../computers.php');
@@ -137,7 +137,7 @@ try {
             if ($result) {
                 $_SESSION['success_message'] = 'Computer updated successfully!';
             } else {
-                $_SESSION['error_message'] = 'Failed to update computer. Error: ' . DbHelper::getLastError();
+                $_SESSION['error_message'] = 'Failed to update computer.';
             }
 
             header('Location: ../../computers.php');
