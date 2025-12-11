@@ -145,12 +145,6 @@
                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl ' . isActive('categories.php') . '">
                       <i class="fas fa-tags w-5"></i>
                       <span class="' . isFontWeight('categories.php') . '">Categories</span>
-                  </a>
-                      <a href="' . ($pathUpdate ? './admin/reports.php' : './reports.php') . '" 
-                      class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl ' . isActive('reports.php') . '">
-                      <i class="fas fa-chart-line w-5"></i>
-                      <span class="' . isFontWeight('reports.php') . '">Reports</span>
-                  </a>
                   <a
                       href="#"
                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
