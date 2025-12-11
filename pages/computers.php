@@ -202,14 +202,11 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
       </div>
 
       <!-- Filter Section -->
-      <div
-        class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up mb-8">
-        <div
-          class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up mb-8">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div
-                class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                 <i class="fas fa-filter text-white"></i>
               </div>
               <div>
@@ -236,7 +233,9 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
             <div class="relative">
               <input
                 type="text"
-                placeholder="Search by name, model, or serial number..."
+                id="searchInput"
+                onkeyup="filterDevices()"
+                placeholder="Search by name, model, serial, or IP..."
                 class="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" />
               <i
                 class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
@@ -244,40 +243,21 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
           </div>
 
           <!-- Filters Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Device Type -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                <i class="fas fa-desktop text-blue-600 mr-2"></i>Device Type
-              </label>
-              <div class="flex items-center gap-4">
-                <label class="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    class="form-checkbox text-blue-600 rounded focus:ring-blue-500" />
-                  <span class="ml-2 text-gray-700">Desktop</span>
-                </label>
-                <label class="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    class="form-checkbox text-blue-600 rounded focus:ring-blue-500" />
-                  <span class="ml-2 text-gray-700">Laptop</span>
-                </label>
-              </div>
-            </div>
-
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <!-- Status -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 <i class="fas fa-circle-dot text-blue-600 mr-2"></i>Status
               </label>
               <select
+                id="statusFilter"
+                onchange="filterDevices()"
                 class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white">
                 <option value="">All Status</option>
-                <option value="active">✓ Active</option>
-                <option value="under_repair">⚠ Under Repair</option>
-                <option value="retired">✕ Retired</option>
-                <option value="lost">🔴 Lost</option>
+                <option value="active">Active</option>
+                <option value="under_repair">Under Repair</option>
+                <option value="retired">Retired</option>
+                <option value="lost">Lost</option>
               </select>
             </div>
 
@@ -287,12 +267,13 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
                 <i class="fas fa-building text-blue-600 mr-2"></i>Section
               </label>
               <select
+                id="sectionFilter"
+                onchange="filterDevices()"
                 class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white">
                 <option value="">All Sections</option>
-                <option value="it">IT Department</option>
-                <option value="hr">HR Department</option>
-                <option value="finance">Finance</option>
-                <option value="operations">Operations</option>
+                <?php foreach ($sections as $section): ?>
+                  <option value="<?= $section['section_id'] ?>"><?= htmlspecialchars($section['section_name']) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
 
@@ -302,26 +283,16 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
                 <i class="fas fa-microchip text-blue-600 mr-2"></i>Processor
               </label>
               <select
+                id="processorFilter"
+                onchange="filterDevices()"
                 class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white">
                 <option value="">All Processors</option>
-                <option value="intel_i3">Intel i3</option>
-                <option value="intel_i5">Intel i5</option>
-                <option value="intel_i7">Intel i7</option>
-                <option value="amd">AMD Ryzen</option>
+                <option value="i3">Intel i3</option>
+                <option value="i5">Intel i5</option>
+                <option value="i7">Intel i7</option>
+                <option value="amd">AMD</option>
               </select>
             </div>
-          </div>
-
-          <!-- Buttons -->
-          <div class="mt-4 flex justify-end gap-3">
-            <button
-              class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
-              <i class="fas fa-rotate-right mr-2"></i>Reset
-            </button>
-            <button
-              class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
-              <i class="fas fa-check mr-2"></i>Apply Filters
-            </button>
           </div>
         </div>
       </div>
@@ -373,7 +344,11 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
                 </tr>
               <?php else: ?>
                 <?php foreach ($computers as $computer): ?>
-                  <tr class="table-row">
+                  <tr class="table-row hover:bg-gray-50 transition-colors"
+                      data-search="<?= htmlspecialchars(strtolower($computer['device_name'] . ' ' . ($computer['model'] ?? '') . ' ' . $computer['device_id'] . ' ' . ($computer['ip_address'] ?? ''))) ?>"
+                      data-status="<?= $computer['status'] ?>" 
+                      data-section="<?= $computer['section_id'] ?? '' ?>" 
+                      data-processor="<?= strtolower($computer['processor'] ?? '') ?>">
                     <td class="px-6 py-4">
                       <div class="flex items-start">
                         <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
@@ -1214,14 +1189,39 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
       document.body.style.overflow = 'auto';
     }
 
-    function clearFilters() {
-      document.querySelectorAll('input, select').forEach((el) => {
-        if (el.type === 'text' || el.type === 'search') {
-          el.value = '';
-        } else if (el.tagName === 'SELECT') {
-          el.selectedIndex = 0;
+    function filterDevices() {
+      const searchText = document.getElementById('searchInput').value.toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+      const section = document.getElementById('sectionFilter').value;
+      const processor = document.getElementById('processorFilter').value.toLowerCase();
+
+      const rows = document.querySelectorAll('.table-row');
+
+      rows.forEach(row => {
+        const rowSearch = row.getAttribute('data-search') || '';
+        const rowStatus = row.getAttribute('data-status') || '';
+        const rowSection = row.getAttribute('data-section') || '';
+        const rowProcessor = row.getAttribute('data-processor') || '';
+
+        let matchesSearch = searchText === '' || rowSearch.includes(searchText);
+        let matchesStatus = status === '' || rowStatus === status;
+        let matchesSection = section === '' || rowSection == section;
+        let matchesProcessor = processor === '' || rowProcessor.includes(processor);
+
+        if (matchesSearch && matchesStatus && matchesSection && matchesProcessor) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
         }
       });
+    }
+
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('statusFilter').value = '';
+      document.getElementById('sectionFilter').value = '';
+      document.getElementById('processorFilter').value = '';
+      filterDevices();
     }
 
     // Close modals on background click

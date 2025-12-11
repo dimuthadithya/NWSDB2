@@ -169,6 +169,65 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
         </div>
       </div>
 
+      <!-- Device Filters -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8 animate-fade-up" style="animation-delay: 0.2s">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+          <div>
+             <h3 class="text-lg font-bold text-gray-900">Filter Devices</h3>
+             <p class="text-sm text-gray-500">Search and filter your device list</p>
+          </div>
+          <button onclick="clearFilters()" class="text-sm text-red-600 hover:text-red-700 font-medium">
+            Clear Filters
+          </button>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+           <!-- Search -->
+           <div class="col-span-1 md:col-span-2 lg:col-span-1">
+             <input type="text" id="searchInput" onkeyup="filterDevices()" placeholder="Search devices..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-500 outline-none transition-all">
+           </div>
+
+           <!-- Category Filter -->
+           <div>
+             <select id="categoryFilter" onchange="filterDevices()" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-500 outline-none transition-all cursor-pointer">
+               <option value="">All Categories</option>
+               <?php 
+                $uniqueCategories = array_unique(array_column($otherDevices, 'category_name'));
+                sort($uniqueCategories);
+                foreach ($uniqueCategories as $catName):
+               ?>
+               <option value="<?= htmlspecialchars($catName) ?>"><?= htmlspecialchars($catName) ?></option>
+               <?php endforeach; ?>
+             </select>
+           </div>
+           
+           <!-- Status Filter -->
+           <div>
+             <select id="statusFilter" onchange="filterDevices()" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-500 outline-none transition-all cursor-pointer">
+               <option value="">All Status</option>
+               <option value="active">Active</option>
+               <option value="under_repair">Under Repair</option>
+               <option value="retired">Retired</option>
+               <option value="lost">Lost</option>
+             </select>
+           </div>
+
+           <!-- WSS Filter -->
+           <div>
+             <select id="wssFilter" onchange="filterDevices()" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-200 focus:border-purple-500 outline-none transition-all cursor-pointer">
+               <option value="">All Locations</option>
+               <?php 
+                $uniqueWss = array_unique(array_column($otherDevices, 'wss_name'));
+                sort($uniqueWss);
+                foreach($uniqueWss as $wss):
+               ?>
+               <option value="<?= htmlspecialchars($wss) ?>"><?= htmlspecialchars($wss) ?></option>
+               <?php endforeach; ?>
+             </select>
+           </div>
+        </div>
+      </div>
+
       <!-- Devices Table -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up" style="animation-delay: 0.3s">
         <div class="overflow-x-auto">
@@ -208,7 +267,11 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
                 </tr>
               <?php else: ?>
                 <?php foreach ($otherDevices as $device): ?>
-                  <tr class="table-row">
+                  <tr class="table-row hover:bg-gray-50 transition-colors"
+                      data-search="<?= htmlspecialchars(strtolower($device['device_name'] . ' ' . ($device['model'] ?? '') . ' ' . $device['device_id'] . ' ' . ($device['system_unit_serial'] ?? ''))) ?>"
+                      data-category="<?= htmlspecialchars($device['category_name'] ?? '') ?>"
+                      data-wss="<?= htmlspecialchars($device['wss_name'] ?? '') ?>"
+                      data-status="<?= $device['status'] ?>">
                     <td class="px-6 py-4">
                       <div class="flex items-start">
                         <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
@@ -438,6 +501,41 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
         sidebar.classList.add('-translate-x-full');
       }
     });
+
+    function filterDevices() {
+      const searchText = document.getElementById('searchInput').value.toLowerCase();
+      const category = document.getElementById('categoryFilter').value;
+      const status = document.getElementById('statusFilter').value;
+      const wss = document.getElementById('wssFilter').value;
+
+      const rows = document.querySelectorAll('.table-row');
+
+      rows.forEach(row => {
+        const rowSearch = row.getAttribute('data-search') || '';
+        const rowCategory = row.getAttribute('data-category') || '';
+        const rowStatus = row.getAttribute('data-status') || '';
+        const rowWss = row.getAttribute('data-wss') || '';
+
+        let matchesSearch = searchText === '' || rowSearch.includes(searchText);
+        let matchesCategory = category === '' || rowCategory === category;
+        let matchesStatus = status === '' || rowStatus === status;
+        let matchesWss = wss === '' || rowWss === wss;
+
+        if (matchesSearch && matchesCategory && matchesStatus && matchesWss) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('categoryFilter').value = '';
+      document.getElementById('statusFilter').value = '';
+      document.getElementById('wssFilter').value = '';
+      filterDevices();
+    }
 
     function openAddDeviceModal() {
       document.getElementById('addDeviceModal').classList.remove('hidden');

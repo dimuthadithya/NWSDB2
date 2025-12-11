@@ -150,14 +150,12 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
 
       <!-- Filter Section -->
 
-      <div
-        class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up">
-        <div
-          class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <!-- Filter Section -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div
-                class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                 <i class="fas fa-filter text-white"></i>
               </div>
 
@@ -171,81 +169,75 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
                 </p>
               </div>
             </div>
+            <button onclick="clearFilters()" class="text-sm font-medium text-gray-600 hover:text-gray-900">
+                Clear All
+            </button>
           </div>
         </div>
 
         <div class="p-6">
+          <div class="mb-6">
+             <input type="text" id="searchInput" onkeyup="filterPrinters()" placeholder="Search printers..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all">
+          </div>
+
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"><i class="fas fa-print text-blue-600 mr-2"></i>Printer
                 Type</label>
 
-              <select
+              <select id="typeFilter" onchange="filterPrinters()"
                 class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white">
                 <option value="">All Types</option>
-
-                <option value="laser">Laser</option>
-
-                <option value="inkjet">Inkjet</option>
-
-                <option value="dot-matrix">Dot Matrix</option>
+                <?php
+                   $types = array_filter(array_unique(array_column($printers, 'device_type')));
+                   sort($types);
+                   foreach($types as $t):
+                ?>
+                <option value="<?= htmlspecialchars($t) ?>"><?= htmlspecialchars($t) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"><i class="fas fa-circle-dot text-blue-600 mr-2"></i>Status</label>
 
-              <select
+              <select id="statusFilter" onchange="filterPrinters()"
                 class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white">
                 <option value="">All Status</option>
-
                 <option value="active">Active</option>
-
                 <option value="under_repair">Under Repair</option>
-
                 <option value="retired">Retired</option>
+                <option value="lost">Lost</option>
               </select>
             </div>
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"><i class="fas fa-building text-blue-600 mr-2"></i>Section</label>
 
-              <select
+              <select id="sectionFilter" onchange="filterPrinters()"
                 class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white">
                 <option value="">All Sections</option>
-
-                <option value="it">IT Department</option>
-
-                <option value="hr">HR Department</option>
+                <?php foreach ($sections as $section): ?>
+                  <option value="<?= $section['section_id'] ?>"><?= htmlspecialchars($section['section_name']) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"><i class="fas fa-network-wired text-blue-600 mr-2"></i>Connectivity</label>
 
-              <select
+              <select id="connectivityFilter" onchange="filterPrinters()"
                 class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white">
                 <option value="">All</option>
-
-                <option value="usb">USB</option>
-
-                <option value="network">Network</option>
-
-                <option value="wifi">Wi-Fi</option>
+                <?php
+                   $conns = array_filter(array_unique(array_column($printers, 'network_connectivity')));
+                   sort($conns);
+                   foreach($conns as $c):
+                ?>
+                <option value="<?= htmlspecialchars($c) ?>"><?= htmlspecialchars($c) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
-          </div>
-
-          <div class="mt-4 flex justify-end gap-3">
-            <button
-              class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">
-              Reset
-            </button>
-
-            <button
-              class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
-              Apply Filters
-            </button>
           </div>
         </div>
       </div>
@@ -291,7 +283,12 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
                 </tr>
               <?php else: ?>
                 <?php foreach ($printers as $printer): ?>
-                  <tr class="table-row">
+                  <tr class="table-row hover:bg-gray-50 transition-colors"
+                      data-search="<?= htmlspecialchars(strtolower($printer['device_name'] . ' ' . ($printer['model'] ?? '') . ' ' . $printer['device_id'] . ' ' . ($printer['system_unit_serial'] ?? ''))) ?>"
+                      data-type="<?= htmlspecialchars($printer['device_type'] ?? '') ?>"
+                      data-status="<?= $printer['status'] ?>" 
+                      data-section="<?= $printer['section_id'] ?? '' ?>" 
+                      data-connectivity="<?= htmlspecialchars($printer['network_connectivity'] ?? '') ?>">
                     <td class="px-6 py-4">
                       <div class="flex items-start">
                         <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
@@ -315,15 +312,15 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
                       <div class="text-sm space-y-1">
                         <div class="flex items-center">
                           <i class="fas fa-tag text-gray-400 text-xs mr-2 w-4"></i>
-                          <span class="text-gray-700">Type: <?= htmlspecialchars($printer['printer_type'] ?? 'N/A') ?></span>
+                          <span class="text-gray-700">Type: <?= htmlspecialchars($printer['device_type'] ?? 'N/A') ?></span>
                         </div>
                         <div class="flex items-center">
-                          <i class="fas fa-palette text-gray-400 text-xs mr-2 w-4"></i>
-                          <span class="text-gray-700">Color: <?= htmlspecialchars($printer['color_capability'] ?? 'N/A') ?></span>
+                          <i class="fas fa-network-wired text-gray-400 text-xs mr-2 w-4"></i>
+                          <span class="text-gray-700">Conn: <?= htmlspecialchars($printer['network_connectivity'] ?? 'N/A') ?></span>
                         </div>
                         <div class="flex items-center">
-                          <i class="fas fa-file-alt text-gray-400 text-xs mr-2 w-4"></i>
-                          <span class="text-gray-700">Paper: <?= htmlspecialchars($printer['paper_size'] ?? 'N/A') ?></span>
+                          <i class="fas fa-barcode text-gray-400 text-xs mr-2 w-4"></i>
+                          <span class="text-gray-700">Serial: <?= htmlspecialchars($printer['system_unit_serial'] ?? 'N/A') ?></span>
                         </div>
                       </div>
                     </td>
@@ -341,6 +338,9 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
                         case 'retired':
                           $statusClass = 'bg-gray-100 text-gray-800';
                           break;
+                        case 'lost':
+                          $statusClass = 'bg-red-100 text-red-800';
+                          break;
                         default:
                           $statusClass = 'bg-gray-100 text-gray-800';
                       }
@@ -348,16 +348,12 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
                       <div class="flex items-center">
                         <span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full <?= $statusClass ?>"><?= $statusText ?></span>
                       </div>
-                      <div class="text-sm text-gray-600 mt-1">Speed: <?= htmlspecialchars($printer['print_speed'] ?? 'N/A') ?></div>
                     </td>
                     <td class="px-6 py-4">
                       <div class="text-sm mb-2">
                         <div class="font-medium text-gray-900"><?= htmlspecialchars($printer['section_name'] ?? 'Unassigned') ?></div>
                         <div class="text-gray-600 text-xs"><?= htmlspecialchars($printer['assigned_to'] ?? 'Not assigned') ?></div>
                       </div>
-                      <span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full <?= $statusClass ?>">
-                        <i class="fas fa-circle text-xs mr-1"></i><?= $statusText ?>
-                      </span>
                     </td>
                     <td class="px-6 py-4 text-right">
                       <div class="flex items-center justify-end space-x-2">
@@ -745,6 +741,45 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
       if (successMessage) successMessage.style.display = 'none';
       if (errorMessage) errorMessage.style.display = 'none';
     }, 5000);
+
+    function filterPrinters() {
+      const searchText = document.getElementById('searchInput').value.toLowerCase();
+      const type = document.getElementById('typeFilter').value;
+      const status = document.getElementById('statusFilter').value;
+      const section = document.getElementById('sectionFilter').value;
+      const connectivity = document.getElementById('connectivityFilter').value;
+
+      const rows = document.querySelectorAll('.table-row');
+
+      rows.forEach(row => {
+        const rowSearch = row.getAttribute('data-search') || '';
+        const rowType = row.getAttribute('data-type') || '';
+        const rowStatus = row.getAttribute('data-status') || '';
+        const rowSection = row.getAttribute('data-section') || '';
+        const rowConnectivity = row.getAttribute('data-connectivity') || '';
+
+        let matchesSearch = searchText === '' || rowSearch.includes(searchText);
+        let matchesType = type === '' || rowType === type;
+        let matchesStatus = status === '' || rowStatus === status;
+        let matchesSection = section === '' || rowSection == section;
+        let matchesConnectivity = connectivity === '' || rowConnectivity === connectivity; // Exact match for connectivity? Or includes? Dropdown values are exact. data-attribute is exact.
+
+        if (matchesSearch && matchesType && matchesStatus && matchesSection && matchesConnectivity) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('typeFilter').value = '';
+      document.getElementById('statusFilter').value = '';
+      document.getElementById('sectionFilter').value = '';
+      document.getElementById('connectivityFilter').value = '';
+      filterPrinters();
+    }
 
     document.getElementById('mobileMenuBtn').addEventListener('click', () => {
       document
