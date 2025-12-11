@@ -91,17 +91,17 @@ INSERT INTO sections (section_name, wss_id) VALUES
 -- ===============================================================
 -- 7. Insert Devices - Regular Computers
 -- ===============================================================
-INSERT INTO devices (device_name, model, category_id, wss_id, section_id, assigned_to, operating_system, processor, ram, hard_drive_capacity, ip_address, system_unit_serial, purchase_date, status) VALUES
-('Admin Desktop 01', 'Dell OptiPlex 7090', 1, 1, 1, 'Rajesh Kumar', 'Windows 11 Pro', 'Intel Core i7-11700', '16GB', '512GB SSD', '192.168.1.101', 'DL7090-SN001', '2023-01-15', 'active'),
-('Tech Laptop 01', 'HP EliteBook 840', 2, 1, 2, 'Priya Fernando', 'Windows 10 Pro', 'Intel Core i5-10210U', '8GB', '256GB SSD', '192.168.1.102', 'HP840-SN002', '2022-11-20', 'active'),
-('Finance Desktop 01', 'Lenovo ThinkCentre M70', 1, 1, 3, 'Saman Perera', 'Windows 11 Pro', 'Intel Core i5-11400', '16GB', '1TB HDD', '192.168.1.103', 'LN-M70-SN003', '2023-03-10', 'active'),
-('Network Printer 01', 'HP LaserJet Pro M404dn', 3, 1, 4, NULL, NULL, NULL, NULL, NULL, '192.168.1.201', 'HP-LJ-SN201', '2023-02-05', 'active'),
-('Engineering Workstation', 'Dell Precision 3650', 1, 2, 5, 'Nilantha Silva', 'Windows 11 Pro', 'Intel Xeon W-1350', '32GB', '1TB SSD', '192.168.2.101', 'DL-PR-SN004', '2023-05-12', 'active'),
-('Operations Laptop', 'Lenovo ThinkPad X1 Carbon', 2, 2, 6, 'Amara Jayasinghe', 'Windows 10 Pro', 'Intel Core i7-10510U', '16GB', '512GB SSD', '192.168.2.102', 'LN-X1-SN005', '2022-09-18', 'active'),
-('Maintenance Desktop', 'Acer Veriton M200', 1, 3, 7, 'Kamal Wickramasinghe', 'Windows 10 Pro', 'Intel Core i3-10100', '8GB', '256GB SSD', '192.168.3.101', 'AC-VM-SN006', '2022-07-22', 'under_repair'),
-('QC Desktop', 'ASUS ExpertCenter D5', 1, 3, 8, 'Chandani Dissanayake', 'Windows 11 Pro', 'Intel Core i5-11400', '16GB', '512GB SSD', '192.168.3.102', 'AS-D5-SN007', '2023-04-08', 'active'),
-('IT Admin Workstation', 'Dell OptiPlex 7090', 1, 4, 9, 'Tharindu Rodrigo', 'Windows 11 Pro', 'Intel Core i7-11700', '32GB', '1TB SSD', '192.168.4.101', 'DL-OPT-SN008', '2023-06-15', 'active'),
-('HR Laptop', 'HP ProBook 450 G8', 2, 4, 10, 'Sanduni Mendis', 'Windows 10 Pro', 'Intel Core i5-1135G7', '8GB', '256GB SSD', '192.168.4.102', 'HP-PB-SN009', '2022-12-03', 'active');
+INSERT INTO devices (device_name, model, category_id, wss_id, section_id, assigned_to, operating_system, processor, ram, hard_drive_capacity, ip_address, system_unit_serial, purchase_date, status, has_keyboard, has_mouse, has_speaker, has_camera, has_web_cam) VALUES
+('Admin Desktop 01', 'Dell OptiPlex 7090', 1, 1, 1, 'Rajesh Kumar', 'Windows 11 Pro', 'Intel Core i7-11700', '16GB', '512GB SSD', '192.168.1.101', 'DL7090-SN001', '2023-01-15', 'active', 1, 1, 1, 0, 0),
+('Tech Laptop 01', 'HP EliteBook 840', 2, 1, 2, 'Priya Fernando', 'Windows 10 Pro', 'Intel Core i5-10210U', '8GB', '256GB SSD', '192.168.1.102', 'HP840-SN002', '2022-11-20', 'active', 1, 1, 1, 1, 1),
+('Finance Desktop 01', 'Lenovo ThinkCentre M70', 1, 1, 3, 'Saman Perera', 'Windows 11 Pro', 'Intel Core i5-11400', '16GB', '1TB HDD', '192.168.1.103', 'LN-M70-SN003', '2023-03-10', 'active', 1, 1, 0, 0, 0),
+('Network Printer 01', 'HP LaserJet Pro M404dn', 3, 1, 4, NULL, NULL, NULL, NULL, NULL, '192.168.1.201', 'HP-LJ-SN201', '2023-02-05', 'active', 0, 0, 0, 0, 0),
+('Engineering Workstation', 'Dell Precision 3650', 1, 2, 5, 'Nilantha Silva', 'Windows 11 Pro', 'Intel Xeon W-1350', '32GB', '1TB SSD', '192.168.2.101', 'DL-PR-SN004', '2023-05-12', 'active', 1, 1, 0, 0, 0),
+('Operations Laptop', 'Lenovo ThinkPad X1 Carbon', 2, 2, 6, 'Amara Jayasinghe', 'Windows 10 Pro', 'Intel Core i7-10510U', '16GB', '512GB SSD', '192.168.2.102', 'LN-X1-SN005', '2022-09-18', 'active', 1, 1, 1, 1, 1),
+('Maintenance Desktop', 'Acer Veriton M200', 1, 3, 7, 'Kamal Wickramasinghe', 'Windows 10 Pro', 'Intel Core i3-10100', '8GB', '256GB SSD', '192.168.3.101', 'AC-VM-SN006', '2022-07-22', 'under_repair', 1, 1, 0, 0, 0),
+('QC Desktop', 'ASUS ExpertCenter D5', 1, 3, 8, 'Chandani Dissanayake', 'Windows 11 Pro', 'Intel Core i5-11400', '16GB', '512GB SSD', '192.168.3.102', 'AS-D5-SN007', '2023-04-08', 'active', 1, 1, 0, 0, 0),
+('IT Admin Workstation', 'Dell OptiPlex 7090', 1, 4, 9, 'Tharindu Rodrigo', 'Windows 11 Pro', 'Intel Core i7-11700', '32GB', '1TB SSD', '192.168.4.101', 'DL-OPT-SN008', '2023-06-15', 'active', 1, 1, 0, 0, 0),
+('HR Laptop', 'HP ProBook 450 G8', 2, 4, 10, 'Sanduni Mendis', 'Windows 10 Pro', 'Intel Core i5-1135G7', '8GB', '256GB SSD', '192.168.4.102', 'HP-PB-SN009', '2022-12-03', 'active', 1, 1, 1, 1, 1);
 
 -- ===============================================================
 -- 8. Insert Devices - RVPN Devices
@@ -123,11 +123,11 @@ INSERT INTO devices (device_name, category_id, wss_id, section_id, location_name
 -- ===============================================================
 -- 10. Insert Repairs
 -- ===============================================================
-INSERT INTO repairs (device_id, technician_id, repair_details, cost, repair_date, status) VALUES
-(7, 8, 'Replaced motherboard due to power surge damage', 15000.00, '2024-10-15', 'completed'),
-(4, 8, 'Fixed paper jam issue and cleaned printer heads', 2500.00, '2024-09-20', 'completed'),
-(6, 4, 'Upgraded RAM and replaced battery', 8500.00, '2024-08-10', 'completed'),
-(3, 1, 'Replaced hard drive and reinstalled OS', 12000.00, '2024-11-01', 'pending');
+INSERT INTO repairs (device_id, repair_details, cost, repair_date, status) VALUES
+(7, 'Replaced motherboard due to power surge damage', 15000.00, '2024-10-15', 'completed'),
+(4, 'Fixed paper jam issue and cleaned printer heads', 2500.00, '2024-09-20', 'completed'),
+(6, 'Upgraded RAM and replaced battery', 8500.00, '2024-08-10', 'completed'),
+(3, 'Replaced hard drive and reinstalled OS', 12000.00, '2024-11-01', 'pending');
 
 -- ===============================================================
 -- 11. Insert Device Issues

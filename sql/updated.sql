@@ -2,8 +2,8 @@
 -- DEVICE RECORD SYSTEM (CORRECTED ORDER)
 -- ===============================================================
 
-CREATE DATABASE IF NOT EXISTS devicerecordsystem4;
-USE devicerecordsystem4;
+CREATE DATABASE IF NOT EXISTS devicerecordsystem;
+USE devicerecordsystem;
 
 -- ===============================================================
 -- 1. DEVICE CATEGORIES (NO DEPENDENCIES)
@@ -121,8 +121,7 @@ CREATE TABLE devices (
   processor VARCHAR(100),
   ram VARCHAR(50),
   hard_drive_capacity VARCHAR(50),
-  keyboard VARCHAR(50),
-  mouse VARCHAR(50),
+
   network_connectivity VARCHAR(100),
   printer_connectivity VARCHAR(100),
   virus_guard VARCHAR(100),
@@ -143,6 +142,13 @@ CREATE TABLE devices (
   rvpn_username VARCHAR(100),
   pin_number VARCHAR(50),
   connection_required ENUM('required','not_required'),
+
+  -- Peripheral Checkboxes
+  has_speaker TINYINT(1) DEFAULT 0,
+  has_camera TINYINT(1) DEFAULT 0,
+  has_mouse TINYINT(1) DEFAULT 0,
+  has_web_cam TINYINT(1) DEFAULT 0,
+  has_keyboard TINYINT(1) DEFAULT 0,
 
   -- Fingerprint device fields
   location_name VARCHAR(150),

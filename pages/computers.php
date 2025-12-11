@@ -415,8 +415,6 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
                       <div class="text-sm space-y-1">
                         <div class="text-gray-700"><?= htmlspecialchars($computer['operating_system'] ?? 'N/A') ?></div>
                         <div class="text-gray-600 text-xs">Monitor: <?= htmlspecialchars($computer['monitor_type'] ?? 'N/A') ?></div>
-                        <div class="text-gray-600 text-xs">KB: <?= htmlspecialchars($computer['keyboard'] ?? 'N/A') ?></div>
-                        <div class="text-gray-600 text-xs">Mouse: <?= htmlspecialchars($computer['mouse'] ?? 'N/A') ?></div>
                       </div>
                     </td>
                     <td class="px-6 py-4">
@@ -678,22 +676,37 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
                   class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                   placeholder="e.g., 512GB SSD" />
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Keyboard</label>
-                <input
-                  type="text"
-                  name="keyboard"
-                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-                  placeholder="e.g., Dell KB216" />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Mouse</label>
-                <input
-                  type="text"
-                  name="mouse"
-                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-                  placeholder="e.g., Dell MS116" />
-              </div>
+
+            </div>
+          </div>
+
+          <!-- Peripherals -->
+          <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-keyboard text-blue-600 mr-2"></i>
+              Peripherals
+            </h4>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_speaker" value="1" class="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Speaker</span>
+              </label>
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_camera" value="1" class="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Camera</span>
+              </label>
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_mouse" value="1" class="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Mouse</span>
+              </label>
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_web_cam" value="1" class="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Web Cam</span>
+              </label>
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_keyboard" value="1" class="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Keyboard</span>
+              </label>
             </div>
           </div>
 
@@ -928,14 +941,37 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
                 <label class="block text-sm font-medium text-gray-700 mb-2">Storage</label>
                 <input type="text" name="hard_drive_capacity" id="edit_hard_drive_capacity" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Keyboard</label>
-                <input type="text" name="keyboard" id="edit_keyboard" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Mouse</label>
-                <input type="text" name="mouse" id="edit_mouse" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
-              </div>
+
+            </div>
+          </div>
+
+          <!-- Peripherals -->
+          <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-keyboard text-green-600 mr-2"></i>
+              Peripherals
+            </h4>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_speaker" id="edit_has_speaker" value="1" class="form-checkbox h-5 w-5 text-green-600 rounded focus:ring-green-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Speaker</span>
+              </label>
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_camera" id="edit_has_camera" value="1" class="form-checkbox h-5 w-5 text-green-600 rounded focus:ring-green-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Camera</span>
+              </label>
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_mouse" id="edit_has_mouse" value="1" class="form-checkbox h-5 w-5 text-green-600 rounded focus:ring-green-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Mouse</span>
+              </label>
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_web_cam" id="edit_has_web_cam" value="1" class="form-checkbox h-5 w-5 text-green-600 rounded focus:ring-green-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Web Cam</span>
+              </label>
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_keyboard" id="edit_has_keyboard" value="1" class="form-checkbox h-5 w-5 text-green-600 rounded focus:ring-green-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Keyboard</span>
+              </label>
             </div>
           </div>
 
@@ -1121,8 +1157,7 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
       document.getElementById('edit_processor').value = computer.processor || '';
       document.getElementById('edit_ram').value = computer.ram || '';
       document.getElementById('edit_hard_drive_capacity').value = computer.hard_drive_capacity || '';
-      document.getElementById('edit_keyboard').value = computer.keyboard || '';
-      document.getElementById('edit_mouse').value = computer.mouse || '';
+
       document.getElementById('edit_ip_address').value = computer.ip_address || '';
       document.getElementById('edit_network_connectivity').value = computer.network_connectivity || '';
       document.getElementById('edit_printer_connectivity').value = computer.printer_connectivity || '';
@@ -1132,6 +1167,12 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
       document.getElementById('edit_system_unit_serial').value = computer.system_unit_serial || '';
       document.getElementById('edit_status').value = computer.status || 'active';
       document.getElementById('edit_notes').value = computer.notes || '';
+
+      document.getElementById('edit_has_speaker').checked = computer.has_speaker == 1;
+      document.getElementById('edit_has_camera').checked = computer.has_camera == 1;
+      document.getElementById('edit_has_mouse').checked = computer.has_mouse == 1;
+      document.getElementById('edit_has_web_cam').checked = computer.has_web_cam == 1;
+      document.getElementById('edit_has_keyboard').checked = computer.has_keyboard == 1;
 
       document.getElementById('editComputerModal').classList.remove('hidden');
       document.body.style.overflow = 'hidden';

@@ -45,8 +45,7 @@ try {
                 'processor' => trim($_POST['processor'] ?? ''),
                 'ram' => trim($_POST['ram'] ?? ''),
                 'hard_drive_capacity' => trim($_POST['hard_drive_capacity'] ?? ''),
-                'keyboard' => trim($_POST['keyboard'] ?? ''),
-                'mouse' => trim($_POST['mouse'] ?? ''),
+
                 'network_connectivity' => trim($_POST['network_connectivity'] ?? ''),
                 'printer_connectivity' => trim($_POST['printer_connectivity'] ?? ''),
                 'virus_guard' => trim($_POST['virus_guard'] ?? ''),
@@ -56,7 +55,13 @@ try {
                 'ups_serial' => trim($_POST['ups_serial'] ?? ''),
                 'purchase_date' => !empty($_POST['purchase_date']) ? $_POST['purchase_date'] : null,
                 'status' => $_POST['status'] ?? 'active',
-                'notes' => trim($_POST['notes'] ?? '')
+
+                'notes' => trim($_POST['notes'] ?? ''),
+                'has_speaker' => isset($_POST['has_speaker']) ? 1 : 0,
+                'has_camera' => isset($_POST['has_camera']) ? 1 : 0,
+                'has_mouse' => isset($_POST['has_mouse']) ? 1 : 0,
+                'has_web_cam' => isset($_POST['has_web_cam']) ? 1 : 0,
+                'has_keyboard' => isset($_POST['has_keyboard']) ? 1 : 0
             ];
 
             // Create device
@@ -109,8 +114,6 @@ try {
                 'processor' => trim($_POST['processor'] ?? ''),
                 'ram' => trim($_POST['ram'] ?? ''),
                 'hard_drive_capacity' => trim($_POST['hard_drive_capacity'] ?? ''),
-                'keyboard' => trim($_POST['keyboard'] ?? ''),
-                'mouse' => trim($_POST['mouse'] ?? ''),
                 'network_connectivity' => trim($_POST['network_connectivity'] ?? ''),
                 'printer_connectivity' => trim($_POST['printer_connectivity'] ?? ''),
                 'virus_guard' => trim($_POST['virus_guard'] ?? ''),
@@ -120,7 +123,12 @@ try {
                 'ups_serial' => trim($_POST['ups_serial'] ?? ''),
                 'purchase_date' => !empty($_POST['purchase_date']) ? $_POST['purchase_date'] : null,
                 'status' => $_POST['status'] ?? 'active',
-                'notes' => trim($_POST['notes'] ?? '')
+                'notes' => trim($_POST['notes'] ?? ''),
+                'has_speaker' => isset($_POST['has_speaker']) ? 1 : 0,
+                'has_camera' => isset($_POST['has_camera']) ? 1 : 0,
+                'has_mouse' => isset($_POST['has_mouse']) ? 1 : 0,
+                'has_web_cam' => isset($_POST['has_web_cam']) ? 1 : 0,
+                'has_keyboard' => isset($_POST['has_keyboard']) ? 1 : 0
             ];
 
             // Update device
