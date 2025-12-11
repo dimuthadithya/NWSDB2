@@ -137,11 +137,13 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
           Add New Printer
         </button>
         <button
+          onclick="exportToExcel()"
           class="inline-flex items-center px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm border border-gray-200 transition-all">
           <i class="fas fa-file-excel mr-2 text-green-600"></i>
           Export to Excel
         </button>
         <button
+          onclick="exportToPDF()"
           class="inline-flex items-center px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm border border-gray-200 transition-all">
           <i class="fas fa-file-pdf mr-2 text-red-600"></i>
           Export to PDF
@@ -245,7 +247,7 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
       <div
         class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up">
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
+          <table id="devicesTable" class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
               <tr>
                 <th
@@ -860,6 +862,170 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
         closeDeleteModal();
       }
     });
+  </script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function exportToExcel() {
+       const table = document.getElementById('devicesTable');
+       if(!table || table.rows.length <= 1) { 
+          Swal.fire('No Data', 'There is no data to export.', 'info');
+          return;
+       }
+
+      Swal.fire({
+        title: 'Exporting...',
+        text: 'Generating Excel file, please wait.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+          setTimeout(() => {
+             try {
+                const clone = table.cloneNode(true);
+                const rows = clone.rows;
+                for (let i = 0; i < rows.length; i++) {
+                    if(rows[i].cells.length > 0) {
+                        rows[i].deleteCell(-1); 
+                    }
+                }
+                const wb = XLSX.utils.table_to_book(clone, {sheet: "Printers"});
+                XLSX.writeFile(wb, 'Printers_Report_' + new Date().toISOString().slice(0,10) + '.xlsx');
+                Swal.close();
+             } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'Failed to export Excel.', 'error');
+             }
+          }, 500);
+        }
+      });
+    }
+
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const table = document.getElementById('devicesTable');
+       if(!table || table.rows.length <= 1) {
+          Swal.fire('No Data', 'There is no data to export.', 'info');
+          return;
+       }
+
+      Swal.fire({
+        title: 'Exporting...',
+        text: 'Generating PDF file, please wait.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+          setTimeout(() => {
+             try {
+                const doc = new jsPDF('l', 'mm', 'a4'); 
+                doc.setFontSize(16);
+                doc.text("Printers Report", 14, 15);
+                doc.setFontSize(10);
+                doc.text("Generated: " + new Date().toLocaleString(), 14, 22);
+                doc.text("NWSDB Hardware Device Manager", 14, 27);
+
+                doc.autoTable({ 
+                    html: '#devicesTable', 
+                    startY: 35, 
+                    theme: 'grid',
+                    columns: [0, 1, 2, 3], 
+                    headStyles: { fillColor: [59, 130, 246] },
+                    styles: { fontSize: 8, cellPadding: 2 }
+                });
+
+                doc.save('Printers_Report_' + new Date().toISOString().slice(0,10) + '.pdf');
+                Swal.close();
+             } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'Failed to export PDF.', 'error');
+             }
+          }, 500);
+        }
+      });
+    }
+  </script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function exportToExcel() {
+       const table = document.getElementById('devicesTable');
+       if(!table || table.rows.length <= 1) { 
+          Swal.fire('No Data', 'There is no data to export.', 'info');
+          return;
+       }
+
+      Swal.fire({
+        title: 'Exporting...',
+        text: 'Generating Excel file, please wait.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+          setTimeout(() => {
+             try {
+                const clone = table.cloneNode(true);
+                const rows = clone.rows;
+                for (let i = 0; i < rows.length; i++) {
+                    if(rows[i].cells.length > 0) {
+                        rows[i].deleteCell(-1); 
+                    }
+                }
+                const wb = XLSX.utils.table_to_book(clone, {sheet: "Printers"});
+                XLSX.writeFile(wb, 'Printers_Report_' + new Date().toISOString().slice(0,10) + '.xlsx');
+                Swal.close();
+             } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'Failed to export Excel.', 'error');
+             }
+          }, 500);
+        }
+      });
+    }
+
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const table = document.getElementById('devicesTable');
+       if(!table || table.rows.length <= 1) {
+          Swal.fire('No Data', 'There is no data to export.', 'info');
+          return;
+       }
+
+      Swal.fire({
+        title: 'Exporting...',
+        text: 'Generating PDF file, please wait.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+          setTimeout(() => {
+             try {
+                const doc = new jsPDF('l', 'mm', 'a4'); 
+                doc.setFontSize(16);
+                doc.text("Printers Report", 14, 15);
+                doc.setFontSize(10);
+                doc.text("Generated: " + new Date().toLocaleString(), 14, 22);
+                doc.text("NWSDB Hardware Device Manager", 14, 27);
+
+                doc.autoTable({ 
+                    html: '#devicesTable', 
+                    startY: 35, 
+                    theme: 'grid',
+                    columns: [0, 1, 2, 3], 
+                    headStyles: { fillColor: [59, 130, 246] },
+                    styles: { fontSize: 8, cellPadding: 2 }
+                });
+
+                doc.save('Printers_Report_' + new Date().toISOString().slice(0,10) + '.pdf');
+                Swal.close();
+             } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'Failed to export PDF.', 'error');
+             }
+          }, 500);
+        }
+      });
+    }
   </script>
 </body>
 
