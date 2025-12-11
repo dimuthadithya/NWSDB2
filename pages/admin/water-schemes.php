@@ -22,7 +22,20 @@ if (isset($_SESSION['error_message'])) {
 }
 
 // Fetch water supply schemes data
-$schemes = DbHelper::getAllWaterSupplySchemes();
+$allSchemes = DbHelper::getAllWaterSupplySchemes();
+$totalSchemes = count($allSchemes);
+
+// Pagination Logic
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = 10;
+$offset = ($page - 1) * $limit;
+$totalPages = ceil($totalSchemes / $limit);
+
+// Ensure page is valid
+if ($page < 1) $page = 1;
+if ($page > $totalPages && $totalPages > 0) $page = $totalPages;
+
+$schemes = array_slice($allSchemes, $offset, $limit);
 $totalSchemes = DbHelper::getWaterSupplySchemeCount();
 $activeSchemes = DbHelper::getActiveSchemeCount();
 $maintenanceSchemes = DbHelper::getMaintenanceSchemeCount();
@@ -321,34 +334,53 @@ $areas = DbHelper::getAllAreas(); // For dropdown in modal
         </div>
 
         <!-- Pagination -->
-        <div
-          class="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
+        <?php if ($totalSchemes > 0): ?>
+        <div class="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
           <div class="text-sm text-gray-600">
-            Showing <?php echo count($schemes); ?> of <?php echo $totalSchemes; ?> entries
+            Showing <span class="font-medium"><?php echo $offset + 1; ?></span> to
+            <span class="font-medium"><?php echo min($offset + $limit, $totalSchemes); ?></span> of
+            <span class="font-medium"><?php echo $totalSchemes; ?></span> entries
           </div>
           <div class="flex gap-2">
-            <button
-              class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-100">
-              Previous
-            </button>
-            <button
-              class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700">
-              1
-            </button>
-            <button
-              class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-100">
-              2
-            </button>
-            <button
-              class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-100">
-              3
-            </button>
-            <button
-              class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-100">
-              Next
-            </button>
+             <!-- Previous Button -->
+             <a href="?page=<?php echo max(1, $page - 1); ?>"
+               class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 <?php echo $page <= 1 ? 'pointer-events-none opacity-50' : ''; ?>">
+               Previous
+             </a>
+
+             <!-- Page Numbers -->
+             <?php
+             $startPage = max(1, $page - 2);
+             $endPage = min($totalPages, $page + 2);
+
+             if ($startPage > 1) {
+                 echo '<a href="?page=1" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-100">1</a>';
+                 if ($startPage > 2) echo '<span class="px-2">...</span>';
+             }
+
+             for ($i = $startPage; $i <= $endPage; $i++):
+             ?>
+               <a href="?page=<?php echo $i; ?>"
+                  class="px-4 py-2 border <?php echo $i === $page ? 'bg-blue-600 text-white' : 'border-gray-300 text-gray-700 hover:bg-gray-100'; ?> rounded-lg text-sm">
+                 <?php echo $i; ?>
+               </a>
+             <?php endfor; ?>
+
+             <?php
+             if ($endPage < $totalPages) {
+                 if ($endPage < $totalPages - 1) echo '<span class="px-2">...</span>';
+                 echo '<a href="?page=' . $totalPages . '" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-100">' . $totalPages . '</a>';
+             }
+             ?>
+
+             <!-- Next Button -->
+             <a href="?page=<?php echo min($totalPages, $page + 1); ?>"
+               class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 <?php echo $page >= $totalPages ? 'pointer-events-none opacity-50' : ''; ?>">
+               Next
+             </a>
           </div>
         </div>
+        <?php endif; ?>
       </div>
     </div>
   </main>

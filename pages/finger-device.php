@@ -8,22 +8,34 @@ $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
 // Fetch finger devices from database
-$fingerDevices = DbHelper::getAllFingerDevices();
-if (!$fingerDevices) {
-  $fingerDevices = [];
+$allFingerDevices = DbHelper::getAllFingerDevices();
+if (!$allFingerDevices) {
+  $allFingerDevices = [];
 }
+$totalDevices = count($allFingerDevices);
 
 // Calculate statistics
-$totalDevices = count($fingerDevices);
-$activeDevices = count(array_filter($fingerDevices, function ($device) {
+$activeDevices = count(array_filter($allFingerDevices, function ($device) {
   return $device['status'] === 'active';
 }));
-$approvedDevices = count(array_filter($fingerDevices, function ($device) {
+$approvedDevices = count(array_filter($allFingerDevices, function ($device) {
   return $device['approval_status'] === 'approved';
 }));
 // Get unique locations
-$locations = array_unique(array_column($fingerDevices, 'location_name'));
+$locations = array_unique(array_column($allFingerDevices, 'location_name'));
 $totalLocations = count(array_filter($locations));
+
+// Pagination Logic
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = 10;
+$offset = ($page - 1) * $limit;
+$totalPages = ceil($totalDevices / $limit);
+
+// Ensure page is valid
+if ($page < 1) $page = 1;
+if ($page > $totalPages && $totalPages > 0) $page = $totalPages;
+
+$fingerDevices = array_slice($allFingerDevices, $offset, $limit);
 
 // Fetch data for dropdowns
 $sections = DbHelper::getAllSections();
@@ -408,38 +420,55 @@ if ($categories) {
         </div>
 
         <!-- Pagination -->
+        <?php if ($totalDevices > 0): ?>
         <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
           <div class="flex items-center justify-between">
             <div class="text-sm text-gray-700">
-              Showing <span class="font-medium">1</span> to
-              <span class="font-medium">10</span> of
-              <span class="font-medium">67</span> results
+              Showing <span class="font-medium"><?php echo $offset + 1; ?></span> to
+              <span class="font-medium"><?php echo min($offset + $limit, $totalDevices); ?></span> of
+              <span class="font-medium"><?php echo $totalDevices; ?></span> results
             </div>
             <div class="flex gap-2">
-              <button
-                class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-                disabled>
+              <!-- Previous Button -->
+              <a href="?page=<?php echo max(1, $page - 1); ?>"
+                 class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 <?php echo $page <= 1 ? 'pointer-events-none opacity-50' : ''; ?>">
                 Previous
-              </button>
-              <button
-                class="px-3 py-1 border border-blue-500 bg-blue-500 text-white rounded-lg">
-                1
-              </button>
-              <button
-                class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50">
-                2
-              </button>
-              <button
-                class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50">
-                3
-              </button>
-              <button
-                class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50">
+              </a>
+
+              <!-- Page Numbers -->
+              <?php
+              $startPage = max(1, $page - 2);
+              $endPage = min($totalPages, $page + 2);
+
+              if ($startPage > 1) {
+                  echo '<a href="?page=1" class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50">1</a>';
+                  if ($startPage > 2) echo '<span class="px-2">...</span>';
+              }
+
+              for ($i = $startPage; $i <= $endPage; $i++):
+              ?>
+                <a href="?page=<?php echo $i; ?>"
+                   class="px-3 py-1 border <?php echo $i === $page ? 'border-blue-500 bg-blue-500 text-white' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'; ?> rounded-lg">
+                  <?php echo $i; ?>
+                </a>
+              <?php endfor; ?>
+
+              <?php
+              if ($endPage < $totalPages) {
+                  if ($endPage < $totalPages - 1) echo '<span class="px-2">...</span>';
+                  echo '<a href="?page=' . $totalPages . '" class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50">' . $totalPages . '</a>';
+              }
+              ?>
+
+              <!-- Next Button -->
+              <a href="?page=<?php echo min($totalPages, $page + 1); ?>"
+                 class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 <?php echo $page >= $totalPages ? 'pointer-events-none opacity-50' : ''; ?>">
                 Next
-              </button>
+              </a>
             </div>
           </div>
         </div>
+        <?php endif; ?>
       </div>
     </div>
   </main>
