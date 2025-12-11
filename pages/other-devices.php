@@ -63,7 +63,11 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
 </head>
 
 <body class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100">
-  <?php include '../includes/sidemenu.php'; ?>
+  <?php 
+  $pathUpdate = true;
+  $pathUpdate2 = false;
+  include '../includes/sidemenu.php'; 
+  ?>
 
   <div class="lg:pl-64 min-h-screen flex flex-col">
     <?php include '../includes/header.php'; ?>
