@@ -11,7 +11,8 @@ $name = $_SESSION['user']['name'];
 $laptopCatId = DbHelper::getCategoryId('laptop');
 $desktopCatId = DbHelper::getCategoryId('Desktop Computer');
 $printerId = DbHelper::getCategoryId('printer');
-$otherId = DbHelper::getCategoryId('other');
+$fingerprintId = DbHelper::getCategoryId('Fingerprint Device');
+$rvpnId = DbHelper::getCategoryId('RVPN Device');
 
 
 // get counts
@@ -23,10 +24,14 @@ $activeUsers = DbHelper::getRowCountWithCondition('users', ['status' => 'active'
 $regularUsers = $totalUsers - $adminUsers;
 $activeDevices = DbHelper::getRowCountWithCondition('devices', ['status' => 'active']);
 $repairDevices = DbHelper::getRowCountWithCondition('devices', ['status' => 'under_repair']);
+
 $laptopsCount = DbHelper::getRowCountWithCondition('devices', ['category_id' => $laptopCatId]);
 $printersCount = DbHelper::getRowCountWithCondition('devices', ['category_id' => $printerId]);
 $computersCount = DbHelper::getRowCountWithCondition('devices', ['category_id' => $desktopCatId]);
-$otherDevicesCount = $totalDevices - ($laptopsCount + $printersCount + $computersCount);
+$fingerprintCount = DbHelper::getRowCountWithCondition('devices', ['category_id' => $fingerprintId]);
+$rvpnCount = DbHelper::getRowCountWithCondition('devices', ['category_id' => $rvpnId]);
+
+$otherDevicesCount = $totalDevices - ($laptopsCount + $printersCount + $computersCount + $fingerprintCount + $rvpnCount);
 
 // Get top 3 sections by device count
 $topSections = DbHelper::getSectionsByDeviceCount();
@@ -221,7 +226,7 @@ $recentActivities = DbHelper::getRecentActivities(4);
       </div>
 
       <!-- Device Categories Overview -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
           class="stat-card bg-white rounded-2xl p-6 shadow-sm hover:shadow-md animate-fade-up"
           style="animation-delay: 0.5s">
@@ -276,6 +281,40 @@ $recentActivities = DbHelper::getRecentActivities(4);
         <div
           class="stat-card bg-white rounded-2xl p-6 shadow-sm hover:shadow-md animate-fade-up"
           style="animation-delay: 0.8s">
+          <div class="flex items-center space-x-4">
+            <div
+              class="w-14 h-14 bg-teal-100 rounded-xl flex items-center justify-center">
+              <i class="fas fa-fingerprint text-teal-600 text-2xl"></i>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm">Fingerprint Devices</p>
+              <h3 class="text-2xl font-bold text-gray-800">
+                <?php echo $fingerprintCount; ?>
+              </h3>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="stat-card bg-white rounded-2xl p-6 shadow-sm hover:shadow-md animate-fade-up"
+          style="animation-delay: 0.9s">
+          <div class="flex items-center space-x-4">
+            <div
+              class="w-14 h-14 bg-rose-100 rounded-xl flex items-center justify-center">
+              <i class="fas fa-shield-alt text-rose-600 text-2xl"></i>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm">RVPN Devices</p>
+              <h3 class="text-2xl font-bold text-gray-800">
+                <?php echo $rvpnCount; ?>
+              </h3>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="stat-card bg-white rounded-2xl p-6 shadow-sm hover:shadow-md animate-fade-up"
+          style="animation-delay: 1.0s">
           <div class="flex items-center space-x-4">
             <div
               class="w-14 h-14 bg-amber-100 rounded-xl flex items-center justify-center">
@@ -519,23 +558,29 @@ $recentActivities = DbHelper::getRecentActivities(4);
       desktops: <?php echo $computersCount; ?>,
       laptops: <?php echo $laptopsCount; ?>,
       printers: <?php echo $printersCount; ?>,
+      fingerprint: <?php echo $fingerprintCount; ?>,
+      rvpn: <?php echo $rvpnCount; ?>,
       others: <?php echo $otherDevicesCount; ?>,
     };
     new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: ['Desktop Computers', 'Laptops', 'Printers', 'Other Devices'],
+        labels: ['Desktop Computers', 'Laptops', 'Printers', 'Fingerprint', 'RVPN', 'Other Devices'],
         datasets: [{
           data: [
             deviceData.desktops,
             deviceData.laptops,
             deviceData.printers,
+            deviceData.fingerprint,
+            deviceData.rvpn,
             deviceData.others
           ],
           backgroundColor: [
             'rgba(59, 130, 246, 0.8)',
             'rgba(99, 102, 241, 0.8)',
             'rgba(147, 51, 234, 0.8)',
+            'rgba(20, 184, 166, 0.8)',
+            'rgba(244, 63, 94, 0.8)',
             'rgba(251, 191, 36, 0.8)',
           ],
           borderWidth: 0,
