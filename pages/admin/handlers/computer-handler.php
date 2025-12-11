@@ -73,32 +73,32 @@ try {
                 $_SESSION['error_message'] = 'Failed to create computer.';
             }
 
-            header('Location: ../../computers.php');
+            header("Location: " . ($_POST['redirect_to'] ?? '../../computers.php'));
             exit();
 
         case 'update':
             // Validate required fields
             if (empty($_POST['device_id']) || !is_numeric($_POST['device_id'])) {
                 $_SESSION['error_message'] = 'Invalid device ID.';
-                header('Location: ../../computers.php');
+                header("Location: " . ($_POST['redirect_to'] ?? '../../computers.php'));
                 exit();
             }
 
             if (empty($_POST['device_name'])) {
                 $_SESSION['error_message'] = 'Device name is required.';
-                header('Location: ../../computers.php');
+                header("Location: " . ($_POST['redirect_to'] ?? '../../computers.php'));
                 exit();
             }
 
             if (empty($_POST['category_id']) || !is_numeric($_POST['category_id'])) {
                 $_SESSION['error_message'] = 'Valid category is required.';
-                header('Location: ../../computers.php');
+                header("Location: " . ($_POST['redirect_to'] ?? '../../computers.php'));
                 exit();
             }
 
             if (empty($_POST['wss_id']) || !is_numeric($_POST['wss_id'])) {
                 $_SESSION['error_message'] = 'Valid WSS is required.';
-                header('Location: ../../computers.php');
+                header("Location: " . ($_POST['redirect_to'] ?? '../../computers.php'));
                 exit();
             }
 
@@ -140,14 +140,14 @@ try {
                 $_SESSION['error_message'] = 'Failed to update computer.';
             }
 
-            header('Location: ../../computers.php');
+            header("Location: " . ($_POST['redirect_to'] ?? '../../computers.php'));
             exit();
 
         case 'delete':
             // Validate device ID
             if (empty($_POST['device_id']) || !is_numeric($_POST['device_id'])) {
                 $_SESSION['error_message'] = 'Invalid device ID.';
-                header('Location: ../../computers.php');
+                header("Location: " . ($_POST['redirect_to'] ?? '../../computers.php'));
                 exit();
             }
 
@@ -162,16 +162,16 @@ try {
                 $_SESSION['error_message'] = 'Failed to delete computer.';
             }
 
-            header('Location: ../../computers.php');
+            header("Location: " . ($_POST['redirect_to'] ?? '../../computers.php'));
             exit();
 
         default:
             $_SESSION['error_message'] = 'Invalid action.';
-            header('Location: ../../computers.php');
+            header("Location: " . ($_POST['redirect_to'] ?? '../../computers.php'));
             exit();
     }
 } catch (Exception $e) {
     $_SESSION['error_message'] = 'An error occurred: ' . $e->getMessage();
-    header('Location: ../../computers.php');
+    header("Location: " . ($_POST['redirect_to'] ?? '../../computers.php'));
     exit();
 }

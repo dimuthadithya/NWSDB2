@@ -283,6 +283,130 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
     </main>
   </div>
 
+  <!-- Add Device Modal -->
+  <div id="addDeviceModal" class="hidden fixed inset-0 overflow-y-auto h-full w-full z-50 backdrop-blur-sm bg-black/30 flex items-center justify-center p-4">
+    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden" onclick="event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
+        <h3 class="text-xl font-bold text-gray-900 flex items-center">
+            <i class="fas fa-plus-circle text-purple-600 mr-2"></i>
+            Add New Device
+        </h3>
+        <button onclick="closeAddDeviceModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
+          <i class="fas fa-times text-2xl"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 max-h-[70vh] overflow-y-auto">
+        <form id="addDeviceForm" method="POST" action="admin/handlers/computer-handler.php">
+          <input type="hidden" name="action" value="create">
+          <input type="hidden" name="redirect_to" value="../../other-devices.php">
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Basic Info -->
+            <div class="md:col-span-2">
+              <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 border-b pb-2">Basic Information</h4>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Device Name *</label>
+              <input type="text" name="device_name" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all" placeholder="e.g. UPS-Main-Server">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Device Category *</label>
+              <select name="category_id" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all">
+                <option value="">Select Category</option>
+                <?php 
+                $excludeCategories = ['Desktop Computer', 'Laptop', 'Printer', 'RVPN Device', 'Fingerprint Device'];
+                if ($categories):
+                    foreach ($categories as $cat):
+                        if (!in_array($cat['category_name'], $excludeCategories)):
+                ?>
+                    <option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['category_name']) ?></option>
+                <?php 
+                        endif;
+                    endforeach;
+                endif; 
+                ?>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Model</label>
+              <input type="text" name="model" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all">
+            </div>
+
+             <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Serial Number</label>
+              <input type="text" name="system_unit_serial" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all">
+            </div>
+
+            <!-- Location Info -->
+            <div class="md:col-span-2 mt-2">
+              <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 border-b pb-2">Location & Assignment</h4>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Water Supply Scheme *</label>
+              <select name="wss_id" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all">
+                <option value="">Select Scheme</option>
+                <?php foreach ($wssOptions as $wss): ?>
+                  <option value="<?= $wss['wss_id'] ?>"><?= htmlspecialchars($wss['wss_name']) ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Section</label>
+              <select name="section_id" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all">
+                <option value="">Select Section (Optional)</option>
+                 <?php
+                  $allSections = DbHelper::getAllSections();
+                  foreach ($allSections as $section):
+                 ?>
+                  <option value="<?= $section['section_id'] ?>"><?= htmlspecialchars($section['section_name']) ?> (<?= htmlspecialchars($section['wss_name']??'') ?>)</option>
+                 <?php endforeach; ?>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Assigned To</label>
+              <input type="text" name="assigned_to" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all">
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+               <select name="status" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all">
+                  <option value="active">Active</option>
+                  <option value="under_repair">Under Repair</option>
+                  <option value="retired">Retired</option>
+                  <option value="lost">Lost</option>
+                </select>
+            </div>
+
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                <textarea name="notes" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"></textarea>
+            </div>
+
+          </div>
+        </form>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
+        <button onclick="closeAddDeviceModal()" type="button" class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
+          <i class="fas fa-times mr-2"></i>Cancel
+        </button>
+        <button type="submit" form="addDeviceForm" class="px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg">
+          <i class="fas fa-save mr-2"></i>Save Device
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Auto-hide messages after 5 seconds
     setTimeout(() => {
@@ -312,20 +436,52 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
     });
 
     function openAddDeviceModal() {
-      alert('Add Device functionality will be implemented');
+      document.getElementById('addDeviceModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeAddDeviceModal() {
+        document.getElementById('addDeviceModal').classList.add('hidden');
+        document.getElementById('addDeviceForm').reset();
+        document.body.style.overflow = 'auto';
     }
 
     function viewDevice(device) {
-      alert('View device: ' + device.device_name);
+      alert('View device: ' + device.device_name + ' (Implementation Pending)');
     }
 
     function editDevice(device) {
-      alert('Edit device: ' + device.device_name);
+      alert('Edit device: ' + device.device_name + ' (Implementation Pending)');
     }
 
     function confirmDelete(deviceId, deviceName) {
       if (confirm('Are you sure you want to delete ' + deviceName + '?')) {
-        alert('Delete device ID: ' + deviceId);
+        // Use a form to submit delete request
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'admin/handlers/computer-handler.php';
+        
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'delete';
+        
+        const idInput = document.createElement('input');
+        idInput.type = 'hidden';
+        idInput.name = 'device_id';
+        idInput.value = deviceId;
+        
+        const redirectInput = document.createElement('input');
+        redirectInput.type = 'hidden';
+        redirectInput.name = 'redirect_to';
+        redirectInput.value = '../../other-devices.php';
+        
+        form.appendChild(actionInput);
+        form.appendChild(idInput);
+        form.appendChild(redirectInput);
+        
+        document.body.appendChild(form);
+        form.submit();
       }
     }
   </script>
