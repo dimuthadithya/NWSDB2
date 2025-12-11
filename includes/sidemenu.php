@@ -96,6 +96,12 @@
                   <i class="fas fa-chart-pie w-5"></i>
                   <span class="<?php echo isFontWeight('summary.php'); ?>">Summary</span>
               </a>
+              <a
+                  href="<?php echo $pathUpdate2 ? '../settings.php' : './settings.php' ?>"
+                  class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?php echo isActive('settings.php'); ?>">
+                  <i class="fas fa-cog w-5"></i>
+                  <span class="<?php echo isFontWeight('settings.php'); ?>">Settings</span>
+              </a>
           </div>
 
           <?php if ($role == 'admin')
@@ -145,12 +151,7 @@
                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl ' . isActive('categories.php') . '">
                       <i class="fas fa-tags w-5"></i>
                       <span class="' . isFontWeight('categories.php') . '">Categories</span>
-                  <a
-                      href="#"
-                      class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
-                      <i class="fas fa-cog w-5"></i>
-                      <span>Settings</span>
-                  </a>
+
               </div>
           </div>'
             ?>
