@@ -16,6 +16,12 @@ class DbHelper
         }
     }
 
+    public static function getLastError()
+    {
+        self::init();
+        return self::$db->getLastError();
+    }
+
 
     /**
      * Creates a new user in the database

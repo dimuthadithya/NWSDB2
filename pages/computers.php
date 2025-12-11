@@ -414,7 +414,24 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
                     <td class="px-6 py-4">
                       <div class="text-sm space-y-1">
                         <div class="text-gray-700"><?= htmlspecialchars($computer['operating_system'] ?? 'N/A') ?></div>
-                        <div class="text-gray-600 text-xs">Monitor: <?= htmlspecialchars($computer['monitor_type'] ?? 'N/A') ?></div>
+                        <div class="text-gray-600 text-xs">Monitor: <?= htmlspecialchars($computer['monitor_info'] ?? 'N/A') ?></div>
+                        <div class="flex gap-2 mt-1">
+                          <?php if (!empty($computer['has_keyboard'])): ?>
+                            <i class="fas fa-keyboard text-gray-500" title="Keyboard"></i>
+                          <?php endif; ?>
+                          <?php if (!empty($computer['has_mouse'])): ?>
+                            <i class="fas fa-mouse text-gray-500" title="Mouse"></i>
+                          <?php endif; ?>
+                          <?php if (!empty($computer['has_speaker'])): ?>
+                            <i class="fas fa-volume-high text-gray-500" title="Speaker"></i>
+                          <?php endif; ?>
+                          <?php if (!empty($computer['has_camera'])): ?>
+                            <i class="fas fa-camera text-gray-500" title="Camera"></i>
+                          <?php endif; ?>
+                          <?php if (!empty($computer['has_web_cam'])): ?>
+                            <i class="fas fa-video text-gray-500" title="Web Cam"></i>
+                          <?php endif; ?>
+                        </div>
                       </div>
                     </td>
                     <td class="px-6 py-4">
@@ -1168,11 +1185,14 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
       document.getElementById('edit_status').value = computer.status || 'active';
       document.getElementById('edit_notes').value = computer.notes || '';
 
-      document.getElementById('edit_has_speaker').checked = computer.has_speaker == 1;
-      document.getElementById('edit_has_camera').checked = computer.has_camera == 1;
-      document.getElementById('edit_has_mouse').checked = computer.has_mouse == 1;
-      document.getElementById('edit_has_web_cam').checked = computer.has_web_cam == 1;
-      document.getElementById('edit_has_keyboard').checked = computer.has_keyboard == 1;
+      // Debug to check data
+      console.log('Editing computer:', computer);
+
+      document.getElementById('edit_has_speaker').checked = (computer.has_speaker == 1 || computer.has_speaker === '1');
+      document.getElementById('edit_has_camera').checked = (computer.has_camera == 1 || computer.has_camera === '1');
+      document.getElementById('edit_has_mouse').checked = (computer.has_mouse == 1 || computer.has_mouse === '1');
+      document.getElementById('edit_has_web_cam').checked = (computer.has_web_cam == 1 || computer.has_web_cam === '1');
+      document.getElementById('edit_has_keyboard').checked = (computer.has_keyboard == 1 || computer.has_keyboard === '1');
 
       document.getElementById('editComputerModal').classList.remove('hidden');
       document.body.style.overflow = 'hidden';
