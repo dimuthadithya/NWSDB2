@@ -1,4 +1,4 @@
-# NWSDB Device Record System - 12-Week Project Development Diary
+# NWSDB Device Record System
 
 ## Project Information
 
@@ -8,6 +8,61 @@
 - **Developer:** Development Team
 
 ---
+
+## Getting Started
+
+Follow these instructions to set up the project on your local machine.
+
+### Prerequisites
+
+- **PHP**: Version 7.4 or higher.
+- **MySQL/MariaDB**: For the database.
+- **Web Server**: Apache or Nginx (e.g., via XAMPP, WAMP, or Laragon).
+
+### Installation
+
+1.  **Clone the Repository**
+
+    ```bash
+    git clone <repository-url>
+    cd NWSDB2
+    ```
+
+2.  **Database Setup**
+
+    - Open your MySQL client (e.g., phpMyAdmin, HeidiSQL).
+    - Create a new database named `devicerecordsystem`.
+    - Import the schema file: `sql/updated.sql`.
+    - (Optional) Import dummy data: `sql/updatedDummy.sql`.
+
+3.  **Configuration**
+
+    - Open `config/db.php`.
+    - Verify the database credentials match your local setup:
+      ```php
+      define('DB_HOST', 'localhost');
+      define('DB_USERNAME', 'root');
+      define('DB_PASSWORD', ''); // Your database password
+      define('DB_NAME', 'devicerecordsystem');
+      ```
+
+4.  **Running the Application**
+    - If using **Laragon/XAMPP**: Move the project folder to the `www` or `htdocs` directory. Access it via `http://localhost/NWSDB2`.
+    - Or use the PHP built-in server:
+      ```bash
+      php -S localhost:8000
+      ```
+      Then access `http://localhost:8000` in your browser.
+
+### Usage
+
+1.  **Registration**: Go to `/pages/register.php` to create a new account.
+2.  **Login**: Use your credentials at `/pages/login.php`.
+3.  **Admin Access**: By default, new users have the 'user' role. To make a user an admin, manually update the `role` column in the `users` table to 'admin'.
+
+---
+
+## Development Diary
 
 ## Week 01 (September 2 - 6, 2025)
 
