@@ -16,6 +16,12 @@ class DbHelper
         }
     }
 
+    public static function getLastError()
+    {
+        self::init();
+        return self::$db->getLastError();
+    }
+
 
     /**
      * Creates a new user in the database
@@ -379,10 +385,11 @@ class DbHelper
     {
         self::init();
 
-        $sql = "SELECT d.device_id, d.device_name, d.model, c.category_name, w.wss_name 
+        $sql = "SELECT d.*, c.category_name, w.wss_name, s.section_name
                 FROM devices d 
-                INNER JOIN device_categories c ON d.category_id = c.category_id
-                INNER JOIN water_supply_schemes w ON d.wss_id = w.wss_id
+                LEFT JOIN device_categories c ON d.category_id = c.category_id
+                LEFT JOIN water_supply_schemes w ON d.wss_id = w.wss_id
+                LEFT JOIN sections s ON d.section_id = s.section_id
                 ORDER BY d.device_name ASC";
 
         try {

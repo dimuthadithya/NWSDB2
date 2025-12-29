@@ -22,7 +22,21 @@ foreach ($categories as $category) {
   }
 }
 
+// Pagination Logic
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = 10;
+$offset = ($page - 1) * $limit;
+
 $totalComputers = $computers ? count($computers) : 0;
+$totalPages = ceil($totalComputers / $limit);
+
+// Ensure page is valid
+if ($page < 1) $page = 1;
+if ($page > $totalPages && $totalPages > 0) $page = $totalPages;
+
+// Slice the array for current page
+$currentComputers = array_slice($computers, $offset, $limit);
+
 $activeComputers = $computers ? count(array_filter($computers, fn($c) => $c['status'] === 'active')) : 0;
 $repairComputers = $computers ? count(array_filter($computers, fn($c) => $c['status'] === 'under_repair')) : 0;
 $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['status'] === 'retired')) : 0;
@@ -190,11 +204,13 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
           Add New Computer
         </button>
         <button
+          onclick="exportToExcel()"
           class="inline-flex items-center px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm border border-gray-200 transition-all">
           <i class="fas fa-file-excel mr-2 text-green-600"></i>
           Export to Excel
         </button>
         <button
+          onclick="exportToPDF()"
           class="inline-flex items-center px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm border border-gray-200 transition-all">
           <i class="fas fa-file-pdf mr-2 text-red-600"></i>
           Export to PDF
@@ -202,14 +218,11 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
       </div>
 
       <!-- Filter Section -->
-      <div
-        class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up mb-8">
-        <div
-          class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up mb-8">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div
-                class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                 <i class="fas fa-filter text-white"></i>
               </div>
               <div>
@@ -236,7 +249,9 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
             <div class="relative">
               <input
                 type="text"
-                placeholder="Search by name, model, or serial number..."
+                id="searchInput"
+                onkeyup="filterDevices()"
+                placeholder="Search by name, model, serial, or IP..."
                 class="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" />
               <i
                 class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
@@ -244,40 +259,21 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
           </div>
 
           <!-- Filters Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Device Type -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                <i class="fas fa-desktop text-blue-600 mr-2"></i>Device Type
-              </label>
-              <div class="flex items-center gap-4">
-                <label class="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    class="form-checkbox text-blue-600 rounded focus:ring-blue-500" />
-                  <span class="ml-2 text-gray-700">Desktop</span>
-                </label>
-                <label class="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    class="form-checkbox text-blue-600 rounded focus:ring-blue-500" />
-                  <span class="ml-2 text-gray-700">Laptop</span>
-                </label>
-              </div>
-            </div>
-
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <!-- Status -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
                 <i class="fas fa-circle-dot text-blue-600 mr-2"></i>Status
               </label>
               <select
+                id="statusFilter"
+                onchange="filterDevices()"
                 class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white">
                 <option value="">All Status</option>
-                <option value="active">✓ Active</option>
-                <option value="under_repair">⚠ Under Repair</option>
-                <option value="retired">✕ Retired</option>
-                <option value="lost">🔴 Lost</option>
+                <option value="active">Active</option>
+                <option value="under_repair">Under Repair</option>
+                <option value="retired">Retired</option>
+                <option value="lost">Lost</option>
               </select>
             </div>
 
@@ -287,12 +283,13 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
                 <i class="fas fa-building text-blue-600 mr-2"></i>Section
               </label>
               <select
+                id="sectionFilter"
+                onchange="filterDevices()"
                 class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white">
                 <option value="">All Sections</option>
-                <option value="it">IT Department</option>
-                <option value="hr">HR Department</option>
-                <option value="finance">Finance</option>
-                <option value="operations">Operations</option>
+                <?php foreach ($sections as $section): ?>
+                  <option value="<?= $section['section_id'] ?>"><?= htmlspecialchars($section['section_name']) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
 
@@ -302,26 +299,16 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
                 <i class="fas fa-microchip text-blue-600 mr-2"></i>Processor
               </label>
               <select
+                id="processorFilter"
+                onchange="filterDevices()"
                 class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-white">
                 <option value="">All Processors</option>
-                <option value="intel_i3">Intel i3</option>
-                <option value="intel_i5">Intel i5</option>
-                <option value="intel_i7">Intel i7</option>
-                <option value="amd">AMD Ryzen</option>
+                <option value="i3">Intel i3</option>
+                <option value="i5">Intel i5</option>
+                <option value="i7">Intel i7</option>
+                <option value="amd">AMD</option>
               </select>
             </div>
-          </div>
-
-          <!-- Buttons -->
-          <div class="mt-4 flex justify-end gap-3">
-            <button
-              class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
-              <i class="fas fa-rotate-right mr-2"></i>Reset
-            </button>
-            <button
-              class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
-              <i class="fas fa-check mr-2"></i>Apply Filters
-            </button>
           </div>
         </div>
       </div>
@@ -330,7 +317,7 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
         class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up"
         style="animation-delay: 0.6s">
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
+          <table id="devicesTable" class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
               <tr>
                 <th
@@ -372,8 +359,12 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
                   </td>
                 </tr>
               <?php else: ?>
-                <?php foreach ($computers as $computer): ?>
-                  <tr class="table-row">
+                <?php foreach ($currentComputers as $computer): ?>
+                  <tr class="table-row hover:bg-gray-50 transition-colors"
+                      data-search="<?= htmlspecialchars(strtolower($computer['device_name'] . ' ' . ($computer['model'] ?? '') . ' ' . $computer['device_id'] . ' ' . ($computer['ip_address'] ?? ''))) ?>"
+                      data-status="<?= $computer['status'] ?>" 
+                      data-section="<?= $computer['section_id'] ?? '' ?>" 
+                      data-processor="<?= strtolower($computer['processor'] ?? '') ?>">
                     <td class="px-6 py-4">
                       <div class="flex items-start">
                         <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
@@ -414,9 +405,24 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
                     <td class="px-6 py-4">
                       <div class="text-sm space-y-1">
                         <div class="text-gray-700"><?= htmlspecialchars($computer['operating_system'] ?? 'N/A') ?></div>
-                        <div class="text-gray-600 text-xs">Monitor: <?= htmlspecialchars($computer['monitor_type'] ?? 'N/A') ?></div>
-                        <div class="text-gray-600 text-xs">KB: <?= htmlspecialchars($computer['keyboard'] ?? 'N/A') ?></div>
-                        <div class="text-gray-600 text-xs">Mouse: <?= htmlspecialchars($computer['mouse'] ?? 'N/A') ?></div>
+                        <div class="text-gray-600 text-xs">Monitor: <?= htmlspecialchars($computer['monitor_info'] ?? 'N/A') ?></div>
+                        <div class="flex gap-2 mt-1">
+                          <?php if (!empty($computer['has_keyboard'])): ?>
+                            <i class="fas fa-keyboard text-gray-500" title="Keyboard"></i>
+                          <?php endif; ?>
+                          <?php if (!empty($computer['has_mouse'])): ?>
+                            <i class="fas fa-mouse text-gray-500" title="Mouse"></i>
+                          <?php endif; ?>
+                          <?php if (!empty($computer['has_speaker'])): ?>
+                            <i class="fas fa-volume-high text-gray-500" title="Speaker"></i>
+                          <?php endif; ?>
+                          <?php if (!empty($computer['has_camera'])): ?>
+                            <i class="fas fa-camera text-gray-500" title="Camera"></i>
+                          <?php endif; ?>
+                          <?php if (!empty($computer['has_web_cam'])): ?>
+                            <i class="fas fa-video text-gray-500" title="Web Cam"></i>
+                          <?php endif; ?>
+                        </div>
                       </div>
                     </td>
                     <td class="px-6 py-4">
@@ -482,42 +488,55 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
         </div>
 
         <!-- Pagination -->
+        <?php if ($totalComputers > 0): ?>
         <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
           <div class="flex items-center justify-between">
             <div class="text-sm text-gray-700">
-              Showing <span class="font-medium">1</span> to
-              <span class="font-medium">4</span> of
-              <span class="font-medium">42</span> results
+              Showing <span class="font-medium"><?php echo $offset + 1; ?></span> to
+              <span class="font-medium"><?php echo min($offset + $limit, $totalComputers); ?></span> of
+              <span class="font-medium"><?php echo $totalComputers; ?></span> results
             </div>
-            <nav class="flex items-center space-x-2">
-              <button
-                class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors">
-                <i class="fas fa-chevron-left"></i>
-              </button>
-              <button
-                class="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium">
-                1
-              </button>
-              <button
-                class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors">
-                2
-              </button>
-              <button
-                class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors">
-                3
-              </button>
-              <span class="px-2 text-gray-500">...</span>
-              <button
-                class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors">
-                11
-              </button>
-              <button
-                class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors">
-                <i class="fas fa-chevron-right"></i>
-              </button>
-            </nav>
+            <div class="flex gap-2">
+              <!-- Previous Button -->
+              <a href="?page=<?php echo max(1, $page - 1); ?>"
+                 class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 <?php echo $page <= 1 ? 'pointer-events-none opacity-50' : ''; ?>">
+                Previous
+              </a>
+
+              <!-- Page Numbers -->
+              <?php
+              $startPage = max(1, $page - 2);
+              $endPage = min($totalPages, $page + 2);
+
+              if ($startPage > 1) {
+                  echo '<a href="?page=1" class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50">1</a>';
+                  if ($startPage > 2) echo '<span class="px-2">...</span>';
+              }
+
+              for ($i = $startPage; $i <= $endPage; $i++):
+              ?>
+                <a href="?page=<?php echo $i; ?>"
+                   class="px-3 py-1 border <?php echo $i === $page ? 'border-blue-500 bg-blue-500 text-white' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'; ?> rounded-lg">
+                  <?php echo $i; ?>
+                </a>
+              <?php endfor; ?>
+
+              <?php
+              if ($endPage < $totalPages) {
+                  if ($endPage < $totalPages - 1) echo '<span class="px-2">...</span>';
+                  echo '<a href="?page=' . $totalPages . '" class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50">' . $totalPages . '</a>';
+              }
+              ?>
+
+              <!-- Next Button -->
+              <a href="?page=<?php echo min($totalPages, $page + 1); ?>"
+                 class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 <?php echo $page >= $totalPages ? 'pointer-events-none opacity-50' : ''; ?>">
+                Next
+              </a>
+            </div>
           </div>
         </div>
+        <?php endif; ?>
       </div>
     </div>
   </main>
@@ -678,22 +697,37 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
                   class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                   placeholder="e.g., 512GB SSD" />
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Keyboard</label>
-                <input
-                  type="text"
-                  name="keyboard"
-                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-                  placeholder="e.g., Dell KB216" />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Mouse</label>
-                <input
-                  type="text"
-                  name="mouse"
-                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-                  placeholder="e.g., Dell MS116" />
-              </div>
+
+            </div>
+          </div>
+
+          <!-- Peripherals -->
+          <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-keyboard text-blue-600 mr-2"></i>
+              Peripherals
+            </h4>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_speaker" value="1" class="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Speaker</span>
+              </label>
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_camera" value="1" class="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Camera</span>
+              </label>
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_mouse" value="1" class="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Mouse</span>
+              </label>
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_web_cam" value="1" class="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Web Cam</span>
+              </label>
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_keyboard" value="1" class="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Keyboard</span>
+              </label>
             </div>
           </div>
 
@@ -928,14 +962,37 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
                 <label class="block text-sm font-medium text-gray-700 mb-2">Storage</label>
                 <input type="text" name="hard_drive_capacity" id="edit_hard_drive_capacity" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Keyboard</label>
-                <input type="text" name="keyboard" id="edit_keyboard" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Mouse</label>
-                <input type="text" name="mouse" id="edit_mouse" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" />
-              </div>
+
+            </div>
+          </div>
+
+          <!-- Peripherals -->
+          <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-keyboard text-green-600 mr-2"></i>
+              Peripherals
+            </h4>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_speaker" id="edit_has_speaker" value="1" class="form-checkbox h-5 w-5 text-green-600 rounded focus:ring-green-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Speaker</span>
+              </label>
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_camera" id="edit_has_camera" value="1" class="form-checkbox h-5 w-5 text-green-600 rounded focus:ring-green-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Camera</span>
+              </label>
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_mouse" id="edit_has_mouse" value="1" class="form-checkbox h-5 w-5 text-green-600 rounded focus:ring-green-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Mouse</span>
+              </label>
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_web_cam" id="edit_has_web_cam" value="1" class="form-checkbox h-5 w-5 text-green-600 rounded focus:ring-green-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Web Cam</span>
+              </label>
+              <label class="inline-flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <input type="checkbox" name="has_keyboard" id="edit_has_keyboard" value="1" class="form-checkbox h-5 w-5 text-green-600 rounded focus:ring-green-500">
+                <span class="ml-2 text-gray-700 text-sm font-medium">Keyboard</span>
+              </label>
             </div>
           </div>
 
@@ -1121,8 +1178,7 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
       document.getElementById('edit_processor').value = computer.processor || '';
       document.getElementById('edit_ram').value = computer.ram || '';
       document.getElementById('edit_hard_drive_capacity').value = computer.hard_drive_capacity || '';
-      document.getElementById('edit_keyboard').value = computer.keyboard || '';
-      document.getElementById('edit_mouse').value = computer.mouse || '';
+
       document.getElementById('edit_ip_address').value = computer.ip_address || '';
       document.getElementById('edit_network_connectivity').value = computer.network_connectivity || '';
       document.getElementById('edit_printer_connectivity').value = computer.printer_connectivity || '';
@@ -1132,6 +1188,12 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
       document.getElementById('edit_system_unit_serial').value = computer.system_unit_serial || '';
       document.getElementById('edit_status').value = computer.status || 'active';
       document.getElementById('edit_notes').value = computer.notes || '';
+
+      document.getElementById('edit_has_speaker').checked = (computer.has_speaker == 1 || computer.has_speaker === '1');
+      document.getElementById('edit_has_camera').checked = (computer.has_camera == 1 || computer.has_camera === '1');
+      document.getElementById('edit_has_mouse').checked = (computer.has_mouse == 1 || computer.has_mouse === '1');
+      document.getElementById('edit_has_web_cam').checked = (computer.has_web_cam == 1 || computer.has_web_cam === '1');
+      document.getElementById('edit_has_keyboard').checked = (computer.has_keyboard == 1 || computer.has_keyboard === '1');
 
       document.getElementById('editComputerModal').classList.remove('hidden');
       document.body.style.overflow = 'hidden';
@@ -1156,14 +1218,39 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
       document.body.style.overflow = 'auto';
     }
 
-    function clearFilters() {
-      document.querySelectorAll('input, select').forEach((el) => {
-        if (el.type === 'text' || el.type === 'search') {
-          el.value = '';
-        } else if (el.tagName === 'SELECT') {
-          el.selectedIndex = 0;
+    function filterDevices() {
+      const searchText = document.getElementById('searchInput').value.toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+      const section = document.getElementById('sectionFilter').value;
+      const processor = document.getElementById('processorFilter').value.toLowerCase();
+
+      const rows = document.querySelectorAll('.table-row');
+
+      rows.forEach(row => {
+        const rowSearch = row.getAttribute('data-search') || '';
+        const rowStatus = row.getAttribute('data-status') || '';
+        const rowSection = row.getAttribute('data-section') || '';
+        const rowProcessor = row.getAttribute('data-processor') || '';
+
+        let matchesSearch = searchText === '' || rowSearch.includes(searchText);
+        let matchesStatus = status === '' || rowStatus === status;
+        let matchesSection = section === '' || rowSection == section;
+        let matchesProcessor = processor === '' || rowProcessor.includes(processor);
+
+        if (matchesSearch && matchesStatus && matchesSection && matchesProcessor) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
         }
       });
+    }
+
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('statusFilter').value = '';
+      document.getElementById('sectionFilter').value = '';
+      document.getElementById('processorFilter').value = '';
+      filterDevices();
     }
 
     // Close modals on background click
@@ -1187,6 +1274,91 @@ $retiredComputers = $computers ? count(array_filter($computers, fn($c) => $c['st
         closeDeleteModal();
       }
     });
+  </script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function exportToExcel() {
+       const table = document.getElementById('devicesTable');
+       if(!table || table.rows.length <= 1) { 
+          Swal.fire('No Data', 'There is no data to export.', 'info');
+          return;
+       }
+
+      Swal.fire({
+        title: 'Exporting...',
+        text: 'Generating Excel file, please wait.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+          setTimeout(() => {
+             try {
+                const clone = table.cloneNode(true);
+                const rows = clone.rows;
+                for (let i = 0; i < rows.length; i++) {
+                    if(rows[i].cells.length > 0) {
+                        rows[i].deleteCell(-1); 
+                    }
+                }
+
+                const wb = XLSX.utils.table_to_book(clone, {sheet: "Computers"});
+                XLSX.writeFile(wb, 'Computers_Report_' + new Date().toISOString().slice(0,10) + '.xlsx');
+                Swal.close();
+             } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'Failed to export Excel.', 'error');
+             }
+          }, 500);
+        }
+      });
+    }
+
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      
+      const table = document.getElementById('devicesTable');
+       if(!table || table.rows.length <= 1) {
+          Swal.fire('No Data', 'There is no data to export.', 'info');
+          return;
+       }
+
+      Swal.fire({
+        title: 'Exporting...',
+        text: 'Generating PDF file, please wait.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+          setTimeout(() => {
+             try {
+                const doc = new jsPDF('l', 'mm', 'a4'); 
+                
+                doc.setFontSize(16);
+                doc.text("Computers Report", 14, 15);
+                doc.setFontSize(10);
+                doc.text("Generated: " + new Date().toLocaleString(), 14, 22);
+                doc.text("NWSDB Hardware Device Manager", 14, 27);
+
+                doc.autoTable({ 
+                    html: '#devicesTable', 
+                    startY: 35, 
+                    theme: 'grid',
+                    columns: [0, 1, 2, 3, 4], 
+                    headStyles: { fillColor: [59, 130, 246] },
+                    styles: { fontSize: 8, cellPadding: 2 }
+                });
+
+                doc.save('Computers_Report_' + new Date().toISOString().slice(0,10) + '.pdf');
+                Swal.close();
+             } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'Failed to export PDF.', 'error');
+             }
+          }, 500);
+        }
+      });
+    }
   </script>
 </body>
 

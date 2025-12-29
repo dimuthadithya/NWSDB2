@@ -137,11 +137,13 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
           Add New Printer
         </button>
         <button
+          onclick="exportToExcel()"
           class="inline-flex items-center px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm border border-gray-200 transition-all">
           <i class="fas fa-file-excel mr-2 text-green-600"></i>
           Export to Excel
         </button>
         <button
+          onclick="exportToPDF()"
           class="inline-flex items-center px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm border border-gray-200 transition-all">
           <i class="fas fa-file-pdf mr-2 text-red-600"></i>
           Export to PDF
@@ -150,14 +152,12 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
 
       <!-- Filter Section -->
 
-      <div
-        class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up">
-        <div
-          class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <!-- Filter Section -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div
-                class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                 <i class="fas fa-filter text-white"></i>
               </div>
 
@@ -171,81 +171,75 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
                 </p>
               </div>
             </div>
+            <button onclick="clearFilters()" class="text-sm font-medium text-gray-600 hover:text-gray-900">
+                Clear All
+            </button>
           </div>
         </div>
 
         <div class="p-6">
+          <div class="mb-6">
+             <input type="text" id="searchInput" onkeyup="filterPrinters()" placeholder="Search printers..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all">
+          </div>
+
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"><i class="fas fa-print text-blue-600 mr-2"></i>Printer
                 Type</label>
 
-              <select
+              <select id="typeFilter" onchange="filterPrinters()"
                 class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white">
                 <option value="">All Types</option>
-
-                <option value="laser">Laser</option>
-
-                <option value="inkjet">Inkjet</option>
-
-                <option value="dot-matrix">Dot Matrix</option>
+                <?php
+                   $types = array_filter(array_unique(array_column($printers, 'device_type')));
+                   sort($types);
+                   foreach($types as $t):
+                ?>
+                <option value="<?= htmlspecialchars($t) ?>"><?= htmlspecialchars($t) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"><i class="fas fa-circle-dot text-blue-600 mr-2"></i>Status</label>
 
-              <select
+              <select id="statusFilter" onchange="filterPrinters()"
                 class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white">
                 <option value="">All Status</option>
-
                 <option value="active">Active</option>
-
                 <option value="under_repair">Under Repair</option>
-
                 <option value="retired">Retired</option>
+                <option value="lost">Lost</option>
               </select>
             </div>
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"><i class="fas fa-building text-blue-600 mr-2"></i>Section</label>
 
-              <select
+              <select id="sectionFilter" onchange="filterPrinters()"
                 class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white">
                 <option value="">All Sections</option>
-
-                <option value="it">IT Department</option>
-
-                <option value="hr">HR Department</option>
+                <?php foreach ($sections as $section): ?>
+                  <option value="<?= $section['section_id'] ?>"><?= htmlspecialchars($section['section_name']) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"><i class="fas fa-network-wired text-blue-600 mr-2"></i>Connectivity</label>
 
-              <select
+              <select id="connectivityFilter" onchange="filterPrinters()"
                 class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white">
                 <option value="">All</option>
-
-                <option value="usb">USB</option>
-
-                <option value="network">Network</option>
-
-                <option value="wifi">Wi-Fi</option>
+                <?php
+                   $conns = array_filter(array_unique(array_column($printers, 'network_connectivity')));
+                   sort($conns);
+                   foreach($conns as $c):
+                ?>
+                <option value="<?= htmlspecialchars($c) ?>"><?= htmlspecialchars($c) ?></option>
+                <?php endforeach; ?>
               </select>
             </div>
-          </div>
-
-          <div class="mt-4 flex justify-end gap-3">
-            <button
-              class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">
-              Reset
-            </button>
-
-            <button
-              class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
-              Apply Filters
-            </button>
           </div>
         </div>
       </div>
@@ -253,7 +247,7 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
       <div
         class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden animate-fade-up">
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
+          <table id="devicesTable" class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
               <tr>
                 <th
@@ -291,7 +285,12 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
                 </tr>
               <?php else: ?>
                 <?php foreach ($printers as $printer): ?>
-                  <tr class="table-row">
+                  <tr class="table-row hover:bg-gray-50 transition-colors"
+                      data-search="<?= htmlspecialchars(strtolower($printer['device_name'] . ' ' . ($printer['model'] ?? '') . ' ' . $printer['device_id'] . ' ' . ($printer['system_unit_serial'] ?? ''))) ?>"
+                      data-type="<?= htmlspecialchars($printer['device_type'] ?? '') ?>"
+                      data-status="<?= $printer['status'] ?>" 
+                      data-section="<?= $printer['section_id'] ?? '' ?>" 
+                      data-connectivity="<?= htmlspecialchars($printer['network_connectivity'] ?? '') ?>">
                     <td class="px-6 py-4">
                       <div class="flex items-start">
                         <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
@@ -315,15 +314,15 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
                       <div class="text-sm space-y-1">
                         <div class="flex items-center">
                           <i class="fas fa-tag text-gray-400 text-xs mr-2 w-4"></i>
-                          <span class="text-gray-700">Type: <?= htmlspecialchars($printer['printer_type'] ?? 'N/A') ?></span>
+                          <span class="text-gray-700">Type: <?= htmlspecialchars($printer['device_type'] ?? 'N/A') ?></span>
                         </div>
                         <div class="flex items-center">
-                          <i class="fas fa-palette text-gray-400 text-xs mr-2 w-4"></i>
-                          <span class="text-gray-700">Color: <?= htmlspecialchars($printer['color_capability'] ?? 'N/A') ?></span>
+                          <i class="fas fa-network-wired text-gray-400 text-xs mr-2 w-4"></i>
+                          <span class="text-gray-700">Conn: <?= htmlspecialchars($printer['network_connectivity'] ?? 'N/A') ?></span>
                         </div>
                         <div class="flex items-center">
-                          <i class="fas fa-file-alt text-gray-400 text-xs mr-2 w-4"></i>
-                          <span class="text-gray-700">Paper: <?= htmlspecialchars($printer['paper_size'] ?? 'N/A') ?></span>
+                          <i class="fas fa-barcode text-gray-400 text-xs mr-2 w-4"></i>
+                          <span class="text-gray-700">Serial: <?= htmlspecialchars($printer['system_unit_serial'] ?? 'N/A') ?></span>
                         </div>
                       </div>
                     </td>
@@ -341,6 +340,9 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
                         case 'retired':
                           $statusClass = 'bg-gray-100 text-gray-800';
                           break;
+                        case 'lost':
+                          $statusClass = 'bg-red-100 text-red-800';
+                          break;
                         default:
                           $statusClass = 'bg-gray-100 text-gray-800';
                       }
@@ -348,16 +350,12 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
                       <div class="flex items-center">
                         <span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full <?= $statusClass ?>"><?= $statusText ?></span>
                       </div>
-                      <div class="text-sm text-gray-600 mt-1">Speed: <?= htmlspecialchars($printer['print_speed'] ?? 'N/A') ?></div>
                     </td>
                     <td class="px-6 py-4">
                       <div class="text-sm mb-2">
                         <div class="font-medium text-gray-900"><?= htmlspecialchars($printer['section_name'] ?? 'Unassigned') ?></div>
                         <div class="text-gray-600 text-xs"><?= htmlspecialchars($printer['assigned_to'] ?? 'Not assigned') ?></div>
                       </div>
-                      <span class="px-3 py-1 inline-flex text-xs font-semibold rounded-full <?= $statusClass ?>">
-                        <i class="fas fa-circle text-xs mr-1"></i><?= $statusText ?>
-                      </span>
                     </td>
                     <td class="px-6 py-4 text-right">
                       <div class="flex items-center justify-end space-x-2">
@@ -746,6 +744,45 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
       if (errorMessage) errorMessage.style.display = 'none';
     }, 5000);
 
+    function filterPrinters() {
+      const searchText = document.getElementById('searchInput').value.toLowerCase();
+      const type = document.getElementById('typeFilter').value;
+      const status = document.getElementById('statusFilter').value;
+      const section = document.getElementById('sectionFilter').value;
+      const connectivity = document.getElementById('connectivityFilter').value;
+
+      const rows = document.querySelectorAll('.table-row');
+
+      rows.forEach(row => {
+        const rowSearch = row.getAttribute('data-search') || '';
+        const rowType = row.getAttribute('data-type') || '';
+        const rowStatus = row.getAttribute('data-status') || '';
+        const rowSection = row.getAttribute('data-section') || '';
+        const rowConnectivity = row.getAttribute('data-connectivity') || '';
+
+        let matchesSearch = searchText === '' || rowSearch.includes(searchText);
+        let matchesType = type === '' || rowType === type;
+        let matchesStatus = status === '' || rowStatus === status;
+        let matchesSection = section === '' || rowSection == section;
+        let matchesConnectivity = connectivity === '' || rowConnectivity === connectivity; // Exact match for connectivity? Or includes? Dropdown values are exact. data-attribute is exact.
+
+        if (matchesSearch && matchesType && matchesStatus && matchesSection && matchesConnectivity) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('typeFilter').value = '';
+      document.getElementById('statusFilter').value = '';
+      document.getElementById('sectionFilter').value = '';
+      document.getElementById('connectivityFilter').value = '';
+      filterPrinters();
+    }
+
     document.getElementById('mobileMenuBtn').addEventListener('click', () => {
       document
         .getElementById('sidebar')
@@ -825,6 +862,170 @@ $repairPrinters = $printers ? count(array_filter($printers, fn($p) => $p['status
         closeDeleteModal();
       }
     });
+  </script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function exportToExcel() {
+       const table = document.getElementById('devicesTable');
+       if(!table || table.rows.length <= 1) { 
+          Swal.fire('No Data', 'There is no data to export.', 'info');
+          return;
+       }
+
+      Swal.fire({
+        title: 'Exporting...',
+        text: 'Generating Excel file, please wait.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+          setTimeout(() => {
+             try {
+                const clone = table.cloneNode(true);
+                const rows = clone.rows;
+                for (let i = 0; i < rows.length; i++) {
+                    if(rows[i].cells.length > 0) {
+                        rows[i].deleteCell(-1); 
+                    }
+                }
+                const wb = XLSX.utils.table_to_book(clone, {sheet: "Printers"});
+                XLSX.writeFile(wb, 'Printers_Report_' + new Date().toISOString().slice(0,10) + '.xlsx');
+                Swal.close();
+             } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'Failed to export Excel.', 'error');
+             }
+          }, 500);
+        }
+      });
+    }
+
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const table = document.getElementById('devicesTable');
+       if(!table || table.rows.length <= 1) {
+          Swal.fire('No Data', 'There is no data to export.', 'info');
+          return;
+       }
+
+      Swal.fire({
+        title: 'Exporting...',
+        text: 'Generating PDF file, please wait.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+          setTimeout(() => {
+             try {
+                const doc = new jsPDF('l', 'mm', 'a4'); 
+                doc.setFontSize(16);
+                doc.text("Printers Report", 14, 15);
+                doc.setFontSize(10);
+                doc.text("Generated: " + new Date().toLocaleString(), 14, 22);
+                doc.text("NWSDB Hardware Device Manager", 14, 27);
+
+                doc.autoTable({ 
+                    html: '#devicesTable', 
+                    startY: 35, 
+                    theme: 'grid',
+                    columns: [0, 1, 2, 3], 
+                    headStyles: { fillColor: [59, 130, 246] },
+                    styles: { fontSize: 8, cellPadding: 2 }
+                });
+
+                doc.save('Printers_Report_' + new Date().toISOString().slice(0,10) + '.pdf');
+                Swal.close();
+             } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'Failed to export PDF.', 'error');
+             }
+          }, 500);
+        }
+      });
+    }
+  </script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function exportToExcel() {
+       const table = document.getElementById('devicesTable');
+       if(!table || table.rows.length <= 1) { 
+          Swal.fire('No Data', 'There is no data to export.', 'info');
+          return;
+       }
+
+      Swal.fire({
+        title: 'Exporting...',
+        text: 'Generating Excel file, please wait.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+          setTimeout(() => {
+             try {
+                const clone = table.cloneNode(true);
+                const rows = clone.rows;
+                for (let i = 0; i < rows.length; i++) {
+                    if(rows[i].cells.length > 0) {
+                        rows[i].deleteCell(-1); 
+                    }
+                }
+                const wb = XLSX.utils.table_to_book(clone, {sheet: "Printers"});
+                XLSX.writeFile(wb, 'Printers_Report_' + new Date().toISOString().slice(0,10) + '.xlsx');
+                Swal.close();
+             } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'Failed to export Excel.', 'error');
+             }
+          }, 500);
+        }
+      });
+    }
+
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const table = document.getElementById('devicesTable');
+       if(!table || table.rows.length <= 1) {
+          Swal.fire('No Data', 'There is no data to export.', 'info');
+          return;
+       }
+
+      Swal.fire({
+        title: 'Exporting...',
+        text: 'Generating PDF file, please wait.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+          setTimeout(() => {
+             try {
+                const doc = new jsPDF('l', 'mm', 'a4'); 
+                doc.setFontSize(16);
+                doc.text("Printers Report", 14, 15);
+                doc.setFontSize(10);
+                doc.text("Generated: " + new Date().toLocaleString(), 14, 22);
+                doc.text("NWSDB Hardware Device Manager", 14, 27);
+
+                doc.autoTable({ 
+                    html: '#devicesTable', 
+                    startY: 35, 
+                    theme: 'grid',
+                    columns: [0, 1, 2, 3], 
+                    headStyles: { fillColor: [59, 130, 246] },
+                    styles: { fontSize: 8, cellPadding: 2 }
+                });
+
+                doc.save('Printers_Report_' + new Date().toISOString().slice(0,10) + '.pdf');
+                Swal.close();
+             } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'Failed to export PDF.', 'error');
+             }
+          }, 500);
+        }
+      });
+    }
   </script>
 </body>
 

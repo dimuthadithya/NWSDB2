@@ -8,13 +8,14 @@ $role = $_SESSION['user']['role'];
 $name = $_SESSION['user']['name'];
 
 // Fetch RVPN connections from database
-$rvpnConnections = DbHelper::getAllRVPNConnections();
+$allConnections = DbHelper::getAllRVPNConnections();
+$totalConnections = $allConnections ? count($allConnections) : 0;
 $sections = DbHelper::getAllSections();
 $waterSupplySchemes = DbHelper::getAllWaterSupplySchemes();
 $categories = DbHelper::getAllDeviceCategories();
 
-if (!$rvpnConnections) {
-  $rvpnConnections = [];
+if (!$allConnections) {
+  $allConnections = [];
 }
 
 // Get RVPN category ID
@@ -27,12 +28,23 @@ foreach ($categories as $category) {
 }
 
 // Calculate statistics
-$totalConnections = count($rvpnConnections);
-$activeConnections = count(array_filter($rvpnConnections, function ($conn) {
+$activeConnections = count(array_filter($allConnections, function ($conn) {
   return $conn['status'] === 'active';
 }));
 $inactiveConnections = $totalConnections - $activeConnections;
 $totalUsers = $totalConnections; // Each connection represents a user
+
+// Pagination Logic
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = 10;
+$offset = ($page - 1) * $limit;
+$totalPages = ceil($totalConnections / $limit);
+
+// Ensure page is valid
+if ($page < 1) $page = 1;
+if ($page > $totalPages && $totalPages > 0) $page = $totalPages;
+
+$rvpnConnections = array_slice($allConnections, $offset, $limit);
 
 ?>
 
@@ -353,38 +365,55 @@ $totalUsers = $totalConnections; // Each connection represents a user
         </div>
 
         <!-- Pagination -->
+        <?php if ($totalConnections > 0): ?>
         <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
           <div class="flex items-center justify-between">
             <div class="text-sm text-gray-700">
-              Showing <span class="font-medium">1</span> to
-              <span class="font-medium">10</span> of
-              <span class="font-medium">156</span> results
+              Showing <span class="font-medium"><?php echo $offset + 1; ?></span> to
+              <span class="font-medium"><?php echo min($offset + $limit, $totalConnections); ?></span> of
+              <span class="font-medium"><?php echo $totalConnections; ?></span> results
             </div>
             <div class="flex gap-2">
-              <button
-                class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-                disabled>
+              <!-- Previous Button -->
+              <a href="?page=<?php echo max(1, $page - 1); ?>"
+                 class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 <?php echo $page <= 1 ? 'pointer-events-none opacity-50' : ''; ?>">
                 Previous
-              </button>
-              <button
-                class="px-3 py-1 border border-blue-500 bg-blue-500 text-white rounded-lg">
-                1
-              </button>
-              <button
-                class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50">
-                2
-              </button>
-              <button
-                class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50">
-                3
-              </button>
-              <button
-                class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50">
+              </a>
+
+              <!-- Page Numbers -->
+              <?php
+              $startPage = max(1, $page - 2);
+              $endPage = min($totalPages, $page + 2);
+
+              if ($startPage > 1) {
+                  echo '<a href="?page=1" class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50">1</a>';
+                  if ($startPage > 2) echo '<span class="px-2">...</span>';
+              }
+
+              for ($i = $startPage; $i <= $endPage; $i++):
+              ?>
+                <a href="?page=<?php echo $i; ?>"
+                   class="px-3 py-1 border <?php echo $i === $page ? 'border-blue-500 bg-blue-500 text-white' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'; ?> rounded-lg">
+                  <?php echo $i; ?>
+                </a>
+              <?php endfor; ?>
+
+              <?php
+              if ($endPage < $totalPages) {
+                  if ($endPage < $totalPages - 1) echo '<span class="px-2">...</span>';
+                  echo '<a href="?page=' . $totalPages . '" class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50">' . $totalPages . '</a>';
+              }
+              ?>
+
+              <!-- Next Button -->
+              <a href="?page=<?php echo min($totalPages, $page + 1); ?>"
+                 class="px-3 py-1 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 <?php echo $page >= $totalPages ? 'pointer-events-none opacity-50' : ''; ?>">
                 Next
-              </button>
+              </a>
             </div>
           </div>
         </div>
+        <?php endif; ?>
       </div>
     </div>
   </main>

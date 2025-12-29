@@ -66,9 +66,6 @@ class Database
             $placeholders = implode(", ", array_fill(0, count($data), "?"));
             $query = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
 
-            error_log("Insert Query: " . $query);
-            error_log("Insert Data: " . print_r($data, true));
-
             $stmt = $this->executeQuery($query, array_values($data));
             return $stmt ? $this->conn->lastInsertId() : false;
         } catch (PDOException $e) {

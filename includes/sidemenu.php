@@ -85,8 +85,8 @@
                   <span class="<?php echo isFontWeight('repairs.php'); ?>">Repairs</span>
               </a>
               <a
-                  href="#"
-                  class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
+                  href="<?php echo $pathUpdate2 ? '../issues.php' : './issues.php' ?>"
+                  class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?php echo isActive('issues.php'); ?>">
                   <i class="fas fa-exclamation-triangle w-5"></i>
                   <span>Issues</span>
               </a>
@@ -95,6 +95,12 @@
                   class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?php echo isActive('summary.php'); ?>">
                   <i class="fas fa-chart-pie w-5"></i>
                   <span class="<?php echo isFontWeight('summary.php'); ?>">Summary</span>
+              </a>
+              <a
+                  href="<?php echo $pathUpdate2 ? '../settings.php' : './settings.php' ?>"
+                  class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl <?php echo isActive('settings.php'); ?>">
+                  <i class="fas fa-cog w-5"></i>
+                  <span class="<?php echo isFontWeight('settings.php'); ?>">Settings</span>
               </a>
           </div>
 
@@ -145,18 +151,7 @@
                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl ' . isActive('categories.php') . '">
                       <i class="fas fa-tags w-5"></i>
                       <span class="' . isFontWeight('categories.php') . '">Categories</span>
-                  </a>
-                      <a href="' . ($pathUpdate ? './admin/reports.php' : './reports.php') . '" 
-                      class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl ' . isActive('reports.php') . '">
-                      <i class="fas fa-chart-line w-5"></i>
-                      <span class="' . isFontWeight('reports.php') . '">Reports</span>
-                  </a>
-                  <a
-                      href="#"
-                      class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
-                      <i class="fas fa-cog w-5"></i>
-                      <span>Settings</span>
-                  </a>
+
               </div>
           </div>'
             ?>
