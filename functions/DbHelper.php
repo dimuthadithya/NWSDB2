@@ -104,7 +104,7 @@ class DbHelper
 
         $deviceCategories = self::$db->select('device_categories');
 
-        return $deviceCategories ? $deviceCategories : false;
+        return $deviceCategories ? $deviceCategories : [];
     }
     public static function getAllUsers()
     {
@@ -250,7 +250,7 @@ class DbHelper
 
         $laptops = self::$db->select('devices', ['*'], ['category_id' => $laptopId]);
 
-        return $laptops ? $laptops : false;
+        return $laptops ? $laptops : [];
     }
     public static function getAllOtherDevices()
     {
@@ -260,7 +260,7 @@ class DbHelper
 
         $otherDevices = self::$db->select('devices', ['*'], ['category_id' => $otherDeviceId]);
 
-        return $otherDevices ? $otherDevices : false;
+        return $otherDevices ? $otherDevices : [];
     }
 
     public static function getAllPrinters()
@@ -730,7 +730,7 @@ class DbHelper
 
         $sections = self::$db->getSectionsByDeviceCount();
 
-        return $sections ? $sections : false;
+        return $sections ? $sections : [];
     }
 
     public static function getCategoryId($category)
