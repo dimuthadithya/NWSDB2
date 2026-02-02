@@ -25,6 +25,12 @@ if (isset($_SESSION['error_message'])) {
 $categories = DbHelper::getAllDeviceCategories();
 $totalCategories = count($categories);
 
+// Get total devices count
+$totalDevices = DbHelper::getRowCount('devices');
+
+// Define protected system categories
+$protectedCategories = ['Desktop Computer', 'Laptop', 'Printer', 'Fingerprint Device', 'RVPN Device'];
+
 ?>
 
 <!DOCTYPE html>
@@ -129,7 +135,7 @@ $totalCategories = count($categories);
             </div>
             <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Devices</span>
           </div>
-          <h3 class="text-3xl font-bold mb-1">2,547</h3>
+          <h3 class="text-3xl font-bold mb-1"><?php echo number_format($totalDevices); ?></h3>
           <p class="text-green-100 text-sm">Total Devices</p>
         </div>
 
@@ -229,6 +235,7 @@ $totalCategories = count($categories);
             $categoryName = $category['category_name'];
             $icon = $icons[$categoryName] ?? 'fa-tag';
             $color = $colors[$categoryName] ?? 'indigo';
+            $isProtected = in_array($categoryName, $protectedCategories);
             ?>
             <div class="category-card bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
               <div class="flex items-start justify-between mb-4">
@@ -236,15 +243,27 @@ $totalCategories = count($categories);
                   <i class="fas <?php echo $icon; ?> text-white text-2xl"></i>
                 </div>
                 <div class="flex gap-2">
-                  <button onclick='openEditModal(<?php echo json_encode($category); ?>)' class="text-green-600 hover:text-green-800" title="Edit">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button onclick="confirmDelete(<?php echo $category['category_id']; ?>, '<?php echo htmlspecialchars($categoryName); ?>')" class="text-red-600 hover:text-red-800" title="Delete">
-                    <i class="fas fa-trash"></i>
-                  </button>
+                  <?php if ($isProtected): ?>
+                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-semibold flex items-center gap-1" title="System category - Cannot be modified or deleted">
+                      <i class="fas fa-shield-alt"></i>
+                      Protected
+                    </span>
+                  <?php else: ?>
+                    <button onclick='openEditModal(<?php echo json_encode($category); ?>)' class="text-green-600 hover:text-green-800" title="Edit">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="confirmDelete(<?php echo $category['category_id']; ?>, '<?php echo htmlspecialchars($categoryName); ?>')" class="text-red-600 hover:text-red-800" title="Delete">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  <?php endif; ?>
                 </div>
               </div>
-              <h3 class="text-lg font-bold text-gray-900 mb-2"><?php echo htmlspecialchars($categoryName); ?></h3>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">
+                <?php echo htmlspecialchars($categoryName); ?>
+                <?php if ($isProtected): ?>
+                  <i class="fas fa-lock text-blue-500 text-xs ml-1" title="System category"></i>
+                <?php endif; ?>
+              </h3>
               <p class="text-sm text-gray-600 mb-4"><?php echo htmlspecialchars($category['description'] ?? 'No description'); ?></p>
               <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                 <span class="text-xs text-gray-500">Created</span>
@@ -346,6 +365,21 @@ $totalCategories = count($categories);
       <form method="POST" action="handlers/category-handler.php" class="p-6">
         <input type="hidden" name="action" value="update">
         <input type="hidden" name="category_id" id="edit_category_id">
+
+        <!-- Protected Category Warning -->
+        <div id="edit_protected_warning" class="hidden mb-4 bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="fas fa-shield-alt text-blue-400"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-blue-700">
+                <strong>Protected System Category:</strong> The category name cannot be changed as it is required by the system. You can only update the description.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div class="space-y-6">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Category Name <span class="text-red-500">*</span></label>
@@ -466,9 +500,34 @@ $totalCategories = count($categories);
     }
 
     function openEditModal(category) {
+      // Protected categories list
+      const protectedCategories = ['Desktop Computer', 'Laptop', 'Printer', 'Fingerprint Device', 'RVPN Device'];
+      const isProtected = protectedCategories.includes(category.category_name);
+
       document.getElementById('edit_category_id').value = category.category_id;
       document.getElementById('edit_category_name').value = category.category_name;
       document.getElementById('edit_description').value = category.description || '';
+
+      // Disable category name field for protected categories
+      const categoryNameField = document.getElementById('edit_category_name');
+      const warningDiv = document.getElementById('edit_protected_warning');
+
+      if (isProtected) {
+        categoryNameField.disabled = true;
+        categoryNameField.classList.add('bg-gray-100', 'cursor-not-allowed');
+        categoryNameField.title = 'System category name cannot be changed';
+        if (warningDiv) {
+          warningDiv.classList.remove('hidden');
+        }
+      } else {
+        categoryNameField.disabled = false;
+        categoryNameField.classList.remove('bg-gray-100', 'cursor-not-allowed');
+        categoryNameField.title = '';
+        if (warningDiv) {
+          warningDiv.classList.add('hidden');
+        }
+      }
+
       document.getElementById('editModal').classList.remove('hidden');
     }
 

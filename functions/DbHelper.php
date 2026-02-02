@@ -106,6 +106,25 @@ class DbHelper
 
         return $deviceCategories ? $deviceCategories : [];
     }
+
+    /**
+     * Get device category by ID
+     * @param int $category_id Category ID
+     * @return array|bool Returns category data or false
+     */
+    public static function getDeviceCategoryById($category_id)
+    {
+        self::init();
+
+        if (!is_numeric($category_id)) {
+            return false;
+        }
+
+        $category = self::$db->getById('device_categories', $category_id, 'category_id');
+
+        return $category ? $category : false;
+    }
+
     public static function getAllUsers()
     {
         self::init();

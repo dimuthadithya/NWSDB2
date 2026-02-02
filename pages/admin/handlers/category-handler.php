@@ -51,8 +51,33 @@ try {
             }
 
             $category_id = $_POST['category_id'];
+
+            // Protected system categories that cannot have their names changed
+            $protectedCategories = ['Desktop Computer', 'Laptop', 'Printer', 'Fingerprint Device', 'RVPN Device'];
+
+            // Get current category details
+            $currentCategory = DbHelper::getDeviceCategoryById($category_id);
+
+            if (!$currentCategory) {
+                $_SESSION['error_message'] = 'Category not found.';
+                header('Location: ../categories.php');
+                exit();
+            }
+
+            $newCategoryName = trim($_POST['category_name']);
+
+            // If this is a protected category and the name is being changed, block it
+            if (
+                in_array($currentCategory['category_name'], $protectedCategories) &&
+                $currentCategory['category_name'] !== $newCategoryName
+            ) {
+                $_SESSION['error_message'] = 'Cannot rename system category "' . htmlspecialchars($currentCategory['category_name']) . '". You can only update its description.';
+                header('Location: ../categories.php');
+                exit();
+            }
+
             $data = [
-                'category_name' => trim($_POST['category_name']),
+                'category_name' => $newCategoryName,
                 'description' => trim($_POST['description'] ?? '')
             ];
 
@@ -77,6 +102,18 @@ try {
             }
 
             $category_id = $_POST['category_id'];
+
+            // Protected system categories that cannot be deleted
+            $protectedCategories = ['Desktop Computer', 'Laptop', 'Printer', 'Fingerprint Device', 'RVPN Device'];
+
+            // Get category details to check if it's protected
+            $category = DbHelper::getDeviceCategoryById($category_id);
+
+            if ($category && in_array($category['category_name'], $protectedCategories)) {
+                $_SESSION['error_message'] = 'Cannot delete system category "' . htmlspecialchars($category['category_name']) . '". This category is required by the system.';
+                header('Location: ../categories.php');
+                exit();
+            }
 
             // Delete category
             $result = DbHelper::deleteDeviceCategory($category_id);
